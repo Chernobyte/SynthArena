@@ -1,0 +1,21 @@
+
+General
+- MP3 output from game session sounds
+
+Armor
+- indicates damage / hp
+- loss of armor increases knockback / movement
+
+Characters
+- unique movement / abilities / armor values
+- directed shield: take no damage, but must aim.
+- cannot hold shield indefinitely
+
+Weapons
+- Boomerang
+- Rocket Launcher
+- Directional Bomb (Bomberman)
+- Crouch Dash (Kirby) / Wavedash
+- Air Cannon (Push, but no damage)
+- Hook (Pudge, Scorpion)
+- Charge Shot (Stationary or free movement)
