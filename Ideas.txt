@@ -1,10 +1,20 @@
+- Core
++ Secondary
+? Stretch
+
 
 General
-- MP3 output from game session sounds
+- Round based combat
+- Set # of Stocks / Lives per round
+? MP3 output from game session sounds
 
 Armor
 - indicates damage / hp
 - loss of armor increases knockback / movement
+
+Health
+- Percentage vs Stamina
+- Recover HP Items
 
 Characters
 - unique movement / abilities / armor values
