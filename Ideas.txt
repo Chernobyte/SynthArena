@@ -19,3 +19,6 @@ Weapons
 - Air Cannon (Push, but no damage)
 - Hook (Pudge, Scorpion)
 - Charge Shot (Stationary or free movement)
+
+Character Design
+- large forearms for weapons
