@@ -2,11 +2,11 @@
 + Secondary
 ? Stretch
 
-
 General
 - Round based combat
 - Set # of Stocks / Lives per round
 ? MP3 output from game session sounds
+? Alternative input system
 
 Armor
 - indicates damage / hp
@@ -29,6 +29,8 @@ Weapons
 - Air Cannon (Push, but no damage)
 - Hook (Pudge, Scorpion)
 - Charge Shot (Stationary or free movement)
+- Shock rifle mechanic (Unreal Tournament)
+- Grenades / Traps (Delayed Attacks)
 
 Character Design
 - large forearms for weapons
