@@ -5,32 +5,39 @@
 General
 - Round based combat
 - Set # of Stocks / Lives per round
+- Time Limit Per Round
 ? MP3 output from game session sounds
 ? Alternative input system
 
-Armor
-- indicates damage / hp
-- loss of armor increases knockback / movement
-
-Health
-- Percentage vs Stamina
-- Recover HP Items
-
 Characters
-- unique movement / abilities / armor values
-- directed shield: take no damage, but must aim.
+- stamina per stock
+- unique movement / abilities / health values / weapons
+- HP total represented by armor size
+- HP status represented by armor condition (cracked / clean)
+- shield (directed?): take no / reduced damage, but must aim.
 - cannot hold shield indefinitely
+
+Powerups
+- Speed / Jump
+- 2x Damage
+? Health Restore
 
 Weapons
 - Boomerang
 - Rocket Launcher
-- Directional Bomb (Bomberman)
-- Crouch Dash (Kirby) / Wavedash
-- Air Cannon (Push, but no damage)
-- Hook (Pudge, Scorpion)
-- Charge Shot (Stationary or free movement)
-- Shock rifle mechanic (Unreal Tournament)
-- Grenades / Traps (Delayed Attacks)
+- Automatic rifle (burst?)
+- Single-shot (sidearm?)
++ Directional Bomb (Bomberman)
++ Crouch Dash (Kirby) / Wavedash
++ Air Cannon (Push, but no damage)
++ Hook (Pudge, Scorpion)
++ Charge Shot (Stationary or free movement)
++ Shock rifle mechanic (Unreal Tournament)
++ Grenades / Traps (Delayed Attacks)
 
 Character Design
-- large forearms for weapons
+- Futuristic Theme (Tron?)
+- Colorful effects
+- Comically large weapons
+- Weapons morph between two equipped weapons
+
