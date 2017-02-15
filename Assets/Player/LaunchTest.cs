@@ -12,13 +12,12 @@ public class LaunchTest : MonoBehaviour
 	public float b; 			//base knockback of move
 	public float s; 			//knockback scaling/growth
 	public Vector2 ld; 			//launch direction relative to player
-
+	public float curPerc;
 	public float w; 			//weight of character
 	public float f; 			//max fall speed of character
 	public bool stunned; 		//whether or not a character 
 
-	private Vector2 negForce;
-	public float NEG_FORCE_SCALE = 1.2f;
+	public float DRAG_SCALE = 1f;
 
 	// Use this for initialization
 	void Start () 
@@ -33,20 +32,34 @@ public class LaunchTest : MonoBehaviour
 		if (Input.GetKeyDown (KeyCode.Space)) 
 		{
 			Debug.Log ("force applied");
+			float tmp = Knockback ();
+			//rb.AddForce (new Vector2 (0f, tmp));
+			Debug.Log (tmp);
 			rb.AddForce (new Vector2 (xForce, yForce));
-			//rb.AddForce(transform.up *10);
 
+
+			stunned = true;
+			Debug.Log ("stunned!");
+			return;
 		}
 	
-		//this adds an opposing force to slow down the character. may need fine tuning
+		//this adds drag to slow down the character's upward ascent. may need fine tuning
 		if (stunned) 
 		{
-			if (rb.velocity.magnitude != 0f) 
+			if (rb.velocity.y > 0f) 
 			{
-				//mult negative force by scaling factor 
-				negForce = NEG_FORCE_SCALE * -rb.velocity;
-				rb.AddRelativeForce (negForce);
+				rb.drag = DRAG_SCALE;
+			} else {
+				Debug.Log ("not stunned");
+				rb.drag = 0f;
+				stunned = false;
+
 			}
 		}
+	}
+
+	private float Knockback()
+	{
+		return s * (((14 * (curPerc + d) * (d + 2)) / (w + 100)) + 18) + b;
 	}
 }
