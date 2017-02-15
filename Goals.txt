@@ -1,16 +1,23 @@
 
 2-15-17
 - Camera with 4 actors
-- Title Screen (Tron Grid)
 
 2-20-17
 - Design Document 1st Draft
+
 - Art Bible 1st Draft
-- HUD Sketch / Menu Layouts
+
 - Music:
 	Title Screen / Menu Music
 	Sample Battle Music
-- Look into Physics Impulses
+
+- (EP) Camera finds actors based on tag 
+- (MR) Title Screen (Tron Grid)
+- (EP) HUD / Menus layouts 1st draft
+- (MR / AK) Look into Physics Impulses (Launching, Drag, Gravity, Movement)
+
+? Add Base Character Object (Health, etc)
+? Extend Base Character to Fire a projectile that damages the other player
 
 2-22-17
 
