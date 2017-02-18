@@ -10,10 +10,12 @@ public class movement : MonoBehaviour {
     GameObject groundObj;
     float move      = 0.0f;
     float maxSpd    = 6.0f;
-    float jmpStr    = 300.0f;
+    float jmpStr    = 200.0f;
     float fallStr   = -50.0f;
     float fallSpd   = 1.0f;
+    float temp;
     bool onTheGround= true;
+    bool wait = false;
     int jump = 0;
 
     private void Start ()
@@ -31,18 +33,48 @@ public class movement : MonoBehaviour {
 
     private void Move()
     {
-        if (Input.GetKey(KeyCode.D))
+        
+
+        playerRB.velocity = new Vector2(move, playerRB.velocity.y);
+
+        if (Input.GetAxis("Vertical") > 0f && jump<=1 && !wait)
+        {
+            temp = Input.GetAxis("Vertical");
+            jump++;
+            playerRB.AddForce(new Vector2(0f, jmpStr));
+            onTheGround = false;
+            wait = true;
+        }
+
+        if(Input.GetAxis("Vertical")==0)
+        {
+            wait = false;
+        }
+        
+
+        if (playerBC.IsTouching(groundObj.GetComponent<BoxCollider2D>()))
+        {
+            jump = 0;
+            wait = false;
+        }
+                    
+        if(Input.GetAxis("Vertical") < 0f)
+        {
+            playerRB.AddForce(new Vector2(0f, fallStr));
+        }
+
+        if (Input.GetAxis("Horizontal") > 0f)
         {
             if (move < maxSpd)
             {
-                move = move + 2.0f;
+                move = move + Input.GetAxis("Horizontal");
             }
         }
-        else if (Input.GetKey(KeyCode.A))
+        else if(Input.GetAxis("Horizontal") < 0f)
         {
             if (move > (maxSpd * -1))
             {
-                move = move - 2.0f;
+                move = move + Input.GetAxis("Horizontal");
             }
         }
         else
@@ -56,26 +88,7 @@ public class movement : MonoBehaviour {
                 move = move + .5f;
             }
         }
-        playerRB.velocity = new Vector2(move, playerRB.velocity.y);
 
-        if (Input.GetKeyDown(KeyCode.W) && jump<1)
-        {
-            jump++;
-            playerRB.AddForce(new Vector2(0f, jmpStr));
-            onTheGround = false;
-        }
-
-        if (playerBC.IsTouching(groundObj.GetComponent<BoxCollider2D>()))
-        {
-            jump = 0;
-        }
-                    
-        if(Input.GetKey(KeyCode.S))
-        {
-            playerRB.AddForce(new Vector2(0f, fallStr));
-        }
-
-        
 
     }
 }
