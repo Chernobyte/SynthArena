@@ -4,17 +4,21 @@ using UnityEngine;
 
 public class mouseTrack : MonoBehaviour {
 
+    public Rigidbody2D Bullet;
+
     GameObject playerObj;
     Transform playerTrans;
     Transform boomerangTrans;
     Vector3 playerPos;
     Vector3 mousePos;
     Vector3 boomerangPos;
+
     float difX;
     float difY;
     float angle;
-    float currentTime;
-    bool thrown;
+    float gunX;
+    float gunY;
+    float bulletSpeed =200f;
 
 
     void Start ()
@@ -31,36 +35,38 @@ public class mouseTrack : MonoBehaviour {
         difY = playerPos.y - mousePos.y;
 
         angle = Mathf.Atan(difY/difX);
-        if(difX < 0.0f && difY < 0.0f && !thrown)
+        if (difX < 0.0f && difY < 0.0f)
         {
-            boomerangPos = new Vector3(playerPos.x + 1.5f * Mathf.Cos(angle), playerPos.y + 1.5f * Mathf.Sin(angle), 0.0f);
+            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
+            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
+            boomerangPos = new Vector3(gunX, gunY, 0.0f);
         }
-        else if(difX > 0.0f && !thrown)
+        else if (difX > 0.0f)
         {
             angle = -angle;
-            boomerangPos = new Vector3(playerPos.x - 1.5f * Mathf.Cos(angle), playerPos.y + 1.5f * Mathf.Sin(angle), 0.0f);
+            gunX = playerPos.x - 1.5f * Mathf.Cos(angle);
+            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
+            boomerangPos = new Vector3(gunX, gunY, 0.0f);
         }
-        else if(difY < 0.0f && !thrown)
+        else if (difY < 0.0f)
         {
-            boomerangPos = new Vector3(playerPos.x + 1.5f * Mathf.Cos(angle), playerPos.y + 1.5f * Mathf.Sin(angle), 0.0f);
+            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
+            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
+            boomerangPos = new Vector3(gunX,gunY, 0.0f);
         }
-        else if(!thrown)
+        else
         {
-            boomerangPos = new Vector3(playerPos.x + 1.5f * Mathf.Cos(angle), playerPos.y + 1.5f * Mathf.Sin(angle), 0.0f);
+            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
+            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
+            boomerangPos = new Vector3(gunX, gunY, 0.0f);
         }
         gameObject.GetComponent<Transform>().position = boomerangPos;
-        if(Input.GetMouseButtonDown(0) && !thrown)
+
+        if (Input.GetMouseButtonDown(0))
         {
-            thrown = true;
-            currentTime = Time.time;
-        }
-        if(thrown)
-        {
-            gameObject.GetComponent<Transform>().Translate(Mathf.Sin((Time.time - currentTime)*3)*Mathf.Cos(angle), Mathf.Sin((Time.time - currentTime)*3) * Mathf.Sin(angle),0);
-        }
-        if((Time.time - currentTime) == (2*Mathf.PI)  && thrown)
-        {
-            Destroy(GameObject.Find("Boomerang"));
+            Rigidbody2D bullet;
+            bullet = (Rigidbody2D)Instantiate(Bullet, boomerangPos, Quaternion.identity);
+            bullet.AddForce(new Vector2(bulletSpeed*(gunX-playerPos.x), bulletSpeed * (gunY -playerPos.y)));
         }
 
     }

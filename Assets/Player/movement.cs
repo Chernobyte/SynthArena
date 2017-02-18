@@ -25,6 +25,7 @@ public class movement : MonoBehaviour {
 
     private void Update()
     {
+        gameObject.GetComponent<Transform>().rotation = Quaternion.identity;
         Move();
     }
 
