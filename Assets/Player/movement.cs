@@ -12,9 +12,6 @@ public class movement : MonoBehaviour {
     float maxSpd    = 6.0f;
     float jmpStr    = 200.0f;
     float fallStr   = -50.0f;
-    float fallSpd   = 1.0f;
-    float temp;
-    bool onTheGround= true;
     bool wait = false;
     int jump = 0;
 
@@ -39,10 +36,8 @@ public class movement : MonoBehaviour {
 
         if (Input.GetAxis("Vertical") > 0f && jump<=1 && !wait)
         {
-            temp = Input.GetAxis("Vertical");
             jump++;
             playerRB.AddForce(new Vector2(0f, jmpStr));
-            onTheGround = false;
             wait = true;
         }
 
