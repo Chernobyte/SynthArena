@@ -68,6 +68,7 @@ public class mouseTrack : MonoBehaviour {
         {
             Rigidbody2D bullet;
             bullet = (Rigidbody2D)Instantiate(Bullet, gunPos, Quaternion.identity);
+            bullet.GetComponent<bulletData>().angle = angle;
             bullet.AddForce(new Vector2(bulletSpeed*(gunX-playerPos.x), bulletSpeed * (gunY -playerPos.y)));
         }
 
