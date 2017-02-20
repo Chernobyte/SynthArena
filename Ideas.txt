@@ -2,6 +2,13 @@
 + Secondary
 ? Stretch
 
+Title
+- BLAST
+- Virtual Arena Combat
+- Virtual Blast Arena
+- SynthArena
+- Euclidean Combat
+
 General
 - Round based combat
 - Set # of Stocks / Lives per round

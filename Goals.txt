@@ -16,11 +16,19 @@
 - (EP) HUD / Menus layouts 1st draft
 - (MR / AK) Look into Physics Impulses (Launching, Drag, Gravity, Movement)
 
-? Add Base Character Object (Health, etc)
-? Extend Base Character to Fire a projectile that damages the other player
-
 2-22-17
+- Art Bible Ready
+- Design Document Ready
+- Music Ready
+
+- (EP) Menu Layout Images
+- (AK) Firing angle mapped to controller angle
+- (AK) Tie jump to button and return to prior functionality
 
 2-27-17
+
+- Add Base Character Object (Health, etc)
+- Extend Base Character to Fire a projectile that damages the other player
+
 
 3-1-17
