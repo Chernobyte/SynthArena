@@ -9,7 +9,7 @@ public class bulletData : MonoBehaviour {
 
 	void Start ()
     {
-        damage = 1;	
+        damage = 1f;	
 	}
 	
 	// Update is called once per frame

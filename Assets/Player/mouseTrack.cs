@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class mouseTrack : MonoBehaviour {
 
-    public Rigidbody2D Bullet;
+    public GameObject Bullet;
 
     GameObject playerObj;
     Transform playerTrans;
@@ -66,10 +66,11 @@ public class mouseTrack : MonoBehaviour {
 
         if (Input.GetMouseButtonDown(0))
         {
-            Rigidbody2D bullet;
-            bullet = (Rigidbody2D)Instantiate(Bullet, gunPos, Quaternion.identity);
+            GameObject bullet;
+            bullet = (GameObject)Instantiate(Bullet, gunPos, Quaternion.identity);
             bullet.GetComponent<bulletData>().angle = angle;
-            bullet.AddForce(new Vector2(bulletSpeed*(gunX-playerPos.x), bulletSpeed * (gunY -playerPos.y)));
+            bullet.GetComponent<Rigidbody2D>().AddForce(new Vector2(bulletSpeed * (gunX - playerPos.x), bulletSpeed * (gunY - playerPos.y)));
+           
         }
 
     }
