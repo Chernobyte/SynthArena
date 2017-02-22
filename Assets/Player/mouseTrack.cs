@@ -64,7 +64,7 @@ public class mouseTrack : MonoBehaviour {
         }
         gameObject.GetComponent<Transform>().position = gunPos;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetAxis("RT")>.2)
         {
             GameObject bullet;
             bullet = (GameObject)Instantiate(Bullet, gunPos, Quaternion.identity);
