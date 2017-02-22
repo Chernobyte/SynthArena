@@ -33,7 +33,7 @@ public class mouseTrack : MonoBehaviour {
     {
         if(!rateOfFire)
         {
-            if (Time.time % 1 == 0)
+            if (Time.timeSinceLevelLoad % 1 > 0 && Time.timeSinceLevelLoad % 1 < .1)
                 rateOfFire = true;
         }
         playerPos = playerTrans.position;
