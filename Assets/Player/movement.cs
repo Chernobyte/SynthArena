@@ -10,9 +10,8 @@ public class movement : MonoBehaviour {
     GameObject groundObj;
     float move      = 0.0f;
     float maxSpd    = 6.0f;
-    float jmpStr    = 200.0f;
+    float jmpStr    = 100.0f;
     float fallStr   = -50.0f;
-    bool wait = false;
     int jump = 0;
 
     private void Start ()
@@ -33,23 +32,16 @@ public class movement : MonoBehaviour {
 
         playerRB.velocity = new Vector2(move, playerRB.velocity.y);
 
-        if (Input.GetAxis("Vertical") > 0f && jump<=1 && !wait)
+        if (Input.GetAxis("Vertical")>0f && jump<=1)
         {
             jump++;
             playerRB.AddForce(new Vector2(0f, jmpStr));
-            wait = true;
-        }
-
-        if(Input.GetAxis("Vertical")==0)
-        {
-            wait = false;
         }
         
 
         if (playerBC.IsTouching(groundObj.GetComponent<BoxCollider2D>()))
         {
             jump = 0;
-            wait = false;
         }
                     
         if(Input.GetAxis("Vertical") < 0f)
