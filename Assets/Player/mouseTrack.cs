@@ -20,6 +20,8 @@ public class mouseTrack : MonoBehaviour {
     float gunY;
     float bulletSpeed =200f;
 
+    bool rateOfFire;
+
 
     void Start ()
     {
@@ -29,48 +31,61 @@ public class mouseTrack : MonoBehaviour {
     }
 	void Update ()
     {
+        if(!rateOfFire)
+        {
+            if (Time.time % 1 == 0)
+                rateOfFire = true;
+        }
         playerPos = playerTrans.position;
-        mousePos = Input.mousePosition;
-        difX = playerPos.x - mousePos.x;
-        difY = playerPos.y - mousePos.y;
 
-        angle = Mathf.Atan(difY/difX);
-        if (difX < 0.0f && difY < 0.0f)//(1)
+        if ((Input.GetAxis("yRightJ") > .3 || Input.GetAxis("yRightJ") < -.3) && (Input.GetAxis("xRightJ") > .3 || Input.GetAxis("xRightJ") < -.3))
         {
-            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
-            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
+            angle = Mathf.Atan(Input.GetAxis("xRightJ") / Input.GetAxis("yRightJ"));
+            Debug.Log("Y:");
+            Debug.Log(Input.GetAxis("yRightJ"));
+            Debug.Log("X:");
+            Debug.Log(Input.GetAxis("xRightJ"));
+            Debug.Log("angle:");
+            Debug.Log(angle);
+        }
+        else
+        {
+            angle = 0;
+        }
+
+        if (Input.GetAxis("xRightJ") < 0f)
+        {
+            if (Input.GetAxis("yRightJ") < 0f)
+            {
+                angle = angle - (Mathf.PI / 2f);
+                gunX = playerPos.x - 2f * Mathf.Cos(angle);
+                gunY = playerPos.y - 2f * Mathf.Sin(angle);
+                gunPos = new Vector3(gunX, gunY, -4.0f);
+            }
+            else
+            {
+                angle = Mathf.PI / 2f + angle;
+                gunX = playerPos.x - 2f * Mathf.Cos(angle);
+                gunY = playerPos.y - 2f * Mathf.Sin(angle);
+                gunPos = new Vector3(gunX, gunY, -4.0f);
+            }
+        }
+        else
+        {
+            gunX = playerPos.x + 2f * Mathf.Cos(angle);
+            gunY = playerPos.y + 2f * Mathf.Sin(angle);
             gunPos = new Vector3(gunX, gunY, -4.0f);
         }
-        else if (difX < 0.0f && difY > 0.0f)//(2)
-        {
-            //angle -= 90;
-            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
-            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
-            gunPos = new Vector3(gunX, gunY, -4.0f);
-        }
-        else if (difY > 0.0f && difY < 0.0f)//(3)
-        {
-            //angle += 90;
-            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
-            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
-            gunPos = new Vector3(gunX,gunY, -4.0f);
-        }
-        else//(4)
-        {
-            //angle += 180;
-            gunX = playerPos.x + 1.5f * Mathf.Cos(angle);
-            gunY = playerPos.y + 1.5f * Mathf.Sin(angle);
-            gunPos = new Vector3(gunX, gunY, -4.0f);
-        }
+       
         gameObject.GetComponent<Transform>().position = gunPos;
 
-        if (Input.GetAxis("RT")>.2)
+        if (Input.GetAxis("RT") > .2f && rateOfFire)
         {
             GameObject bullet;
             bullet = (GameObject)Instantiate(Bullet, gunPos, Quaternion.identity);
             bullet.GetComponent<bulletData>().angle = angle;
             bullet.GetComponent<Rigidbody2D>().AddForce(new Vector2(bulletSpeed * (gunX - playerPos.x), bulletSpeed * (gunY - playerPos.y)));
-           
+            rateOfFire = false;
         }
 
     }

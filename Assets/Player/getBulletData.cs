@@ -25,6 +25,7 @@ public class getBulletData : MonoBehaviour {
             bulletAngle = coll.gameObject.GetComponent<bulletData>().angle;
             xForce = 300f * Mathf.Cos(bulletAngle);
             yForce = 300f * Mathf.Sin(bulletAngle);
+            DestroyImmediate(coll.gameObject);
             gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(xForce, yForce));
             Debug.Log("bleh");
             //destroy bulllet

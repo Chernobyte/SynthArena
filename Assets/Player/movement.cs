@@ -10,7 +10,7 @@ public class movement : MonoBehaviour {
     GameObject groundObj;
     float move      = 0.0f;
     float maxSpd    = 6.0f;
-    float jmpStr    = 100.0f;
+    float jmpStr    = 300.0f;
     float fallStr   = -50.0f;
     int jump = 0;
 
@@ -32,7 +32,7 @@ public class movement : MonoBehaviour {
 
         playerRB.velocity = new Vector2(move, playerRB.velocity.y);
 
-        if (Input.GetAxis("Vertical")>0f && jump<=1)
+        if (Input.GetButtonDown("Vertical") && jump<1)
         {
             jump++;
             playerRB.AddForce(new Vector2(0f, jmpStr));
@@ -44,19 +44,19 @@ public class movement : MonoBehaviour {
             jump = 0;
         }
                     
-        if(Input.GetAxis("Vertical") < 0f)
+        if(Input.GetAxis("Vertical") < -.2f)
         {
             playerRB.AddForce(new Vector2(0f, fallStr));
         }
 
-        if (Input.GetAxis("Horizontal") > 0f)
+        if (Input.GetAxis("Horizontal") > .2f)
         {
             if (move < maxSpd)
             {
                 move = move + Input.GetAxis("Horizontal");
             }
         }
-        else if(Input.GetAxis("Horizontal") < 0f)
+        else if(Input.GetAxis("Horizontal") < -.2f)
         {
             if (move > (maxSpd * -1))
             {
