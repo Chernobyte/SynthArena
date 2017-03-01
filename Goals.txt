@@ -27,8 +27,15 @@
 
 2-27-17
 
-- Add Base Character Object (Health, etc)
-- Extend Base Character to Fire a projectile that damages the other player
-
-
 3-1-17
+
+3-6-17
+- Fix aiming script (should aim in direction of joystick position)
+- Thread character input through InputManager (Input.GetAxis() etc...)
+- Fix residual movement (should come to a complete stop after input is ceased)
+- (MD) Create walk cycle for captain izidore
+- (EP) Spawn character on scene load & wire up input
+- (EP) Add Health Script
+- First Draft Menu / Stage Background
+
+
