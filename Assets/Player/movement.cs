@@ -32,7 +32,7 @@ public class movement : MonoBehaviour {
 
         playerRB.velocity = new Vector2(move, playerRB.velocity.y);
 
-        if (Input.GetButtonDown("Vertical") && jump<1)
+		if ((Input.GetButtonDown("Vertical") || Input.GetButtonDown("Jump")) && jump<1)
         {
             jump++;
             playerRB.AddForce(new Vector2(0f, jmpStr));
