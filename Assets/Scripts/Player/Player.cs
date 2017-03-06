@@ -17,11 +17,13 @@ public class Player : MonoBehaviour
     Overlord overlord;
     int playerNumber;
     float topSpeed = 10;
-    float acceleration = 1;
     float currentSpeed = 0;
+    float acceleration = 1;
     InputController gamepad;
     private Vector2 controllerState;
-    private Vector2 controllerStateR; //Right sticks state
+    private Vector2 controllerStateR; //Right stick state
+    private bool jumpState;
+
 
     // Use this for initialization
     void Start () 
@@ -35,23 +37,7 @@ public class Player : MonoBehaviour
 	void Update () 
 	{
         HandleInput();
-
-		//since we check for collision with the ground, the first jump will not increment the jump counter
-		//PROBLEM: if the player jumps off the ledge and sticks to the side of the stage, he can jump
-		//infinitely since the jump counter is reset each frame. How do we fix this?
-
-		//if (Input.GetButtonDown("Jump") && jump < 1) 
-		//{
-		//	jump++;
-
-		//	//this way, even if the player is falling, he'll have the same jump height every time
-		//	playerRB.velocity = new Vector2(playerRB.velocity.x,0.0f);
-		//	playerRB.AddForce(new Vector2(0.0f, jmpStr));
-		//}
-
-		////reset jump count if player touches the ground
-		//if (playerBC.IsTouching(groundObj.GetComponent<BoxCollider2D>())) jump = 0;
-	}
+    }
 
     public void init(int playerNumber, Overlord overlord)
     {
@@ -71,25 +57,19 @@ public class Player : MonoBehaviour
     {
         //get controller state
         controllerState.x = gamepad.Move_X();
-
-        //controllerState.x = Input.GetAxis("Joystick_0_PC_Move_X");
-
-        Debug.Log(controllerState.x);
-
         controllerState.y = gamepad.Move_Y();
         controllerStateR.x = gamepad.Aim_X();
         controllerStateR.y = gamepad.Aim_Y();
+
+        jumpState = gamepad.L1();
 
         // Left Stick Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
         {
             if (currentSpeed < topSpeed)
             {
-                currentSpeed += acceleration;
-                if (currentSpeed > topSpeed)
-                {
-                    currentSpeed = topSpeed;
-                }
+                    currentSpeed += acceleration;
+                if (currentSpeed > topSpeed) currentSpeed = topSpeed;
             }
         }
         // No Left Stick Input
@@ -102,12 +82,22 @@ public class Player : MonoBehaviour
             }
         }
 
-        playerRB.AddForce(new Vector2(currentSpeed * controllerState.x * Time.deltaTime, 0));
+        playerRB.AddForce(new Vector2(currentSpeed * controllerState.x * Time.deltaTime * 100, 0));
 
-  //      //wasd (and joystick?)
-  //      float moveHorizontal = Input.GetAxis("Horizontal");
+        //since we check for collision with the ground, the first jump will not increment the jump counter
+        //PROBLEM: if the player jumps off the ledge and sticks to the side of the stage, he can jump
+        //infinitely since the jump counter is reset each frame. How do we fix this?
+        if (jumpState && jump < 1)
+        {
+            jump++;
 
-            //if (moveHorizontal != 0.0f) 
-            //	playerRB.velocity = new Vector2 (moveHorizontal * maxSpd * damp, playerRB.velocity.y);
+            //this way, even if the player is falling, he'll have the same jump height every time
+            playerRB.velocity = new Vector2(playerRB.velocity.x, 0.0f);
+            playerRB.AddForce(new Vector2(0.0f, jmpStr));
+        }
+
+        //reset jump count if player touches the ground
+        if (playerBC.IsTouching(groundObj.GetComponent<BoxCollider2D>())) jump = 0;
+
     }
 }
