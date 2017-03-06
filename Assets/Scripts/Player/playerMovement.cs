@@ -48,7 +48,7 @@ public class playerMovement : MonoBehaviour
 	private void Move()
 	{
 		//wasd (and joystick?)
-		float moveHorizontal 	= Input.GetAxis("Horizontal");
+		float moveHorizontal = Input.GetAxis("Horizontal");
 
 		if (moveHorizontal != 0.0f) 
 			playerRB.velocity = new Vector2 (moveHorizontal * maxSpd * damp, playerRB.velocity.y);
