@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     public int maxcurrentJumpCount = 2;
     public float jumpStrength = 500.0f;
     public float gravityMultiplier = 2.0f;
+    public float maxFallSpeed = -10.0f;
 
     Overlord overlord;
     Rigidbody2D _rigidBody;
@@ -16,11 +17,12 @@ public class Player : MonoBehaviour
     float topSpeed = 10.0f;
     float currentSpeed = 0.0f;
     float acceleration = 1.0f;
+    float currentFallSpeed = 0.0f;
     InputController gamepad;
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
     private bool canJump = true;
-    private bool onGround = false;
+    private bool onGround = true;
     private bool fastFalling = false;
     int currentJumpCount = 0;
     
@@ -62,16 +64,16 @@ public class Player : MonoBehaviour
 
         var jumpState = gamepad.L1();
 
-        // Left Stick Input
+        // Left Stick X Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
         {
             if (currentSpeed < topSpeed)
             {
-                    currentSpeed += acceleration;
+                currentSpeed += acceleration;
                 if (currentSpeed > topSpeed) currentSpeed = topSpeed;
             }
         }
-        // No Left Stick Input
+        // No Left Stick X Input
         else
         {
             if (currentSpeed > 0)
@@ -81,15 +83,30 @@ public class Player : MonoBehaviour
             }
         }
 
+        // Left Stick Y Input
+        if (controllerState.y < -0.8)
+        {
+            if (!onGround)
+            {
+                fastFalling = true;
+            }
+        }
+
         // Gravity
         if (fastFalling)
         {
-            
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, maxFallSpeed * 2);
         }
         else
         {
-            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _rigidBody.velocity.y + Physics.gravity.y * gravityMultiplier * Time.deltaTime);
+            var gravityForce = +Physics.gravity.y * gravityMultiplier * 0.01f;
+            var currentFallSpeed = _rigidBody.velocity.y + gravityForce;
+            if (currentFallSpeed < maxFallSpeed) currentFallSpeed = maxFallSpeed;
+
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, currentFallSpeed);
         }
+
+        Debug.Log(_rigidBody.velocity.y);
 
         _rigidBody.velocity = new Vector2(currentSpeed * controllerState.x, _rigidBody.velocity.y);
 
@@ -103,6 +120,7 @@ public class Player : MonoBehaviour
     private void Jump()
     {
         currentJumpCount++;
+        fastFalling = false;
 
         var actualJumpStrength = jumpStrength;
         
@@ -112,13 +130,22 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.gameObject.CompareTag("Platform")) return;
-
+        if (collision.gameObject.CompareTag("Platform"))
         {
             onGround = true;
             canJump = true;
             currentJumpCount = 0;
             fastFalling = false;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            onGround = false;
+            currentJumpCount = 1;
+            canJump = true;
         }
     }
 
