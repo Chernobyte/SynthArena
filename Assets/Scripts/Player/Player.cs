@@ -1,40 +1,39 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Player : MonoBehaviour 
 {
-	Rigidbody2D playerRB;
-	BoxCollider2D playerBC;
-	GameObject groundObj;
-	public float maxSpd 	= 6.0f;
-	public float jmpStr 	= 300.0f;
-	//float fallStr   = -50.0f;
-	public float damp		= 0.1f;
-	public float jumpTime 	= 1.0f;
-	int jump 				= 0;
+    public int maxcurrentJumpCount = 2;
+    public float jumpStrength = 500.0f;
+    public float gravityMultiplier = 2.0f;
 
     Overlord overlord;
+    Rigidbody2D _rigidBody;
+    BoxCollider2D _collider;
     int playerNumber;
-    float topSpeed = 10;
-    float currentSpeed = 0;
-    float acceleration = 1;
+    float topSpeed = 10.0f;
+    float currentSpeed = 0.0f;
+    float acceleration = 1.0f;
     InputController gamepad;
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
-    private bool jumpState;
-
+    private bool canJump = true;
+    private bool onGround = false;
+    private bool fastFalling = false;
+    int currentJumpCount = 0;
+    
 
     // Use this for initialization
-    void Start () 
+    void Start() 
 	{
-		playerRB = gameObject.GetComponent<Rigidbody2D>();
-		playerBC = gameObject.GetComponent<BoxCollider2D>();
-		groundObj= GameObject.Find("floor");
+		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
+        _collider = gameObject.GetComponent<BoxCollider2D>();
 	}
 	
 	// Update is called once per frame
-	void Update () 
+	void Update() 
 	{
         HandleInput();
     }
@@ -61,7 +60,7 @@ public class Player : MonoBehaviour
         controllerStateR.x = gamepad.Aim_X();
         controllerStateR.y = gamepad.Aim_Y();
 
-        jumpState = gamepad.L1();
+        var jumpState = gamepad.L1();
 
         // Left Stick Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
@@ -82,22 +81,48 @@ public class Player : MonoBehaviour
             }
         }
 
-        playerRB.AddForce(new Vector2(currentSpeed * controllerState.x * Time.deltaTime * 100, 0));
-
-        //since we check for collision with the ground, the first jump will not increment the jump counter
-        //PROBLEM: if the player jumps off the ledge and sticks to the side of the stage, he can jump
-        //infinitely since the jump counter is reset each frame. How do we fix this?
-        if (jumpState && jump < 1)
+        // Gravity
+        if (fastFalling)
         {
-            jump++;
-
-            //this way, even if the player is falling, he'll have the same jump height every time
-            playerRB.velocity = new Vector2(playerRB.velocity.x, 0.0f);
-            playerRB.AddForce(new Vector2(0.0f, jmpStr));
+            
+        }
+        else
+        {
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _rigidBody.velocity.y + Physics.gravity.y * gravityMultiplier * Time.deltaTime);
         }
 
-        //reset jump count if player touches the ground
-        if (playerBC.IsTouching(groundObj.GetComponent<BoxCollider2D>())) jump = 0;
+        _rigidBody.velocity = new Vector2(currentSpeed * controllerState.x, _rigidBody.velocity.y);
 
+
+        if (canJump && jumpState && currentJumpCount < maxcurrentJumpCount)
+        {
+            Jump();
+        }
+    }
+
+    private void Jump()
+    {
+        currentJumpCount++;
+
+        var actualJumpStrength = jumpStrength;
+        
+        _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, 0.0f); // ensures jump height is same every time
+        _rigidBody.AddForce(Vector2.up * actualJumpStrength);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!collision.gameObject.CompareTag("Platform")) return;
+
+        {
+            onGround = true;
+            canJump = true;
+            currentJumpCount = 0;
+            fastFalling = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
     }
 }
