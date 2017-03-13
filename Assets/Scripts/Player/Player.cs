@@ -12,6 +12,11 @@ public class Player : MonoBehaviour
     public int maxHealth = 2000;
     public int currentHealth;
 
+	//for aiming
+	public Transform gun;
+	public float fRadius = 1.0f;
+	public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
+
     Overlord overlord;
     HealthDisplay healthDisplay;
     Rigidbody2D _rigidBody;
@@ -27,7 +32,11 @@ public class Player : MonoBehaviour
     private bool canJump = true;
     private bool onGround = true;
     private bool fastFalling = false;
-    int currentJumpCount = 0;    
+    int currentJumpCount = 0;
+
+	//for aiming
+	float angle = 0.0f;
+	Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
 
     // Use this for initialization
     void Start() 
@@ -36,6 +45,8 @@ public class Player : MonoBehaviour
         _collider = gameObject.GetComponent<BoxCollider2D>();
 
         currentHealth = maxHealth;
+		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
+		gun.position = transform.position + gunPos + gunPosOffset;
 	}
 	
 	// Update is called once per frame
@@ -121,6 +132,19 @@ public class Player : MonoBehaviour
         {
             Jump();
         }
+
+		// handle aiming (right stick)
+		if (controllerStateR.magnitude > 0.2f) 
+		{
+			angle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
+			gun.position = transform.position + gunPos + gunPosOffset;
+
+			// handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
+			//because the player's y value for their scale is 2, numbnutz. and this passes down to the child
+			//How to fix this without changing the player's x,y scale values to 1?
+			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+		}
     }
 
     private void Jump()
