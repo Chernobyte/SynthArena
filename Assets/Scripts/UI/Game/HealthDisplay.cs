@@ -16,15 +16,15 @@ public class HealthDisplay : MonoBehaviour {
         _text = gameObject.GetComponent<Text>();
     }
 
-    public void UpdateHealthDisplay(float healthPercent)
+    public void UpdateHealthDisplay(int currentHealth, int maxHealth)
     {
-        currentHealthPercent = healthPercent;
+        currentHealthPercent = currentHealth * 100.0f / maxHealth;
 
         if (currentHealthPercent < 0)
             currentHealthPercent = 0;
         else if (currentHealthPercent > 100)
             currentHealthPercent = 100;
 
-        _text.text = "Health: " + currentHealthPercent;
+        _text.text = "Health: " + (int)currentHealthPercent;
     }
 }

@@ -185,7 +185,6 @@ public class Player : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        var healthPercent = currentHealth / maxHealth * 100.0f;
-        healthDisplay.UpdateHealthDisplay(healthPercent);
+        healthDisplay.UpdateHealthDisplay(currentHealth, maxHealth);
     }
 }
