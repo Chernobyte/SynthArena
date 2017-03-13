@@ -32,7 +32,7 @@ Powerups
 Weapons
 - Boomerang
 - Rocket Launcher
-- Laser Rifle (Bouncing Shot?)
+- Laser Rifle (Bouncing Shot?) (Ramping Fire rate?)
 - Single-shot (sidearm?)
 + Directional Bomb (Bomberman)
 + Crouch Dash (Kirby) / Wavedash
