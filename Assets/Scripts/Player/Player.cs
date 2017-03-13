@@ -9,8 +9,11 @@ public class Player : MonoBehaviour
     public float jumpStrength = 500.0f;
     public float gravityMultiplier = 2.0f;
     public float maxFallSpeed = -10.0f;
+    public int maxHealth = 2000;
+    public int currentHealth;
 
     Overlord overlord;
+    HealthDisplay healthDisplay;
     Rigidbody2D _rigidBody;
     BoxCollider2D _collider;
     int playerNumber;
@@ -24,26 +27,29 @@ public class Player : MonoBehaviour
     private bool canJump = true;
     private bool onGround = true;
     private bool fastFalling = false;
-    int currentJumpCount = 0;
-    
+    int currentJumpCount = 0;    
 
     // Use this for initialization
     void Start() 
 	{
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
+
+        currentHealth = maxHealth;
 	}
 	
 	// Update is called once per frame
 	void Update() 
 	{
         HandleInput();
+        UpdateHealthBar();
     }
 
-    public void init(int playerNumber, Overlord overlord)
+    public void init(int playerNumber, Overlord overlord, HealthDisplay healthDisplay)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
+        this.healthDisplay = healthDisplay;
 
         switch (playerNumber)
         {
@@ -151,5 +157,11 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+    }
+
+    private void UpdateHealthBar()
+    {
+        var healthPercent = currentHealth / maxHealth * 100.0f;
+        healthDisplay.UpdateHealthDisplay(healthPercent);
     }
 }
