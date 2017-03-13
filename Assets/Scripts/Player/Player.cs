@@ -10,6 +10,10 @@ public class Player : MonoBehaviour
     public float gravityMultiplier = 2.0f;
     public float maxFallSpeed = -10.0f;
 
+	//for aiming
+	public Transform gun;
+	public float fRadius = 1.0f;
+
     Overlord overlord;
     Rigidbody2D _rigidBody;
     BoxCollider2D _collider;
@@ -25,13 +29,19 @@ public class Player : MonoBehaviour
     private bool onGround = true;
     private bool fastFalling = false;
     int currentJumpCount = 0;
-    
+
+	//for aiming
+	float angle = 0.0f;
+	Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
 
     // Use this for initialization
     void Start() 
 	{
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
+
+		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
+		gun.position = transform.position + gunPos;
 	}
 	
 	// Update is called once per frame
@@ -115,6 +125,17 @@ public class Player : MonoBehaviour
         {
             Jump();
         }
+
+		// handle aiming (right stick)
+		if (controllerStateR.magnitude > 0.2f) 
+		{
+			angle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
+			gun.position = transform.position + gunPos;
+
+			// handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
+			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+		}
     }
 
     private void Jump()
