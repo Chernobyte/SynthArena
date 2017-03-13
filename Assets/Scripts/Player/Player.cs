@@ -15,7 +15,10 @@ public class Player : MonoBehaviour
 	//for aiming
 	public Transform gun;
 	public float fRadius = 1.0f;
+	public float bulletSpeed = 5.0f;
 	public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
+	//bullet
+	public GameObject bullet;
 
     Overlord overlord;
     HealthDisplay healthDisplay;
@@ -80,6 +83,7 @@ public class Player : MonoBehaviour
         controllerStateR.y = gamepad.Aim_Y();
 
         var jumpState = gamepad.L1();
+		var fireState = gamepad.R1();
 
         // Left Stick X Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
@@ -138,14 +142,25 @@ public class Player : MonoBehaviour
 		{
 			angle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
 			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
-			gun.position = transform.position + gunPos + gunPosOffset;
+			//gun.position = transform.position + gunPos + gunPosOffset;
 
 			// handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
 			//because the player's y value for their scale is 2, numbnutz. and this passes down to the child
 			//How to fix this without changing the player's x,y scale values to 1?
 			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 		}
+		gun.position = transform.position + gunPos + gunPosOffset;
+
+		if (fireState)
+			FireWeapon ();
     }
+
+	private void FireWeapon()
+	{
+		GameObject curBullet = Instantiate (bullet, gun.transform.position + (gun.transform.right * .8f), gun.transform.rotation);
+		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
+		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+	}
 
     private void Jump()
     {
