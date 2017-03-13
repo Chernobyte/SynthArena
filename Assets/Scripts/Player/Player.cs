@@ -19,6 +19,8 @@ public class Player : MonoBehaviour
 	public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
 	//bullet
 	public GameObject bullet;
+	public float bulletSpawnOffset = 1.2f;
+	public float fireRate = 1.0f;
 
     Overlord overlord;
     HealthDisplay healthDisplay;
@@ -40,6 +42,7 @@ public class Player : MonoBehaviour
 	//for aiming
 	float angle = 0.0f;
 	Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
+	bool canFire = true;
 
     // Use this for initialization
     void Start() 
@@ -82,8 +85,8 @@ public class Player : MonoBehaviour
         controllerStateR.x = gamepad.Aim_X();
         controllerStateR.y = gamepad.Aim_Y();
 
-        var jumpState = gamepad.L1();
-		var fireState = gamepad.R1();
+        var jumpState = gamepad.R1();
+		var fireState = gamepad.R2();
 
         // Left Stick X Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
@@ -151,13 +154,25 @@ public class Player : MonoBehaviour
 		}
 		gun.position = transform.position + gunPos + gunPosOffset;
 
-		if (fireState)
+		if (fireState > 0.2f && canFire) 
+		{
 			FireWeapon ();
+			canFire = false;
+			StartCoroutine (FireRoutine (fireRate));
+		}
     }
+
+	IEnumerator FireRoutine(float duration)
+	{
+		yield return new WaitForSeconds (duration);
+		canFire = true;
+	}
 
 	private void FireWeapon()
 	{
-		GameObject curBullet = Instantiate (bullet, gun.transform.position + (gun.transform.right * .8f), gun.transform.rotation);
+		GameObject curBullet = Instantiate (bullet, 
+											gun.transform.position + (gun.transform.right * bulletSpawnOffset), 
+											gun.transform.rotation);
 		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
 		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
 	}
