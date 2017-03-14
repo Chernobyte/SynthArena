@@ -20,7 +20,12 @@ public class Player : MonoBehaviour
     //for aiming
     public Transform gun;
 	public float fRadius = 1.0f;
+	public float bulletSpeed = 5.0f;
 	public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
+	//bullet
+	public GameObject bullet;
+	public float bulletSpawnOffset = 1.2f;
+	public float fireRate = 1.0f;
 
     Overlord overlord;
     HealthDisplay healthDisplay;
@@ -45,6 +50,7 @@ public class Player : MonoBehaviour
 	//for aiming
 	float angle = 0.0f;
 	Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
+	bool canFire = true;
 
     // Use this for initialization
     void Start() 
@@ -96,8 +102,9 @@ public class Player : MonoBehaviour
         controllerState.y = gamepad.Move_Y();
         controllerStateR.x = gamepad.Aim_X();
         controllerStateR.y = gamepad.Aim_Y();
-
-        var jumpInputReceived = gamepad.L1();
+        
+        var jumpInputReceived = gamepad.R1();
+		var fireState = gamepad.R2();
 
         // Left Stick X Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
@@ -161,14 +168,37 @@ public class Player : MonoBehaviour
 		{
 			angle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
 			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
-			gun.position = transform.position + gunPos + gunPosOffset;
+			//gun.position = transform.position + gunPos + gunPosOffset;
 
 			// handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
 			//because the player's y value for their scale is 2, numbnutz. and this passes down to the child
 			//How to fix this without changing the player's x,y scale values to 1?
 			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 		}
+		gun.position = transform.position + gunPos + gunPosOffset;
+
+		if (fireState > 0.2f && canFire) 
+		{
+			FireWeapon ();
+			canFire = false;
+			StartCoroutine (FireRoutine (fireRate));
+		}
     }
+
+	IEnumerator FireRoutine(float duration)
+	{
+		yield return new WaitForSeconds (duration);
+		canFire = true;
+	}
+
+	private void FireWeapon()
+	{
+		GameObject curBullet = Instantiate (bullet, 
+											gun.transform.position + (gun.transform.right * bulletSpawnOffset), 
+											gun.transform.rotation);
+		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
+		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+	}
 
     private void Jump()
     {
