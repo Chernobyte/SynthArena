@@ -55,3 +55,9 @@
 - (EP) Complete Wall Jumping
 - (MdG) First Draft Character Art
 
+3-20-17
+- (MdG) Projectiles
+- (AK) Capt. Izzy Ability 1
+- (MW) Game Logo, Lightning Explosion, Menu Sounds
+- (MR) Particles / Projectile Research
+- (EP) In Game UI mock, Finalize Movement

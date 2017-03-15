@@ -76,8 +76,20 @@ Sounds
 - Overcharging Laser
 - Menu Button Click (Brief Synth)
 
+Art Assets
+- Capt. Izzy
+	- Base Model
+	- Grenade
+	- Primary Attack (Electric Beam)
+	- Impact of Primary Fire on Surface (fizzle / lingering crackles)
+	- Double Jump Effect
+	- Dust cloud (wall sliding effect)
+- Level
+	- Background
+	- Walls / Floors
 
-	
+- UI Mockup
+
 	
 	
 
