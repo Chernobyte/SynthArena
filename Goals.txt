@@ -33,9 +33,25 @@
 - Fix aiming script (should aim in direction of joystick position)
 - Thread character input through InputManager (Input.GetAxis() etc...)
 - Fix residual movement (should come to a complete stop after input is ceased)
-- (MD) Create walk cycle for captain izidore
+- (MdG) Create walk cycle for captain izidore
 - (EP) Spawn character on scene load & wire up input
 - (EP) Add Health Script
 - First Draft Menu / Stage Background
 
+3-13-17
+- (EP) Add Wall Jumping
+- (EP) Print relevant character info to HUD
+- Add placeholder abilities for captain izzy (assigned to inputs w/ debug outputs)
+- (MR) Fix aiming script (should aim in direction of joystick position)
+- (MR) Incorporate shooting script into Capt. Izzy prefab
+- Test sound playing on firing of weapon
+- (MdG) Refine Capt. Izzy sprite and segment into joints
+- Test sound playing in background of main scene
+
+3-15-17
+- (AK) Ability 1: Grenade
+- (MR) Bullets
+- (MW) Initial Sounds
+- (EP) Complete Wall Jumping
+- (MdG) First Draft Character Art
 

@@ -32,7 +32,7 @@ Powerups
 Weapons
 - Boomerang
 - Rocket Launcher
-- Laser Rifle (Bouncing Shot?)
+- Laser Rifle (Bouncing Shot?) (Ramping Fire rate?)
 - Single-shot (sidearm?)
 + Directional Bomb (Bomberman)
 + Crouch Dash (Kirby) / Wavedash
@@ -47,3 +47,37 @@ Character Design
 - Colorful effects
 - Comically large weapons
 - Weapons morph between two equipped weapons
+
+Captain Izzy
+- Laser / Electric Arm Cannon (2 Modes)
+	- Rifle (low RoF, fast laser)
+	- Pistol (high RoF, slow laser)
+- Abililty 1: Ion / Pulse Grenade
+- Ability 2: Overcharge Laser
+
+Skrush
+- Shoulder-Mounted Cannon (2 Modes)
+	- Rocket Launcher (Shoots Rockets that explode on contact)
+	- Sticky Bombs (Explode on player input)
+- Ability 1: Jetpack Boost
+- Ability 2: Detonate Mines
+
+Sounds
+- Footsteps (Metallic)
+- Jumping (Whoosh?)
+- Laser Rifle
+	- Firing
+	- Hitting Wall
+- Laser Pistol
+	- Firing
+	- Hitting Wall
+- Swapping Weapons (Cocking Rifle Action)
+- Ion / Pulse Grenade Explosion
+- Overcharging Laser
+- Menu Button Click (Brief Synth)
+
+
+	
+	
+	
+
