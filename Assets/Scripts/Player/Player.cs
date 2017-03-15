@@ -12,8 +12,13 @@ public class Player : MonoBehaviour
     public int maxHealth = 2000;
     public int currentHealth;
 
-	//for aiming
-	public Transform gun;
+    public GameObject topTriggerObject;
+    public GameObject bottomTriggerObject;
+    public GameObject leftTriggerObject;
+    public GameObject rightTriggerObject;
+
+    //for aiming
+    public Transform gun;
 	public float fRadius = 1.0f;
 	public float bulletSpeed = 5.0f;
 	public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
@@ -26,15 +31,18 @@ public class Player : MonoBehaviour
     HealthDisplay healthDisplay;
     Rigidbody2D _rigidBody;
     BoxCollider2D _collider;
+
     int playerNumber;
     float topSpeed = 10.0f;
     float currentSpeed = 0.0f;
     float acceleration = 1.0f;
+    float deceleration = -0.2f;
     float currentFallSpeed = 0.0f;
     InputController gamepad;
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
     private bool canJump = true;
+    private bool canWallJump = false;
     private bool onGround = true;
     private bool fastFalling = false;
     int currentJumpCount = 0;
@@ -50,13 +58,23 @@ public class Player : MonoBehaviour
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
 
+        InitializeTriggers();
+
         currentHealth = maxHealth;
 		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
 		gun.position = transform.position + gunPos + gunPosOffset;
 	}
-	
-	// Update is called once per frame
-	void Update() 
+
+    private void InitializeTriggers()
+    {
+        topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerEnter);
+        bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit);
+        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit);
+        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
+    }
+
+    // Update is called once per frame
+    void Update() 
 	{
         HandleInput();
         UpdateHealthBar();
@@ -76,16 +94,16 @@ public class Player : MonoBehaviour
             case 4: gamepad = new InputController(ControllerNumber.FOUR); break;
         }
     }
-    
-	private void HandleInput()
+
+    private void HandleInput()
     {
         //get controller state
         controllerState.x = gamepad.Move_X();
         controllerState.y = gamepad.Move_Y();
         controllerStateR.x = gamepad.Aim_X();
         controllerStateR.y = gamepad.Aim_Y();
-
-        var jumpState = gamepad.R1();
+        
+        var jumpInputReceived = gamepad.R1();
 		var fireState = gamepad.R2();
 
         // Left Stick X Input
@@ -102,7 +120,7 @@ public class Player : MonoBehaviour
         {
             if (currentSpeed > 0)
             {
-                currentSpeed -= acceleration;
+                currentSpeed += deceleration;
                 if (currentSpeed < 0) currentSpeed = 0;
             }
         }
@@ -130,14 +148,19 @@ public class Player : MonoBehaviour
             _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, currentFallSpeed);
         }
 
-        Debug.Log(_rigidBody.velocity.y);
-
         _rigidBody.velocity = new Vector2(currentSpeed * controllerState.x, _rigidBody.velocity.y);
 
 
-        if (canJump && jumpState && currentJumpCount < maxcurrentJumpCount)
+        if (canJump && jumpInputReceived)
         {
-            Jump();
+            if (canWallJump)
+            {
+                WallJump();
+            }
+            else if (currentJumpCount < maxcurrentJumpCount)
+            {
+                Jump();
+            }
         }
 
 		// handle aiming (right stick)
@@ -188,7 +211,27 @@ public class Player : MonoBehaviour
         _rigidBody.AddForce(Vector2.up * actualJumpStrength);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void WallJump()
+    {
+        var actualJumpStrength = jumpStrength;
+
+        _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, 0.0f); // ensures jump height is same every time
+        _rigidBody.AddForce(new Vector2(1.0f, 1.0f) * actualJumpStrength);
+
+        Debug.Log("WALLJUMP");
+    }
+
+    public void OnTopTriggerEnter(Collider2D collision)
+    {
+
+    }
+
+    public void OnTopTriggerExit(Collider2D collision)
+    {
+
+    }
+
+    public void OnBottomTriggerEnter(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
@@ -199,7 +242,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    public void OnBottomTriggerExit(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
@@ -209,8 +252,38 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    public void OnLeftTriggerEnter(Collider2D collision)
     {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            canWallJump = true;
+            fastFalling = false;
+        }
+    }
+
+    public void OnLeftTriggerExit(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            canWallJump = false;
+        }
+    }
+
+    public void OnRightTriggerEnter(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            canWallJump = true;
+            fastFalling = false;
+        }
+    }
+
+    public void OnRightTriggerExit(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            canWallJump = false;
+        }
     }
 
     private void UpdateHealthBar()
