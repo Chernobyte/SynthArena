@@ -27,6 +27,9 @@ public class Player : MonoBehaviour
 	public float bulletSpawnOffset = 1.2f;
 	public float fireRate = 1.0f;
 
+    //grenade
+    public GameObject grenade;
+
     Overlord overlord;
     HealthDisplay healthDisplay;
     Rigidbody2D _rigidBody;
@@ -105,6 +108,8 @@ public class Player : MonoBehaviour
         
         var jumpInputReceived = gamepad.R1();
 		var fireState = gamepad.R2();
+        var ability1 = gamepad.L1();
+        var ability2 = gamepad.L2();
 
         // Left Stick X Input
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
@@ -183,6 +188,16 @@ public class Player : MonoBehaviour
 			canFire = false;
 			StartCoroutine (FireRoutine (fireRate));
 		}
+
+        if(ability1)
+        {
+            Ability1();
+        }
+        if(ability2>.2)
+        {
+            Ability2();
+        }
+
     }
 
 	IEnumerator FireRoutine(float duration)
@@ -199,6 +214,20 @@ public class Player : MonoBehaviour
 		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
 		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
 	}
+
+    private void Ability1()
+    {
+        GameObject curBullet = Instantiate(grenade,
+                                            gun.transform.position + (gun.transform.right * bulletSpawnOffset),
+                                            gun.transform.rotation);
+        Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D>();
+        rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+    }
+
+    private void Ability2()
+    {
+
+    }
 
     private void Jump()
     {
