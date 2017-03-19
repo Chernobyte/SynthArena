@@ -27,8 +27,7 @@ public class Player : MonoBehaviour
 	public float bulletSpawnOffset = 1.2f;
 	public float fireRate = 1.0f;
 
-    //grenade
-    public GameObject grenade;
+    //ability stuff
 
     Overlord overlord;
     HealthDisplay healthDisplay;
@@ -217,11 +216,7 @@ public class Player : MonoBehaviour
 
     private void Ability1()
     {
-        GameObject curBullet = Instantiate(grenade,
-                                            gun.transform.position + (gun.transform.right * bulletSpawnOffset),
-                                            gun.transform.rotation);
-        Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D>();
-        rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+        gameObject.GetComponent<AbilityOne>().fire(gun.transform);
     }
 
     private void Ability2()
