@@ -370,6 +370,11 @@ public class Player : MonoBehaviour
         canWallJumpRight = true;
         canWallJumpLeft = true;
 
+        if (controllerState.x > 0.2 || controllerState.x < -0.2)
+        {
+            currentSpeed = maxSpeed * controllerState.x;
+        }
+
         currentFallSpeed = airJumpStrength;
     }
 
