@@ -11,6 +11,9 @@ public class Player : MonoBehaviour
     public float shortJumpStrength = 14.0f;
     public float airJumpStrength = 18.5f;
     public float wallJumpStrength = 18.5f;
+    public float wallJumpHorizontalMultiplier = 1.3f;
+    public float shortWallJumpStrength = 14.0f;
+    public float shortWallJumpHorizontalMultiplier = 0.8f;
     public float gravity = -1.0f;
     public float maxFallSpeed = -10.0f;
     public float acceleration = 0.7f;
@@ -57,15 +60,16 @@ public class Player : MonoBehaviour
     private bool canJump = false;
     private bool onWallLeft = false;
     private bool onWallRight = false;
-    private bool canWallJumpLeft = false;
-    private bool canWallJumpRight = false;
+    private bool canWallJumpToLeft = false;
+    private bool canWallJumpToRight = false;
     private bool onGround = false;
     private bool fastFalling = false;
     private int currentJumpCount = 0;
     private float gravityForce;
     private float jumpPressedTime;
     private float jumpReleasedTime;
-    private bool jumpSquat = false;
+    private bool jumpBufferState = false;
+    private bool wallJumpBufferState = false;
     private bool applyDecelerationThisTick;
     
 
@@ -193,9 +197,9 @@ public class Player : MonoBehaviour
 
         if (onGround)
         {
-            if (jumpSquat && timeSinceJumpOrdered > jumpPreBuffer)
+            if (jumpBufferState && timeSinceJumpOrdered > jumpPreBuffer)
             {
-                if (jumpButtonHeldLength < 0)
+                if (jumpButtonHeldLength < 0) // not yet released
                 {
                     Jump();
                 }
@@ -204,7 +208,38 @@ public class Player : MonoBehaviour
                     ShortJump();
                 }
 
-                jumpSquat = false;
+                jumpBufferState = false;
+            }
+        }
+        else
+        {
+            if (wallJumpBufferState && timeSinceJumpOrdered > jumpPreBuffer)
+            {
+                WallJumpDirection direction;
+
+                wallJumpBufferState = false;
+
+                if (onWallLeft)
+                {
+                    direction = WallJumpDirection.Right;
+                }
+                else if (onWallRight)
+                {
+                    direction = WallJumpDirection.Left;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (jumpButtonHeldLength < 0) // not yet released
+                {
+                    WallJump(direction);
+                }
+                else
+                {
+                    ShortWallJump(direction);
+                }
             }
         }
     }
@@ -264,19 +299,20 @@ public class Player : MonoBehaviour
 
             if (canJump)
             {
-                if (onWallLeft && !onGround && canWallJumpRight)
+                if (onWallLeft && !onGround && canWallJumpToRight)
                 {
-                    WallJump(WallJumpDirection.Right);
+                    wallJumpBufferState = true;
                 }
-                else if (onWallRight && !onGround && canWallJumpLeft)
+                else if (onWallRight && !onGround && canWallJumpToLeft)
                 {
-                    WallJump(WallJumpDirection.Left);
+                    wallJumpBufferState = true;
+                    
                 }
                 else if (currentJumpCount < maxcurrentJumpCount)
                 {
                     if (onGround)
                     {
-                        jumpSquat = true;
+                        jumpBufferState = true;
                     }
                     else
                     {
@@ -347,19 +383,21 @@ public class Player : MonoBehaviour
 
     }
 
-    private void ShortJump()
+    private void PreJump()
     {
         currentJumpCount++;
         fastFalling = false;
+    }
 
+    private void ShortJump()
+    {
+        PreJump();
         currentFallSpeed = shortJumpStrength;
     }
 
     private void Jump()
     {
-        currentJumpCount++;
-        fastFalling = false;
-
+        PreJump();
         currentFallSpeed = jumpStrength;
     }
 
@@ -367,8 +405,8 @@ public class Player : MonoBehaviour
     {
         currentJumpCount++;
         fastFalling = false;
-        canWallJumpRight = true;
-        canWallJumpLeft = true;
+        canWallJumpToRight = true;
+        canWallJumpToLeft = true;
 
         if (controllerState.x > 0.2 || controllerState.x < -0.2)
         {
@@ -380,21 +418,41 @@ public class Player : MonoBehaviour
 
     private enum WallJumpDirection { Left, Right };
 
+    private void ShortWallJump(WallJumpDirection direction)
+    {
+        fastFalling = false;
+
+        if (direction == WallJumpDirection.Right)
+        {
+            currentSpeed = maxSpeed * shortWallJumpHorizontalMultiplier;
+            canWallJumpToRight = false;
+            canWallJumpToLeft = true;
+        }
+        else if (direction == WallJumpDirection.Left)
+        {
+            currentSpeed = -maxSpeed * shortWallJumpHorizontalMultiplier;
+            canWallJumpToLeft = false;
+            canWallJumpToRight = true;
+        }
+
+        currentFallSpeed = shortWallJumpStrength;
+    }
+
     private void WallJump(WallJumpDirection direction)
     {
         fastFalling = false;
 
         if (direction == WallJumpDirection.Right)
         {
-            currentSpeed = maxSpeed * 2;
-            canWallJumpRight = false;
-            canWallJumpLeft = true;
+            currentSpeed = maxSpeed * wallJumpHorizontalMultiplier;
+            canWallJumpToRight = false;
+            canWallJumpToLeft = true;
         }
         else if (direction == WallJumpDirection.Left)
         {
-            currentSpeed = -maxSpeed * 2;
-            canWallJumpLeft = false;
-            canWallJumpRight = true;
+            currentSpeed = -maxSpeed * wallJumpHorizontalMultiplier;
+            canWallJumpToLeft = false;
+            canWallJumpToRight = true;
         }
 
         currentFallSpeed = wallJumpStrength;
@@ -416,8 +474,9 @@ public class Player : MonoBehaviour
         {
             onGround = true;
             canJump = true;
-            canWallJumpLeft = true;
-            canWallJumpRight = true;
+            canWallJumpToLeft = true;
+            canWallJumpToRight = true;
+            wallJumpBufferState = true;
             currentJumpCount = 0;
             currentFallSpeed = 0;
             fastFalling = false;
