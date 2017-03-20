@@ -3,41 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Grenade : MonoBehaviour {
-
-    float pinPull;
-    public float pinTimer =2;
+    
     public GameObject explosion;
-    GameObject collidedObj = null;
-    bool col = false;
+    public float pinTime = 2.0f;
+    public float armTime = 1.0f;
+
+    private float timeCreated;
+    private bool col = false;
+    private Vector3 collisionOffset;
+    private GameObject collidedObj;
+    
 
 	void Start ()
     {
-        pinPull = Time.time;
+        timeCreated = Time.time;
 	}
 	
 	void Update ()
     {
-        if (Time.time - pinPull > pinTimer)
+        var armed = Time.time - timeCreated > armTime;
+        var readyToExplode = Time.time - timeCreated > pinTime + armTime;
+
+        if (armed)
+        {
+            gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+        }
+
+        if (readyToExplode)
         {
             GameObject explode = Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
 
-        if(collidedObj!=null && collidedObj.GetComponent<Rigidbody2D>()!=null)
+        if (col)
         {
-            gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
-            gameObject.GetComponent<Rigidbody2D>().velocity = collidedObj.GetComponent<Rigidbody2D>().velocity;
+            gameObject.transform.position = collidedObj.transform.position + collisionOffset;
         }
-        else if(collidedObj != null)
-        {
-            gameObject.GetComponent<Rigidbody2D>().gravityScale = 0;
-            gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0f, 0f);
-        }
-        
    	}
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        collidedObj = collision.gameObject;
+        var armed = Time.time - timeCreated > armTime;
+        Debug.Log(armed);
+        if (!col && armed)
+        {
+            Debug.Log("COLLIDED");
+            collisionOffset = gameObject.transform.position - collision.gameObject.transform.position;
+            collidedObj = collision.gameObject;
+            col = true;
+        }
     }
 }

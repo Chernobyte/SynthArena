@@ -73,7 +73,7 @@ public class Player : MonoBehaviour
     private bool applyDecelerationThisTick;
     
 
-    void Start() 
+    private void Start() 
 	{
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
@@ -93,7 +93,7 @@ public class Player : MonoBehaviour
         rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
     }
     
-    void Update() 
+    private void Update() 
 	{
         UpdateHealthBar();
         HandleInput();
@@ -119,6 +119,10 @@ public class Player : MonoBehaviour
             case 3: gamepad = new InputController(ControllerNumber.THREE); break;
             case 4: gamepad = new InputController(ControllerNumber.FOUR); break;
         }
+    }
+
+    public void ApplyForce(Vector2 force)
+    {
     }
 
     private void ApplySpeedToRigidBody()
