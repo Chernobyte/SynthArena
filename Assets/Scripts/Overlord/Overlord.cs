@@ -28,14 +28,14 @@ public class Overlord : MonoBehaviour {
 
     void initPlayers()
     {
-        var healthDisplayGOs = GameObject.FindGameObjectsWithTag("HealthDisplay");
-        var healthDisplays = healthDisplayGOs.Select(n => n.GetComponent<HealthDisplay>()).ToArray();
+        var healthDisplayGOs = GameObject.FindGameObjectsWithTag("HealthBar");
+        var healthBars = healthDisplayGOs.Select(n => n.GetComponent<HealthBar>()).ToArray();
 
         for (int i=0; i<players.Length; i++)
         {
             var playerId = i + 1;
-            var healthDisplay = healthDisplays.Where(n => n.playerId == playerId).First();
-            players[i].init(playerId, this, healthDisplay);
+            var healthBar = healthBars.Where(n => n.playerId == playerId).First();
+            players[i].init(playerId, this, healthBar);
         }
     }
 

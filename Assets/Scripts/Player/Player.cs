@@ -43,7 +43,7 @@ public class Player : MonoBehaviour
     //ability stuff
 
     private Overlord overlord;
-    private HealthDisplay healthDisplay;
+    private HealthBar healthBar;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _collider;
 
@@ -102,11 +102,11 @@ public class Player : MonoBehaviour
         ApplySpeedToRigidBody();
     }
 
-    public void init(int playerNumber, Overlord overlord, HealthDisplay healthDisplay)
+    public void init(int playerNumber, Overlord overlord, HealthBar healthBar)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
-        this.healthDisplay = healthDisplay;
+        this.healthBar = healthBar;
 
         switch (playerNumber)
         {
@@ -465,6 +465,6 @@ public class Player : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        healthDisplay.UpdateHealthDisplay(currentHealth, maxHealth);
+        healthBar.UpdateHealthBar(currentHealth, maxHealth);
     }
 }
