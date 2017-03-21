@@ -61,3 +61,10 @@
 - (MW) Game Logo, Lightning Explosion, Menu Sounds
 - (MR) Particles / Projectile Research
 - (EP) In Game UI mock, Finalize Movement
+
+3-22-17
+- (MW) Lightning SFX
+- (AK) Grenade Knockback
+- (MdG) Capt. Izzy Art / Ability Icons
+- (EP) Begin Menu -> Gameplay Transition
+- (MR) Grenade Particles / Effects
