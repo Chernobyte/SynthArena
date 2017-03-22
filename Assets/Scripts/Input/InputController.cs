@@ -34,6 +34,7 @@ public class InputController
     public float L2() { return Input.GetAxis("Joystick" + inputString + "L2"); }
     public bool L3() { return Input.GetButtonDown("Joystick" + inputString + "L3"); }
     public bool R1() { return Input.GetButtonDown("Joystick" + inputString + "R1"); }
+    public bool R1Up() { return Input.GetButtonUp("Joystick" + inputString + "R1"); }
     public float R2() { return Input.GetAxis("Joystick" + inputString + "R2"); }
     public bool R3() { return Input.GetButtonDown("Joystick" + inputString + "R3"); }
     public float Move_X() { return Input.GetAxis("Joystick" + inputString + "Move_X"); }

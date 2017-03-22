@@ -3,14 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Player : MonoBehaviour 
+public class Player : MonoBehaviour
 {
     public int maxcurrentJumpCount = 2;
-    public float jumpStrength = 500.0f;
-    public float gravityMultiplier = 2.0f;
+    public float jumpPreBuffer = 0.1f;
+    public float jumpStrength = 20.0f;
+    public float shortJumpStrength = 14.0f;
+    public float airJumpStrength = 18.5f;
+    public float wallJumpStrength = 18.5f;
+    public float wallJumpHorizontalMultiplier = 1.3f;
+    public float shortWallJumpStrength = 14.0f;
+    public float shortWallJumpHorizontalMultiplier = 0.8f;
+    public float gravity = -1.0f;
     public float maxFallSpeed = -10.0f;
+    public float acceleration = 0.7f;
+    public float deceleration = 1.0f;
+    public float airDeceleration = 0.5f;
+    public float maxSpeed = 10.0f;
     public int maxHealth = 2000;
     public int currentHealth;
+    
 
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
@@ -19,41 +31,49 @@ public class Player : MonoBehaviour
 
     //for aiming
     public Transform gun;
-	public float fRadius = 1.0f;
-	public float bulletSpeed = 5.0f;
-	public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
-	//bullet
-	public GameObject bullet;
-	public float bulletSpawnOffset = 1.2f;
-	public float fireRate = 1.0f;
+    public float fRadius = 1.0f;
+    public float bulletSpeed = 5.0f;
+    public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
+                                                                  //bullet
+    public GameObject bullet;
+    public float bulletSpawnOffset = 1.2f;
+    public float fireRate = 1.0f;
 
-    Overlord overlord;
-    HealthDisplay healthDisplay;
-    Rigidbody2D _rigidBody;
-    BoxCollider2D _collider;
+    private float angle = 0.0f;
+    private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
+    private bool canFire = true;
 
-    int playerNumber;
-    float topSpeed = 10.0f;
-    float currentSpeed = 0.0f;
-    float acceleration = 1.0f;
-    float deceleration = -0.2f;
-    float currentFallSpeed = 0.0f;
-    InputController gamepad;
+    //ability stuff
+
+    private Overlord overlord;
+    private PlayerUI playerUI;
+    private Rigidbody2D _rigidBody;
+    private BoxCollider2D _collider;
+
+    private int playerNumber;
+    private float currentSpeed = 0.0f;
+    private float currentFallSpeed = 0.0f;
+
+    private InputController gamepad;
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
-    private bool canJump = true;
-    private bool canWallJump = false;
-    private bool onGround = true;
+    private bool canJump = false;
+    private bool onWallLeft = false;
+    private bool onWallRight = false;
+    private bool canWallJumpToLeft = false;
+    private bool canWallJumpToRight = false;
+    private bool onGround = false;
     private bool fastFalling = false;
-    int currentJumpCount = 0;
+    private int currentJumpCount = 0;
+    private float gravityForce;
+    private float jumpPressedTime;
+    private float jumpReleasedTime;
+    private bool jumpBufferState = false;
+    private bool wallJumpBufferState = false;
+    private bool applyDecelerationThisTick;
+    
 
-	//for aiming
-	float angle = 0.0f;
-	Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
-	bool canFire = true;
-
-    // Use this for initialization
-    void Start() 
+    private void Start() 
 	{
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
@@ -63,7 +83,7 @@ public class Player : MonoBehaviour
         currentHealth = maxHealth;
 		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
 		gun.position = transform.position + gunPos + gunPosOffset;
-	}
+    }
 
     private void InitializeTriggers()
     {
@@ -72,19 +92,25 @@ public class Player : MonoBehaviour
         leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit);
         rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
     }
-
-    // Update is called once per frame
-    void Update() 
+    
+    private void Update() 
 	{
-        HandleInput();
         UpdateHealthBar();
+        HandleInput();
     }
 
-    public void init(int playerNumber, Overlord overlord, HealthDisplay healthDisplay)
+    private void FixedUpdate()
+    {
+        HandleJump();
+        HandleGravity();
+        ApplySpeedToRigidBody();
+    }
+
+    public void init(int playerNumber, Overlord overlord, PlayerUI playerUI)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
-        this.healthDisplay = healthDisplay;
+        this.playerUI = playerUI;
 
         switch (playerNumber)
         {
@@ -92,6 +118,133 @@ public class Player : MonoBehaviour
             case 2: gamepad = new InputController(ControllerNumber.TWO); break;
             case 3: gamepad = new InputController(ControllerNumber.THREE); break;
             case 4: gamepad = new InputController(ControllerNumber.FOUR); break;
+        }
+    }
+
+    public void ApplyForce(Vector2 force)
+    {
+    }
+
+    private void ApplySpeedToRigidBody()
+    {
+        if (Mathf.Abs(currentSpeed) > Mathf.Abs(maxSpeed))
+        {
+            applyDecelerationThisTick = true;
+        }
+
+        if (applyDecelerationThisTick == true)
+        {
+            float actualDeceleration = deceleration;
+
+            if (!onGround)
+                actualDeceleration = airDeceleration;
+
+            if (currentSpeed < 0)
+            {
+                if (-actualDeceleration < currentSpeed)
+                {
+                    currentSpeed = 0;
+                }
+                else
+                {
+                    currentSpeed += actualDeceleration;
+                }
+            }
+            else if (currentSpeed > 0)
+            {
+                if (actualDeceleration > currentSpeed)
+                {
+                    currentSpeed = 0;
+                }
+                else
+                {
+                    currentSpeed -= actualDeceleration;
+                }
+            }
+        }
+
+        applyDecelerationThisTick = false;
+
+        _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
+    }
+
+    private void HandleGravity()
+    {
+        if (!onGround)
+        {
+            if (fastFalling)
+            {
+                currentFallSpeed = maxFallSpeed * 1.5f;
+            }
+            else
+            {
+                currentFallSpeed += gravity;
+
+                if (onWallLeft || onWallRight)
+                {
+                    if (currentFallSpeed < maxFallSpeed / 2.0f)
+                        currentFallSpeed = maxFallSpeed / 2.0f;
+                }
+                else
+                {
+                    if (currentFallSpeed < maxFallSpeed)
+                        currentFallSpeed = maxFallSpeed;
+                }
+            }
+        }
+    }
+
+    private void HandleJump()
+    {
+        var timeSinceJumpOrdered = Time.time - jumpPressedTime;
+        var jumpButtonHeldLength = jumpReleasedTime - jumpPressedTime;
+
+        if (onGround)
+        {
+            if (jumpBufferState && timeSinceJumpOrdered > jumpPreBuffer)
+            {
+                if (jumpButtonHeldLength < 0) // not yet released
+                {
+                    Jump();
+                }
+                else
+                {
+                    ShortJump();
+                }
+
+                jumpBufferState = false;
+            }
+        }
+        else
+        {
+            if (wallJumpBufferState && timeSinceJumpOrdered > jumpPreBuffer)
+            {
+                WallJumpDirection direction;
+
+                wallJumpBufferState = false;
+
+                if (onWallLeft)
+                {
+                    direction = WallJumpDirection.Right;
+                }
+                else if (onWallRight)
+                {
+                    direction = WallJumpDirection.Left;
+                }
+                else
+                {
+                    return;
+                }
+
+                if (jumpButtonHeldLength < 0) // not yet released
+                {
+                    WallJump(direction);
+                }
+                else
+                {
+                    ShortWallJump(direction);
+                }
+            }
         }
     }
 
@@ -104,63 +257,78 @@ public class Player : MonoBehaviour
         controllerStateR.y = gamepad.Aim_Y();
         
         var jumpInputReceived = gamepad.R1();
+        var jumpInputStopped = gamepad.R1Up();
 		var fireState = gamepad.R2();
+        var ability1 = gamepad.L1();
+        var ability2 = gamepad.L2();
 
-        // Left Stick X Input
-        if (controllerState.x > 0.2 || controllerState.x < -0.2)
+        // Left Stick Right Tilt
+        if (controllerState.x > 0.2)
         {
-            if (currentSpeed < topSpeed)
+            if (currentSpeed < maxSpeed)
             {
                 currentSpeed += acceleration;
-                if (currentSpeed > topSpeed) currentSpeed = topSpeed;
+                if (currentSpeed > maxSpeed)
+                    currentSpeed = maxSpeed;
+            }
+        }
+        // Left Stick Left Tilt
+        else if (controllerState.x < -0.2)
+        {
+            if (currentSpeed > -maxSpeed)
+            {
+                currentSpeed -= acceleration;
+                if (currentSpeed < -maxSpeed)
+                    currentSpeed = -maxSpeed;
             }
         }
         // No Left Stick X Input
         else
         {
-            if (currentSpeed > 0)
-            {
-                currentSpeed += deceleration;
-                if (currentSpeed < 0) currentSpeed = 0;
-            }
+            applyDecelerationThisTick = true;
         }
 
         // Left Stick Y Input
         if (controllerState.y < -0.8)
         {
-            if (!onGround)
+            if (!onGround && !onWallLeft && !onWallRight)
             {
                 fastFalling = true;
             }
         }
 
-        // Gravity
-        if (fastFalling)
+        if (jumpInputReceived)
         {
-            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, maxFallSpeed * 2);
-        }
-        else
-        {
-            var gravityForce = +Physics.gravity.y * gravityMultiplier * 0.01f;
-            var currentFallSpeed = _rigidBody.velocity.y + gravityForce;
-            if (currentFallSpeed < maxFallSpeed) currentFallSpeed = maxFallSpeed;
+            jumpPressedTime = Time.time;
 
-            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, currentFallSpeed);
-        }
-
-        _rigidBody.velocity = new Vector2(currentSpeed * controllerState.x, _rigidBody.velocity.y);
-
-
-        if (canJump && jumpInputReceived)
-        {
-            if (canWallJump)
+            if (canJump)
             {
-                WallJump();
+                if (onWallLeft && !onGround && canWallJumpToRight)
+                {
+                    wallJumpBufferState = true;
+                }
+                else if (onWallRight && !onGround && canWallJumpToLeft)
+                {
+                    wallJumpBufferState = true;
+                    
+                }
+                else if (currentJumpCount < maxcurrentJumpCount)
+                {
+                    if (onGround)
+                    {
+                        jumpBufferState = true;
+                    }
+                    else
+                    {
+                        AirJump();
+                    }
+                }
             }
-            else if (currentJumpCount < maxcurrentJumpCount)
-            {
-                Jump();
-            }
+        }
+
+        if (jumpInputStopped)
+        {
+            jumpReleasedTime = Time.time;
         }
 
 		// handle aiming (right stick)
@@ -183,6 +351,15 @@ public class Player : MonoBehaviour
 			canFire = false;
 			StartCoroutine (FireRoutine (fireRate));
 		}
+
+        if(ability1)
+        {
+            Ability1();
+        }
+        if(ability2>.2)
+        {
+            Ability2();
+        }
     }
 
 	IEnumerator FireRoutine(float duration)
@@ -200,25 +377,89 @@ public class Player : MonoBehaviour
 		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
 	}
 
-    private void Jump()
+    private void Ability1()
+    {
+        gameObject.GetComponent<AbilityOne>().fire(gun.transform);
+    }
+
+    private void Ability2()
+    {
+
+    }
+
+    private void PreJump()
     {
         currentJumpCount++;
         fastFalling = false;
-
-        var actualJumpStrength = jumpStrength;
-        
-        _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, 0.0f); // ensures jump height is same every time
-        _rigidBody.AddForce(Vector2.up * actualJumpStrength);
     }
 
-    private void WallJump()
+    private void ShortJump()
     {
-        var actualJumpStrength = jumpStrength;
+        PreJump();
+        currentFallSpeed = shortJumpStrength;
+    }
 
-        _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, 0.0f); // ensures jump height is same every time
-        _rigidBody.AddForce(new Vector2(1.0f, 1.0f) * actualJumpStrength);
+    private void Jump()
+    {
+        PreJump();
+        currentFallSpeed = jumpStrength;
+    }
 
-        Debug.Log("WALLJUMP");
+    private void AirJump()
+    {
+        currentJumpCount++;
+        fastFalling = false;
+        canWallJumpToRight = true;
+        canWallJumpToLeft = true;
+
+        if (controllerState.x > 0.2 || controllerState.x < -0.2)
+        {
+            currentSpeed = maxSpeed * controllerState.x;
+        }
+
+        currentFallSpeed = airJumpStrength;
+    }
+
+    private enum WallJumpDirection { Left, Right };
+
+    private void ShortWallJump(WallJumpDirection direction)
+    {
+        fastFalling = false;
+
+        if (direction == WallJumpDirection.Right)
+        {
+            currentSpeed = maxSpeed * shortWallJumpHorizontalMultiplier;
+            canWallJumpToRight = false;
+            canWallJumpToLeft = true;
+        }
+        else if (direction == WallJumpDirection.Left)
+        {
+            currentSpeed = -maxSpeed * shortWallJumpHorizontalMultiplier;
+            canWallJumpToLeft = false;
+            canWallJumpToRight = true;
+        }
+
+        currentFallSpeed = shortWallJumpStrength;
+    }
+
+    private void WallJump(WallJumpDirection direction)
+    {
+        fastFalling = false;
+
+        if (direction == WallJumpDirection.Right)
+        {
+            currentSpeed = maxSpeed * wallJumpHorizontalMultiplier;
+            canWallJumpToRight = false;
+            canWallJumpToLeft = true;
+        }
+        else if (direction == WallJumpDirection.Left)
+        {
+            currentSpeed = -maxSpeed * wallJumpHorizontalMultiplier;
+            canWallJumpToLeft = false;
+            canWallJumpToRight = true;
+        }
+
+        currentFallSpeed = wallJumpStrength;
     }
 
     public void OnTopTriggerEnter(Collider2D collision)
@@ -237,7 +478,11 @@ public class Player : MonoBehaviour
         {
             onGround = true;
             canJump = true;
+            canWallJumpToLeft = true;
+            canWallJumpToRight = true;
+            wallJumpBufferState = true;
             currentJumpCount = 0;
+            currentFallSpeed = 0;
             fastFalling = false;
         }
     }
@@ -256,7 +501,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            canWallJump = true;
+            onWallLeft = true;
             fastFalling = false;
         }
     }
@@ -265,7 +510,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            canWallJump = false;
+            onWallLeft = false;
         }
     }
 
@@ -273,7 +518,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            canWallJump = true;
+            onWallRight = true;
             fastFalling = false;
         }
     }
@@ -282,12 +527,12 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            canWallJump = false;
+            onWallRight = false;
         }
     }
 
     private void UpdateHealthBar()
     {
-        healthDisplay.UpdateHealthDisplay(currentHealth, maxHealth);
+        playerUI.UpdateHealthBar(currentHealth, maxHealth);
     }
 }
