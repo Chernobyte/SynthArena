@@ -64,10 +64,11 @@ Skrush
 
 Sounds
 - Footsteps (Metallic)
-- Jumping (Whoosh?)
-- Laser Rifle
+- Jumping 
+- Shock Gun
 	- Firing
 	- Hitting Wall
+	- Air resistance
 - Laser Pistol
 	- Firing
 	- Hitting Wall
