@@ -68,3 +68,11 @@
 - (MdG) Capt. Izzy Art / Ability Icons
 - (EP) Begin Menu -> Gameplay Transition
 - (MR) Grenade Particles / Effects
+
+3-27-17
+- (EP) Menu -> Gameplay Transition; Menu Controls
+- (MW) SFX; Double Game Background Image Size / Density
+- (AK) Finish Grenade Mechanics (Damage, Knockback & Stun)
+	   Increase Bullet Firing Speed, Begin Bullet Bouncing
+- (MdG) Ability Icons; Main Electric Projectile; Grenade Sprite
+- (MR) Capt. Izzy basic animations (Idle, Walking, Jumping, Falling, Shooting)
