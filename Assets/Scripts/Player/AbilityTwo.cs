@@ -13,4 +13,9 @@ public class AbilityTwo : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    public void fire(Transform gun)
+    {
+        
+    }
 }

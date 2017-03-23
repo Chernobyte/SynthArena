@@ -121,8 +121,14 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ApplyForce(Vector2 force)
+    public void ApplyForce(Vector2 force,int weaponDamage)
     {
+        currentSpeed += force.x;
+        currentFallSpeed += force.y;
+        if(weaponDamage!=0)
+        {
+            currentHealth -= weaponDamage;
+        }
     }
 
     private void ApplySpeedToRigidBody()
@@ -384,7 +390,7 @@ public class Player : MonoBehaviour
 
     private void Ability2()
     {
-
+        gameObject.GetComponent<AbilityTwo>().fire(gun.transform);
     }
 
     private void PreJump()

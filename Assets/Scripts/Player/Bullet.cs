@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 	GameObject platform;
+    bool bounce;
+    Vector3 normalVec;
+    Vector3 startVec;
+    Vector3 newVec;
 
 	// Use this for initialization
 	void Start () {
@@ -18,11 +22,32 @@ public class Bullet : MonoBehaviour {
 			Destroy (gameObject);
 	}
 
+    public void toggleBounce(bool active)
+    {
+        bounce = active;
+    }
+
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
-		if (collision.gameObject.CompareTag ("Platform") || collision.gameObject.CompareTag ("Player")) 
-		{
-			Destroy (gameObject);
-		}
-	}
+        if (!bounce)
+        {
+            if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("Player"))
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if(bounce)
+        {
+            if(hit.gameObject.CompareTag("Platform") || hit.gameObject.CompareTag("Wall"))
+            {
+                normalVec = hit.normal;
+                startVec = hit.gameObject.GetComponent<Rigidbody2D>().velocity;
+                float angle = Mathf.Atan2(startVec.x - normalVec.x, startVec.y - normalVec.y);
+            }
+        }
+    }
 }
