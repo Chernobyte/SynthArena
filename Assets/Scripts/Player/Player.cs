@@ -37,6 +37,11 @@ public class Player : MonoBehaviour
     public GameObject bullet;
     public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
+    public bool bouncing = false;
+    private float ability1CDTime = 0f;
+    private float ability2CDTime = 0f;
+    private bool A1OnCooldown;
+    private bool A2OnCooldown;
 
     private float angle = 0.0f;
     private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
@@ -103,6 +108,10 @@ public class Player : MonoBehaviour
         HandleJump();
         HandleGravity();
         ApplySpeedToRigidBody();
+        if (ability1CDTime != 0f)
+            ability1Cooldown();
+        if (ability2CDTime != 0f)
+            ability2Cooldown();
     }
 
     public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI)
@@ -253,6 +262,24 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void ability2Cooldown()
+    {
+        if (Time.time - ability2CDTime > 10)
+        {
+            A2OnCooldown = false;
+            ability2CDTime = 0f;
+        }
+    }
+
+    private void ability1Cooldown()
+    {
+        if(Time.time - ability1CDTime > 10)
+        {
+            A1OnCooldown = false;
+            ability1CDTime = 0f;
+        }
+    }
+    
     private void HandleInput()
     {
         //get controller state
@@ -357,13 +384,15 @@ public class Player : MonoBehaviour
 			StartCoroutine (FireRoutine (fireRate));
 		}
 
-        if(ability1)
+        if(ability1 && !A1OnCooldown)
         {
             Ability1();
+            ability1CDTime = Time.time;
         }
-        if(ability2>.2)
+        if(ability2>.2 && !A2OnCooldown)
         {
             Ability2();
+            ability2CDTime = Time.time;
         }
     }
 
@@ -380,6 +409,7 @@ public class Player : MonoBehaviour
 											gun.transform.rotation);
 		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
 		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+        curBullet.GetComponent<Bullet>().setBounce(bouncing);
 	}
 
     private void Ability1()
