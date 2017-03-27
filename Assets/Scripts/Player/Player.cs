@@ -71,6 +71,9 @@ public class Player : MonoBehaviour
     private bool jumpBufferState = false;
     private bool wallJumpBufferState = false;
     private bool applyDecelerationThisTick;
+
+	//animation
+	private Animator anim;
     
 
     private void Start() 
@@ -83,6 +86,9 @@ public class Player : MonoBehaviour
         currentHealth = maxHealth;
 		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
 		gun.position = transform.position + gunPos + gunPosOffset;
+
+		anim = gameObject.GetComponent<Animator> ();
+		//anim.
     }
 
     private void InitializeTriggers()
@@ -271,6 +277,7 @@ public class Player : MonoBehaviour
                 if (currentSpeed > maxSpeed)
                     currentSpeed = maxSpeed;
             }
+			anim.SetBool ("isRunning", true);
         }
         // Left Stick Left Tilt
         else if (controllerState.x < -0.2)
@@ -281,11 +288,13 @@ public class Player : MonoBehaviour
                 if (currentSpeed < -maxSpeed)
                     currentSpeed = -maxSpeed;
             }
+			anim.SetBool ("isRunning", true);
         }
         // No Left Stick X Input
         else
         {
             applyDecelerationThisTick = true;
+			anim.SetBool ("isRunning", false);
         }
 
         // Left Stick Y Input
