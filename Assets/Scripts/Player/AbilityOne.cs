@@ -8,7 +8,7 @@ public class AbilityOne : MonoBehaviour
 
     Transform gunTrans = null;
     float grenadeSpawnOffset = 1.2f;
-    float grenadeSpeed = 10f;
+    float grenadeSpeed = 25f;
 
     public GameObject grenade;
 
