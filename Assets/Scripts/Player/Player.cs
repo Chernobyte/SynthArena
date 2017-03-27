@@ -31,14 +31,14 @@ public class Player : MonoBehaviour
     //for aiming
     public Transform gun;
     public float fRadius = 1.0f;
-    public float bulletSpeed = 5.0f;
+    public float bulletSpeed = 200.0f;
     public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
                                                                   //bullet
     public GameObject bullet;
     public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
     public bool bouncing = false;
-    private float ability1CDTime = 4f;
+    private float ability1CDTime = 8f;
     private float ability2CDTime = 10f;
     private float A1StartCD = 0f;
     private float A2StartCD = 0f;
@@ -77,6 +77,9 @@ public class Player : MonoBehaviour
     private bool jumpBufferState = false;
     private bool wallJumpBufferState = false;
     private bool applyDecelerationThisTick;
+
+    private float currentStun;
+    private bool notStunned = true;
     
 
     private void Start() 
@@ -103,6 +106,8 @@ public class Player : MonoBehaviour
 	{
         UpdateHealthBar();
         HandleInput();
+        Ability1Cooldown();
+        Ability2Cooldown();
     }
 
     private void FixedUpdate()
@@ -110,10 +115,7 @@ public class Player : MonoBehaviour
         HandleJump();
         HandleGravity();
         ApplySpeedToRigidBody();
-        if (A1OnCooldown && A1StartCD!=0)
-            ability1Cooldown();
-        if (A2OnCooldown && A2StartCD!=0)
-            ability2Cooldown();
+        HandleHitStun();
     }
 
     public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI)
@@ -131,7 +133,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ApplyForce(Vector2 force, int weaponDamage)
+    public void ApplyForce(Vector2 force, int weaponDamage , float timeStunned)
     {
         currentSpeed += force.x;
         currentFallSpeed += force.y;
@@ -139,6 +141,7 @@ public class Player : MonoBehaviour
         {
             currentHealth -= weaponDamage;
         }
+        currentStun = timeStunned;
     }
 
     private void ApplySpeedToRigidBody()
@@ -264,138 +267,156 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void ability1Cooldown()
+    private void HandleHitStun()
     {
-        Debug.Log(A1StartCD);
-        Debug.Log(ability1CDTime);
-
-        if ((Time.time - A1StartCD) > ability1CDTime)
+        if(currentStun>0)
         {
-            A1OnCooldown = false;
-            A1StartCD = 0f;
+            notStunned = false;
+            currentStun -= .2f;
         }
-    }
-
-    private void ability2Cooldown()
-    {
-        if ((Time.time - A2StartCD) > ability2CDTime)
-        {
-            A2OnCooldown = false;
-            A2StartCD = 0f;
-        }
-    }
-    
-    private void HandleInput()
-    {
-        //get controller state
-        controllerState.x = gamepad.Move_X();
-        controllerState.y = gamepad.Move_Y();
-        controllerStateR.x = gamepad.Aim_X();
-        controllerStateR.y = gamepad.Aim_Y();
-        
-        var jumpInputReceived = gamepad.R1();
-        var jumpInputStopped = gamepad.R1Up();
-		var fireState = gamepad.R2();
-        var ability1 = gamepad.L1();
-        var ability2 = gamepad.L2();
-
-        // Left Stick Right Tilt
-        if (controllerState.x > 0.2)
-        {
-            if (currentSpeed < maxSpeed)
-            {
-                currentSpeed += acceleration;
-                if (currentSpeed > maxSpeed)
-                    currentSpeed = maxSpeed;
-            }
-        }
-        // Left Stick Left Tilt
-        else if (controllerState.x < -0.2)
-        {
-            if (currentSpeed > -maxSpeed)
-            {
-                currentSpeed -= acceleration;
-                if (currentSpeed < -maxSpeed)
-                    currentSpeed = -maxSpeed;
-            }
-        }
-        // No Left Stick X Input
         else
         {
-            applyDecelerationThisTick = true;
+            notStunned = true;
         }
+    }
 
-        // Left Stick Y Input
-        if (controllerState.y < -0.8)
+    private void Ability1Cooldown()
+    {
+        if (A1OnCooldown && A1StartCD != 0)
         {
-            if (!onGround && !onWallLeft && !onWallRight)
+            if ((Time.time - A1StartCD) > ability1CDTime)
             {
-                fastFalling = true;
+                A1OnCooldown = false;
+                A1StartCD = 0f;
             }
         }
+    }
 
-        if (jumpInputReceived)
+    private void Ability2Cooldown()
+    {
+        if (A2OnCooldown && A2StartCD != 0)
         {
-            jumpPressedTime = Time.time;
-
-            if (canJump)
+            if ((Time.time - A2StartCD) > ability2CDTime)
             {
-                if (onWallLeft && !onGround && canWallJumpToRight)
+                A2OnCooldown = false;
+                A2StartCD = 0f;
+            }
+        }
+    }
+
+    private void HandleInput()
+    {
+        if(notStunned){ 
+            //get controller state
+            controllerState.x = gamepad.Move_X();
+            controllerState.y = gamepad.Move_Y();
+            controllerStateR.x = gamepad.Aim_X();
+            controllerStateR.y = gamepad.Aim_Y();
+
+            var jumpInputReceived = gamepad.R1();
+            var jumpInputStopped = gamepad.R1Up();
+            var fireState = gamepad.R2();
+            var ability1 = gamepad.L1();
+            var ability2 = gamepad.L2();
+
+            // Left Stick Right Tilt
+            if (controllerState.x > 0.2)
+            {
+                if (currentSpeed < maxSpeed)
                 {
-                    wallJumpBufferState = true;
+                    currentSpeed += acceleration;
+                    if (currentSpeed > maxSpeed)
+                        currentSpeed = maxSpeed;
                 }
-                else if (onWallRight && !onGround && canWallJumpToLeft)
+            }
+            // Left Stick Left Tilt
+            else if (controllerState.x < -0.2)
+            {
+                if (currentSpeed > -maxSpeed)
                 {
-                    wallJumpBufferState = true;
-                    
+                    currentSpeed -= acceleration;
+                    if (currentSpeed < -maxSpeed)
+                        currentSpeed = -maxSpeed;
                 }
-                else if (currentJumpCount < maxcurrentJumpCount)
+            }
+            // No Left Stick X Input
+            else
+            {
+                applyDecelerationThisTick = true;
+            }
+
+            // Left Stick Y Input
+            if (controllerState.y < -0.8)
+            {
+                if (!onGround && !onWallLeft && !onWallRight)
                 {
-                    if (onGround)
+                    fastFalling = true;
+                }
+            }
+
+            if (jumpInputReceived)
+            {
+                jumpPressedTime = Time.time;
+
+                if (canJump)
+                {
+                    if (onWallLeft && !onGround && canWallJumpToRight)
                     {
-                        jumpBufferState = true;
+                        wallJumpBufferState = true;
                     }
-                    else
+                    else if (onWallRight && !onGround && canWallJumpToLeft)
                     {
-                        AirJump();
+                        wallJumpBufferState = true;
+
+                    }
+                    else if (currentJumpCount < maxcurrentJumpCount)
+                    {
+                        if (onGround)
+                        {
+                            jumpBufferState = true;
+                        }
+                        else
+                        {
+                            AirJump();
+                        }
                     }
                 }
             }
-        }
 
-        if (jumpInputStopped)
-        {
-            jumpReleasedTime = Time.time;
-        }
+            if (jumpInputStopped)
+            {
+                jumpReleasedTime = Time.time;
+            }
 
-		// handle aiming (right stick)
-		if (controllerStateR.magnitude > 0.2f) 
-		{
-			angle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
-			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
-			//gun.position = transform.position + gunPos + gunPosOffset;
+            // handle aiming (right stick)
+            if (controllerStateR.magnitude > 0.2f)
+            {
+                angle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+                gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
+                //gun.position = transform.position + gunPos + gunPosOffset;
 
-			// handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
-			//because the player's y value for their scale is 2, numbnutz. and this passes down to the child
-			//How to fix this without changing the player's x,y scale values to 1?
-			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-		}
-		gun.position = transform.position + gunPos + gunPosOffset;
+                // handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
+                //because the player's y value for their scale is 2, numbnutz. and this passes down to the child
+                //How to fix this without changing the player's x,y scale values to 1?
+                gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            }
+            gun.position = transform.position + gunPos + gunPosOffset;
 
-		if (fireState > 0.2f && canFire) 
-		{
-			FireWeapon ();
-			canFire = false;
-			StartCoroutine (FireRoutine (fireRate));
-		}
+            if (fireState > 0.2f && canFire)
+            {
+            FireWeapon();
+            canFire = false;
+            StartCoroutine(FireRoutine(fireRate));
+            }
 
-        if(ability1 && !A1OnCooldown)
-        {
-            Ability1();
-        }
-        if(ability2>.2 && !A2OnCooldown)
-        {
-            Ability2();
+            if (ability1 && !A1OnCooldown)
+            {
+                Ability1();
+            }
+            if (ability2 > .2 && !A2OnCooldown)
+            {
+                Ability2();
+            }
         }
     }
 
@@ -411,7 +432,7 @@ public class Player : MonoBehaviour
 											gun.transform.position + (gun.transform.right * bulletSpawnOffset), 
 											gun.transform.rotation);
 		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
-		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+		rb.velocity = (new Vector2(gun.transform.right.x, gun.transform.right.y)) * bulletSpeed;
         curBullet.GetComponent<Bullet>().setBounce(bouncing);
 	}
 
