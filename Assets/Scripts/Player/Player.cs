@@ -38,10 +38,12 @@ public class Player : MonoBehaviour
     public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
     public bool bouncing = false;
-    private float ability1CDTime = 0f;
-    private float ability2CDTime = 0f;
-    private bool A1OnCooldown;
-    private bool A2OnCooldown;
+    private float ability1CDTime = 4f;
+    private float ability2CDTime = 10f;
+    private float A1StartCD = 0f;
+    private float A2StartCD = 0f;
+    private bool A1OnCooldown = false;
+    private bool A2OnCooldown = false;
 
     private float angle = 0.0f;
     private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
@@ -108,9 +110,9 @@ public class Player : MonoBehaviour
         HandleJump();
         HandleGravity();
         ApplySpeedToRigidBody();
-        if (ability1CDTime != 0f)
+        if (A1OnCooldown && A1StartCD!=0)
             ability1Cooldown();
-        if (ability2CDTime != 0f)
+        if (A2OnCooldown && A2StartCD!=0)
             ability2Cooldown();
     }
 
@@ -262,21 +264,24 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void ability2Cooldown()
+    private void ability1Cooldown()
     {
-        if (Time.time - ability2CDTime > 10)
+        Debug.Log(A1StartCD);
+        Debug.Log(ability1CDTime);
+
+        if ((Time.time - A1StartCD) > ability1CDTime)
         {
-            A2OnCooldown = false;
-            ability2CDTime = 0f;
+            A1OnCooldown = false;
+            A1StartCD = 0f;
         }
     }
 
-    private void ability1Cooldown()
+    private void ability2Cooldown()
     {
-        if(Time.time - ability1CDTime > 10)
+        if ((Time.time - A2StartCD) > ability2CDTime)
         {
-            A1OnCooldown = false;
-            ability1CDTime = 0f;
+            A2OnCooldown = false;
+            A2StartCD = 0f;
         }
     }
     
@@ -387,12 +392,10 @@ public class Player : MonoBehaviour
         if(ability1 && !A1OnCooldown)
         {
             Ability1();
-            ability1CDTime = Time.time;
         }
         if(ability2>.2 && !A2OnCooldown)
         {
             Ability2();
-            ability2CDTime = Time.time;
         }
     }
 
@@ -415,11 +418,15 @@ public class Player : MonoBehaviour
     private void Ability1()
     {
         gameObject.GetComponent<AbilityOne>().fire(gun.transform);
+        A1OnCooldown = true;
+        A1StartCD = Time.time;
     }
 
     private void Ability2()
     {
         gameObject.GetComponent<AbilityTwo>().fire(gun.transform);
+        A2OnCooldown = true;
+        A2StartCD = Time.time;
     }
 
     private void PreJump()
