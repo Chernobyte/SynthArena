@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class CharacterIconData : MonoBehaviour {
 
-    public Sprite CharacterModel;
-    public Sprite Ability1;
-    public Sprite Ability2;
-    public Sprite Weapon;
+    public Sprite characterModel;
+    public Sprite ability1;
+    public Sprite ability2;
+    public Sprite weapon;
+
+    public GameObject characterPrefab;
 
 	void Start ()
     {

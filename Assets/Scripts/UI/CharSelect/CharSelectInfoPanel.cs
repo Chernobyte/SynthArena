@@ -44,10 +44,10 @@ public class CharSelectInfoPanel : MonoBehaviour {
         Weapon.gameObject.SetActive(true);
         ReadyFilter.gameObject.SetActive(false);
 
-        CharacterModel.sprite = data.CharacterModel;
-        Ability1.sprite = data.Ability1;
-        Ability2.sprite = data.Ability2;
-        Weapon.sprite = data.Weapon;
+        CharacterModel.sprite = data.characterModel;
+        Ability1.sprite = data.ability1;
+        Ability2.sprite = data.ability2;
+        Weapon.sprite = data.weapon;
     }
 
     public void DisplayConfirmInfo(CharacterIconData data)
@@ -59,9 +59,9 @@ public class CharSelectInfoPanel : MonoBehaviour {
         Weapon.gameObject.SetActive(true);
         ReadyFilter.gameObject.SetActive(true);
 
-        CharacterModel.sprite = data.CharacterModel;
-        Ability1.sprite = data.Ability1;
-        Ability2.sprite = data.Ability2;
-        Weapon.sprite = data.Weapon;
+        CharacterModel.sprite = data.characterModel;
+        Ability1.sprite = data.ability1;
+        Ability2.sprite = data.ability2;
+        Weapon.sprite = data.weapon;
     }
 }

@@ -22,7 +22,6 @@ public class Player : MonoBehaviour
     public float maxSpeed = 10.0f;
     public int maxHealth = 2000;
     public int currentHealth;
-    
 
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
@@ -106,7 +105,7 @@ public class Player : MonoBehaviour
         ApplySpeedToRigidBody();
     }
 
-    public void init(int playerNumber, Overlord overlord, PlayerUI playerUI)
+    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
@@ -121,7 +120,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ApplyForce(Vector2 force,int weaponDamage)
+    public void ApplyForce(Vector2 force, int weaponDamage)
     {
         currentSpeed += force.x;
         currentFallSpeed += force.y;

@@ -19,9 +19,6 @@ public class CharSelectCursor : MonoBehaviour {
     private CharSelectState state = CharSelectState.Inactive;
     private Vector3 initialPosition;
 
-    
-    
-
     void Start()
     {
         initialPosition = gameObject.transform.position;
@@ -99,7 +96,8 @@ public class CharSelectCursor : MonoBehaviour {
             }
             else if (state == CharSelectState.Selecting)
             {
-                overlord.ConfirmCursor(this);
+                var targetCharacterSelect = characterSelectOptions[currentCharSelectIndex];
+                overlord.ConfirmSelection(this, targetCharacterSelect.characterPrefab);
                 state = CharSelectState.Ready;
                 updatePosition = true;
             }
@@ -108,7 +106,7 @@ public class CharSelectCursor : MonoBehaviour {
         {
             if (state == CharSelectState.Ready)
             {
-                overlord.CancelCursor(this);
+                overlord.CancelSelection(this);
                 state = CharSelectState.Selecting;
                 updatePosition = true;
             }
