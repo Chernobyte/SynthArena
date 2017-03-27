@@ -6,15 +6,16 @@ using UnityEngine;
 public class CharSelectOverlord : MonoBehaviour {
     
     private const int maxNumPlayers = 4;
-    private Cursor[] cursors;
-    private List<Cursor> readyCursors;
-    private GameObject[] charSelectOptions;
+    private CharSelectCursor[] cursors;
+    private CharSelectInfoPanel[] infoPanels;
+    private List<CharSelectCursor> readyCursors = new List<CharSelectCursor>();
+    private CharacterIconData[] charSelectOptions;
 
     void Start()
     {
-        InitReadyCursors();
         InitCharSelectOptions();
-        InitCursors();
+        InitCharSelectInfoPanels();
+        InitCharSelectCursors();
     }
 
     void Update()
@@ -22,33 +23,37 @@ public class CharSelectOverlord : MonoBehaviour {
 
     }
 
-    void InitReadyCursors()
-    {
-        readyCursors = new List<Cursor>();
-    }
-
     void InitCharSelectOptions()
     {
-        charSelectOptions = GameObject.FindGameObjectsWithTag("CharacterSelectOption").OrderByDescending(n => n.transform.position.y).ToArray();
+        var charSelectOptionGOs = GameObject.FindGameObjectsWithTag("CharacterSelectOption");
+        charSelectOptions = charSelectOptionGOs.Select(n => n.GetComponent<CharacterIconData>()).OrderByDescending(n => n.transform.position.y).ToArray();
     }
 
-    void InitCursors()
+    void InitCharSelectInfoPanels()
+    {
+        var infoPanelGOs = GameObject.FindGameObjectsWithTag("CharacterSelectInfoPanel");
+        infoPanels = infoPanelGOs.Select(n => n.GetComponent<CharSelectInfoPanel>()).ToArray();
+    }
+
+    void InitCharSelectCursors()
     {
         var playerCursorGOs = GameObject.FindGameObjectsWithTag("Cursor");
-        var playerCursors = playerCursorGOs.Select(n => n.GetComponent<Cursor>()).ToArray();
+        var playerCursors = playerCursorGOs.Select(n => n.GetComponent<CharSelectCursor>()).ToArray();
 
         for (int i=0; i<playerCursors.Length; i++)
         {
-            playerCursors[i].Init(this, charSelectOptions);
+            var cursor = playerCursors[i];
+            var infoPanel = infoPanels.First(n => n.playerId == cursor.playerId);
+            cursor.Init(this, charSelectOptions, infoPanel);
         }
     }
 
-    public void ConfirmCursor(Cursor cursor)
+    public void ConfirmCursor(CharSelectCursor cursor)
     {
         readyCursors.Add(cursor);
     }
 
-    public void CancelCursor(Cursor cursor)
+    public void CancelCursor(CharSelectCursor cursor)
     {
         readyCursors.Remove(cursor);
     }
