@@ -16,7 +16,7 @@ public class Explosion : MonoBehaviour {
 	
 	void FixedUpdate ()
     {
-		if(Time.time - explosionStart >.2)
+		if(Time.time - explosionStart >.3)
         {
             Destroy(gameObject);
         }
