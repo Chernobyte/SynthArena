@@ -76,3 +76,7 @@
 	   Increase Bullet Firing Speed, Begin Bullet Bouncing
 - (MdG) Ability Icons; Main Electric Projectile; Grenade Sprite
 - (MR) Capt. Izzy basic animations (Idle, Walking, Jumping, Falling, Shooting)
+
+3-29-17
+- (EP) Menu cursors visible when multiple selecting same icon
+
