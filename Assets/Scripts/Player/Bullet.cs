@@ -13,6 +13,9 @@ public class Bullet : MonoBehaviour {
     Vector2 u;
     Vector2 w;
 
+    float knockback = 10f;
+    Vector2 knockbackVector;
+
 	// Use this for initialization
 	void Start () {
 		platform = GameObject.FindWithTag ("Platform");
@@ -42,8 +45,15 @@ public class Bullet : MonoBehaviour {
 	{
         if (!bounce)
         {
-            if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Wall"))
+            if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("Wall"))
             {
+                Destroy(gameObject);
+            }
+            else if(collision.gameObject.CompareTag("Player"))
+            {
+                knockbackVector = new Vector2(collision.gameObject.transform.position.x - gameObject.transform.position.x, collision.gameObject.transform.position.y - gameObject.transform.position.y);
+                knockbackVector.Normalize();
+                collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
                 Destroy(gameObject);
             }
         }
@@ -59,8 +69,11 @@ public class Bullet : MonoBehaviour {
            }
            if (collision.gameObject.CompareTag("Player"))
            {
+                knockbackVector = new Vector2(collision.gameObject.transform.position.x - gameObject.transform.position.x, collision.gameObject.transform.position.y - gameObject.transform.position.y);
+                knockbackVector.Normalize();
+                collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
                 Destroy(gameObject);
-           }
+            }
         }
    }
 

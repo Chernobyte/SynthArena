@@ -35,7 +35,7 @@ public class Player : MonoBehaviour
     public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
                                                                   //bullet
     public GameObject bullet;
-    public float bulletSpawnOffset = 1.2f;
+    public float bulletSpawnOffset = .5f;
     public float fireRate = 1.0f;
     public bool bouncing = false;
     private float ability1CDTime = 8f;
@@ -141,7 +141,7 @@ public class Player : MonoBehaviour
         {
             currentHealth -= weaponDamage;
         }
-        currentStun = timeStunned;
+        currentStun = Time.time + timeStunned;
     }
 
     private void ApplySpeedToRigidBody()
@@ -269,14 +269,15 @@ public class Player : MonoBehaviour
 
     private void HandleHitStun()
     {
-        if(currentStun>0)
+        if(currentStun!=0)
         {
-            notStunned = false;
-            currentStun -= .2f;
-        }
-        else
-        {
-            notStunned = true;
+            if (Time.time > currentStun)
+            {
+                notStunned = true;
+                currentStun = 0;
+            }
+            else
+                notStunned = false;            
         }
     }
 
