@@ -13,7 +13,7 @@ public class Bullet : MonoBehaviour {
     Vector2 u;
     Vector2 w;
 
-    float knockback = 10f;
+    float knockback = 2f;
     Vector2 knockbackVector;
 
 	// Use this for initialization
@@ -33,6 +33,7 @@ public class Bullet : MonoBehaviour {
             bounce = false;
             bounceDuration = 0;
         }
+
 	}
 
     public void setBounce(bool active)
@@ -51,7 +52,7 @@ public class Bullet : MonoBehaviour {
             }
             else if(collision.gameObject.CompareTag("Player"))
             {
-                knockbackVector = new Vector2(collision.gameObject.transform.position.x - gameObject.transform.position.x, collision.gameObject.transform.position.y - gameObject.transform.position.y);
+                knockbackVector = gameObject.GetComponent<Rigidbody2D>().velocity;
                 knockbackVector.Normalize();
                 collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
                 Destroy(gameObject);

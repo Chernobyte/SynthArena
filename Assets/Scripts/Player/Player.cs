@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
     //for aiming
     public Transform gun;
     public float fRadius = 1.0f;
-    public float bulletSpeed = 200.0f;
+    public float bulletSpeed = 5f;
     public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
                                                                   //bullet
     public GameObject bullet;
@@ -312,7 +312,7 @@ public class Player : MonoBehaviour
 
     private void HandleInput()
     {
-        if(notStunned){ 
+        if(notStunned){ // notStunned switches when hit by an attack
             //get controller state
             controllerState.x = gamepad.Move_X();
             controllerState.y = gamepad.Move_Y();
