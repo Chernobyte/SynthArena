@@ -31,11 +31,11 @@ public class Player : MonoBehaviour
     //for aiming
     public Transform gun;
     public float fRadius = 1.0f;
-    public float bulletSpeed = 200.0f;
+    public float bulletSpeed = 5f;
     public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
                                                                   //bullet
     public GameObject bullet;
-    public float bulletSpawnOffset = 1.2f;
+    public float bulletSpawnOffset = .5f;
     public float fireRate = 1.0f;
     public bool bouncing = false;
     private float ability1CDTime = 8f;
@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
     private float A2StartCD = 0f;
     private bool A1OnCooldown = false;
     private bool A2OnCooldown = false;
+    private float A1TimeSinceAbility = 100;
+    private float A2TimeSinceAbility = 100;
 
     private float angle = 0.0f;
     private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
@@ -108,6 +110,7 @@ public class Player : MonoBehaviour
         HandleInput();
         Ability1Cooldown();
         Ability2Cooldown();
+        UpdateAbilitiesCD();
     }
 
     private void FixedUpdate()
@@ -141,7 +144,7 @@ public class Player : MonoBehaviour
         {
             currentHealth -= weaponDamage;
         }
-        currentStun = timeStunned;
+        currentStun = Time.time + timeStunned;
     }
 
     private void ApplySpeedToRigidBody()
@@ -269,14 +272,15 @@ public class Player : MonoBehaviour
 
     private void HandleHitStun()
     {
-        if(currentStun>0)
+        if(currentStun!=0)
         {
-            notStunned = false;
-            currentStun -= .2f;
-        }
-        else
-        {
-            notStunned = true;
+            if (Time.time > currentStun)
+            {
+                notStunned = true;
+                currentStun = 0;
+            }
+            else
+                notStunned = false;            
         }
     }
 
@@ -284,7 +288,8 @@ public class Player : MonoBehaviour
     {
         if (A1OnCooldown && A1StartCD != 0)
         {
-            if ((Time.time - A1StartCD) > ability1CDTime)
+            A1TimeSinceAbility = Time.time - A1StartCD;
+            if (A1TimeSinceAbility > ability1CDTime)
             {
                 A1OnCooldown = false;
                 A1StartCD = 0f;
@@ -296,7 +301,8 @@ public class Player : MonoBehaviour
     {
         if (A2OnCooldown && A2StartCD != 0)
         {
-            if ((Time.time - A2StartCD) > ability2CDTime)
+            A2TimeSinceAbility = Time.time - A2StartCD;
+            if (A2TimeSinceAbility > ability2CDTime)
             {
                 A2OnCooldown = false;
                 A2StartCD = 0f;
@@ -306,7 +312,7 @@ public class Player : MonoBehaviour
 
     private void HandleInput()
     {
-        if(notStunned){ 
+        if(notStunned){ // notStunned switches when hit by an attack
             //get controller state
             controllerState.x = gamepad.Move_X();
             controllerState.y = gamepad.Move_Y();
@@ -597,5 +603,10 @@ public class Player : MonoBehaviour
     private void UpdateHealthBar()
     {
         playerUI.UpdateHealthBar(currentHealth, maxHealth);
+    }
+
+    private void UpdateAbilitiesCD()
+    {
+        playerUI.UpdateAbilitiesCD(A1TimeSinceAbility, ability1CDTime, A2TimeSinceAbility, ability2CDTime);
     }
 }
