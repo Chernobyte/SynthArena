@@ -44,8 +44,8 @@ public class Player : MonoBehaviour
     private float A2StartCD = 0f;
     private bool A1OnCooldown = false;
     private bool A2OnCooldown = false;
-    private float A1TimeSinceAbility = 0;
-    private float A2TimeSinceAbility = 0;
+    private float A1TimeSinceAbility = 100;
+    private float A2TimeSinceAbility = 100;
 
     private float angle = 0.0f;
     private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);

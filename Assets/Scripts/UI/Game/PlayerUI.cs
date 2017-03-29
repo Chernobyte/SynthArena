@@ -16,10 +16,11 @@ public class PlayerUI : MonoBehaviour {
     
     void Start()
     {
-        A1Fill.fillAmount = 0;
-        A2Fill.fillAmount = 0;
         A1Fill.color = new Color(0, 0, 0, .5f);
         A2Fill.color = new Color(0, 0, 0, .5f);
+        A1Fill.fillAmount = 0;
+        A2Fill.fillAmount = 0;
+       
     }
 
     public void UpdateHealthBar(int currentHealth, int maxHealth)
