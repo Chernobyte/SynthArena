@@ -83,3 +83,10 @@
 - (AK) Hitstun, Grenade speed / Power -> less spam more oomph
 - (MdG) Cont. 
 - (MR) Cont. (+ Wall Sliding Animation).
+
+4-3-17
+- (EP) Cont., Animation Integration, Music Integration, Menu Win Screen
+- (MW) Game Background, Game Logo
+- (AK) Music Integration, Projectile Sprites
+- (MdG) Projectile Refinement
+- (MR) Animation
