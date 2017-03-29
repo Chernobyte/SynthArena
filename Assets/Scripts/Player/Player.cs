@@ -279,8 +279,8 @@ public class Player : MonoBehaviour
                     currentSpeed = maxSpeed;
             }
 			anim.SetBool ("isRunning", true);
-			//gameObject.transform.localScale = new Vector3 (-1, 1, 1);
-			gameObject.transform.rotation = Quaternion.identity; //should return x axis to face right
+			gameObject.transform.localScale = Vector3.one;
+			//gameObject.transform.rotation = Quaternion.identity; //should return x axis to face right
         }
         // Left Stick Left Tilt
         //else if (controllerState.x < -0.2)
@@ -293,8 +293,8 @@ public class Player : MonoBehaviour
                     currentSpeed = -maxSpeed;
             }
 			anim.SetBool ("isRunning", true);
-			//gameObject.transform.localScale = Vector3.one;
-			gameObject.transform.rotation = Quaternion.Euler (Vector3.up * 180); //should flip x axis to face left
+			gameObject.transform.localScale = new Vector3 (-1, 1, 1);
+			//gameObject.transform.rotation = Quaternion.Euler (Vector3.up * 180); //should flip x axis to face left
         }
         // No Left Stick X Input
         else
@@ -313,7 +313,7 @@ public class Player : MonoBehaviour
         }
 
         //if (jumpInputReceived)
-		if(Input.GetKey(KeyCode.Space))
+		if(Input.GetKeyDown(KeyCode.Space))
         {
             jumpPressedTime = Time.time;
 
