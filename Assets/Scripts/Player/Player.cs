@@ -269,7 +269,8 @@ public class Player : MonoBehaviour
         var ability2 = gamepad.L2();
 
         // Left Stick Right Tilt
-        if (controllerState.x > 0.2)
+        //if (controllerState.x > 0.2)
+		if(Input.GetKey(KeyCode.D))
         {
             if (currentSpeed < maxSpeed)
             {
@@ -278,9 +279,12 @@ public class Player : MonoBehaviour
                     currentSpeed = maxSpeed;
             }
 			anim.SetBool ("isRunning", true);
+			//gameObject.transform.localScale = new Vector3 (-1, 1, 1);
+			gameObject.transform.rotation = Quaternion.identity; //should return x axis to face right
         }
         // Left Stick Left Tilt
-        else if (controllerState.x < -0.2)
+        //else if (controllerState.x < -0.2)
+		else if(Input.GetKey(KeyCode.A))
         {
             if (currentSpeed > -maxSpeed)
             {
@@ -289,6 +293,8 @@ public class Player : MonoBehaviour
                     currentSpeed = -maxSpeed;
             }
 			anim.SetBool ("isRunning", true);
+			//gameObject.transform.localScale = Vector3.one;
+			gameObject.transform.rotation = Quaternion.Euler (Vector3.up * 180); //should flip x axis to face left
         }
         // No Left Stick X Input
         else
@@ -306,7 +312,8 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (jumpInputReceived)
+        //if (jumpInputReceived)
+		if(Input.GetKey(KeyCode.Space))
         {
             jumpPressedTime = Time.time;
 
@@ -331,6 +338,7 @@ public class Player : MonoBehaviour
                     {
                         AirJump();
                     }
+					anim.SetBool ("isJumping", true);
                 }
             }
         }
@@ -347,9 +355,6 @@ public class Player : MonoBehaviour
 			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
 			//gun.position = transform.position + gunPos + gunPosOffset;
 
-			// handle gun rotation (why the fuck is it gettign skewed? the scale doesnt change?)
-			//because the player's y value for their scale is 2, numbnutz. and this passes down to the child
-			//How to fix this without changing the player's x,y scale values to 1?
 			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 		}
 		gun.position = transform.position + gunPos + gunPosOffset;
@@ -493,6 +498,8 @@ public class Player : MonoBehaviour
             currentJumpCount = 0;
             currentFallSpeed = 0;
             fastFalling = false;
+
+			anim.SetBool ("isJumping", false);
         }
     }
 
