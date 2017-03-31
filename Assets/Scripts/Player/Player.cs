@@ -440,10 +440,12 @@ public class Player : MonoBehaviour
 		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
 		rb.velocity = (new Vector2(gun.transform.right.x, gun.transform.right.y)) * bulletSpeed;
         curBullet.GetComponent<Bullet>().setBounce(bouncing);
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.Play();
 	}
 
     private void Ability1()
-    {
+    { 
         gameObject.GetComponent<AbilityOne>().fire(gun.transform);
         A1OnCooldown = true;
         A1StartCD = Time.time;
