@@ -62,12 +62,32 @@ public class Bullet : MonoBehaviour {
         {
            if( collision.gameObject.CompareTag("Platform"))
            {
-                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(gameObject.GetComponent<Rigidbody2D>().velocity.x, -gameObject.GetComponent<Rigidbody2D>().velocity.y);
+                float velH = gameObject.GetComponent<Rigidbody2D>().velocity.x;
+                float velV = gameObject.GetComponent<Rigidbody2D>().velocity.y;
+                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(velH, -velV);
+                if (velH < 0 && velV < 0)
+                    gameObject.transform.Rotate(0, 0, -90);
+                else if (velH < 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+                else if (velH > 0 && velV >0)
+                    gameObject.transform.Rotate(0, 0, -90);
+                else if (velH > 0)
+                    gameObject.transform.Rotate(0, 0, 90);
             }
             else if (collision.gameObject.CompareTag("Wall"))
            {
-                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(-gameObject.GetComponent<Rigidbody2D>().velocity.x, gameObject.GetComponent<Rigidbody2D>().velocity.y);
-           }
+                float velH = gameObject.GetComponent<Rigidbody2D>().velocity.x;
+                float velV = gameObject.GetComponent<Rigidbody2D>().velocity.y;
+                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(-velH, velV);
+                if (velH < 0 && velV < 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+                else if (velH < 0)
+                    gameObject.transform.Rotate(0, 0, -90);
+                else if (velH > 0 && velV > 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+                else if (velH > 0)
+                    gameObject.transform.Rotate(0, 0, -90);
+            }
            if (collision.gameObject.CompareTag("Player"))
            {
                 knockbackVector = new Vector2(collision.gameObject.transform.position.x - gameObject.transform.position.x, collision.gameObject.transform.position.y - gameObject.transform.position.y);

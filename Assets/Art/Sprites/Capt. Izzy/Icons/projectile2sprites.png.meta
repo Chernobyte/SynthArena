@@ -1,13 +1,116 @@
 fileFormatVersion: 2
 guid: 46c39d83fd3a7764ab1c4ead12bae2dd
-timeCreated: 1490818532
+timeCreated: 1491081597
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: projectile2sprites_0
+    21300002: projectile2sprites_1
+    21300004: projectile2sprites_2
+    21300006: projectile2sprites_3
+    21300008: projectile2sprites_4
+    21300010: projectile2sprites_5
+    21300012: projectile2sprites_6
+    21300014: projectile2sprites_7
+    21300016: projectile2sprites_8
+    21300018: projectile2sprites_9
+    21300020: projectile2sprites_10
+    21300022: projectile2sprites_11
+    21300024: projectile2sprites_12
+    21300026: projectile2sprites_13
+    21300028: projectile2sprites_14
+    21300030: projectile2sprites_15
+    21300032: projectile2sprites_16
+    21300034: projectile2sprites_17
+    21300036: projectile2sprites_18
+    21300038: projectile2sprites_19
+    21300040: projectile2sprites_20
+    21300042: projectile2sprites_21
+    21300044: projectile2sprites_22
+    21300046: projectile2sprites_23
+    21300048: projectile2sprites_24
+    21300050: projectile2sprites_25
+    21300052: projectile2sprites_26
+    21300054: projectile2sprites_27
+    21300056: projectile2sprites_28
+    21300058: projectile2sprites_29
+    21300060: projectile2sprites_30
+    21300062: projectile2sprites_31
+    21300064: projectile2sprites_32
+    21300066: projectile2sprites_33
+    21300068: projectile2sprites_34
+    21300070: projectile2sprites_35
+    21300072: projectile2sprites_36
+    21300074: projectile2sprites_37
+    21300076: projectile2sprites_38
+    21300078: projectile2sprites_39
+    21300080: projectile2sprites_40
+    21300082: projectile2sprites_41
+    21300084: projectile2sprites_42
+    21300086: projectile2sprites_43
+    21300088: projectile2sprites_44
+    21300090: projectile2sprites_45
+    21300092: projectile2sprites_46
+    21300094: projectile2sprites_47
+    21300096: projectile2sprites_48
+    21300098: projectile2sprites_49
+    21300100: projectile2sprites_50
+    21300102: projectile2sprites_51
+    21300104: projectile2sprites_52
+    21300106: projectile2sprites_53
+    21300108: projectile2sprites_54
+    21300110: projectile2sprites_55
+    21300112: projectile2sprites_56
+    21300114: projectile2sprites_57
+    21300116: projectile2sprites_58
+    21300118: projectile2sprites_59
+    21300120: projectile2sprites_60
+    21300122: projectile2sprites_61
+    21300124: projectile2sprites_62
+    21300126: projectile2sprites_63
+    21300128: projectile2sprites_64
+    21300130: projectile2sprites_65
+    21300132: projectile2sprites_66
+    21300134: projectile2sprites_67
+    21300136: projectile2sprites_68
+    21300138: projectile2sprites_69
+    21300140: projectile2sprites_70
+    21300142: projectile2sprites_71
+    21300144: projectile2sprites_72
+    21300146: projectile2sprites_73
+    21300148: projectile2sprites_74
+    21300150: projectile2sprites_75
+    21300152: projectile2sprites_76
+    21300154: projectile2sprites_77
+    21300156: projectile2sprites_78
+    21300158: projectile2sprites_79
+    21300160: projectile2sprites_80
+    21300162: projectile2sprites_81
+    21300164: projectile2sprites_82
+    21300166: projectile2sprites_83
+    21300168: projectile2sprites_84
+    21300170: projectile2sprites_85
+    21300172: projectile2sprites_86
+    21300174: projectile2sprites_87
+    21300176: projectile2sprites_88
+    21300178: projectile2sprites_89
+    21300180: projectile2sprites_90
+    21300182: projectile2sprites_91
+    21300184: projectile2sprites_92
+    21300186: projectile2sprites_93
+    21300188: projectile2sprites_94
+    21300190: projectile2sprites_95
+    21300192: projectile2sprites_96
+    21300194: projectile2sprites_97
+    21300196: projectile2sprites_98
+    21300198: projectile2sprites_99
+    21300200: projectile2sprites_100
+    21300202: projectile2sprites_101
+    21300204: projectile2sprites_102
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -30,11 +133,11 @@ TextureImporter:
     filterMode: -1
     aniso: -1
     mipBias: -1
-    wrapMode: -1
-  nPOTScale: 1
+    wrapMode: 1
+  nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 0
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -42,9 +145,9 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spritePixelsToUnits: 100
   alphaUsage: 1
-  alphaIsTransparency: 0
+  alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 0
+  textureType: 8
   textureShape: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
@@ -58,9 +161,82 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: projectile2sprites_0
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 351
+        width: 118
+        height: 119
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: projectile2sprites_1
+      rect:
+        serializedVersion: 2
+        x: 982
+        y: 175
+        width: 8
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: projectile2sprites_2
+      rect:
+        serializedVersion: 2
+        x: 979
+        y: 112
+        width: 6
+        height: 5
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: projectile2sprites_3
+      rect:
+        serializedVersion: 2
+        x: 982
+        y: 97
+        width: 4
+        height: 6
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: projectile2sprites_4
+      rect:
+        serializedVersion: 2
+        x: 989
+        y: 37
+        width: 11
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
     outline: []
   spritePackingTag: 
   userData: 
