@@ -167,10 +167,14 @@ public class Player : MonoBehaviour
         if (currentFallSpeed < 0)
         {
             LowerBodyAnimator.SetBool("isJumping", false);
-            LowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
         }
 
+        LowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
+
         applyDecelerationThisTick = false;
+
+        Debug.Log(currentSpeed);
+        Debug.Log(currentFallSpeed);
 
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
     }
