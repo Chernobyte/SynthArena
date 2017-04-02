@@ -4,6 +4,17 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour {
 	GameObject platform;
+    bool bounce;
+    float bounceTime = 2;
+    float bounceDuration = 0;
+    Vector2 normalVec;
+    Vector2 startVec;
+    Vector2 newVec;
+    Vector2 u;
+    Vector2 w;
+
+    float knockback = 2f;
+    Vector2 knockbackVector;
 
 	// Use this for initialization
 	void Start () {
@@ -16,13 +27,93 @@ public class Bullet : MonoBehaviour {
 
 		if (diff.magnitude > 50f)
 			Destroy (gameObject);
+
+        if(Time.time - bounceDuration > bounceTime)
+        {
+            bounce = false;
+            bounceDuration = 0;
+        }
+
 	}
+
+    public void setBounce(bool active)
+    {
+        bounce = active;
+        bounceDuration = Time.time;
+    }
 
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
-		if (collision.gameObject.CompareTag ("Platform") || collision.gameObject.CompareTag ("Player")) 
-		{
-			Destroy (gameObject);
-		}
-	}
+        if (!bounce)
+        {
+            if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("Wall"))
+            {
+                Destroy(gameObject);
+            }
+            else if(collision.gameObject.CompareTag("Player"))
+            {
+                knockbackVector = gameObject.GetComponent<Rigidbody2D>().velocity;
+                knockbackVector.Normalize();
+                collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
+                Destroy(gameObject);
+            }
+        }
+        else
+        {
+           if( collision.gameObject.CompareTag("Platform"))
+           {
+                float velH = gameObject.GetComponent<Rigidbody2D>().velocity.x;
+                float velV = gameObject.GetComponent<Rigidbody2D>().velocity.y;
+                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(velH, -velV);
+                if (velH < 0 && velV < 0)
+                    gameObject.transform.Rotate(0, 0, -90);
+                else if (velH < 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+                else if (velH > 0 && velV >0)
+                    gameObject.transform.Rotate(0, 0, -90);
+                else if (velH > 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+            }
+            else if (collision.gameObject.CompareTag("Wall"))
+           {
+                float velH = gameObject.GetComponent<Rigidbody2D>().velocity.x;
+                float velV = gameObject.GetComponent<Rigidbody2D>().velocity.y;
+                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(-velH, velV);
+                if (velH < 0 && velV < 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+                else if (velH < 0)
+                    gameObject.transform.Rotate(0, 0, -90);
+                else if (velH > 0 && velV > 0)
+                    gameObject.transform.Rotate(0, 0, 90);
+                else if (velH > 0)
+                    gameObject.transform.Rotate(0, 0, -90);
+            }
+           if (collision.gameObject.CompareTag("Player"))
+           {
+                knockbackVector = new Vector2(collision.gameObject.transform.position.x - gameObject.transform.position.x, collision.gameObject.transform.position.y - gameObject.transform.position.y);
+                knockbackVector.Normalize();
+                collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
+                Destroy(gameObject);
+            }
+        }
+   }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Debug.Log("Collide");
+        if(bounce)
+        {
+            if(hit.gameObject.CompareTag("Platform") || hit.gameObject.CompareTag("Wall"))
+            {
+                Debug.Log("bounce");
+                normalVec = hit.normal;
+                startVec = hit.gameObject.GetComponent<Rigidbody2D>().velocity;
+                float angle = Mathf.Atan2(startVec.y - normalVec.y, startVec.x - normalVec.x);
+                u = normalVec * ((normalVec.magnitude * startVec.magnitude * Mathf.Cos(angle)) / (normalVec.magnitude * normalVec.magnitude));
+                w = startVec - u;
+                newVec = w - u;
+                hit.gameObject.GetComponent<Rigidbody2D>().velocity = newVec;
+            }
+        }
+    }
 }

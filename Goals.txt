@@ -68,3 +68,25 @@
 - (MdG) Capt. Izzy Art / Ability Icons
 - (EP) Begin Menu -> Gameplay Transition
 - (MR) Grenade Particles / Effects
+
+3-27-17
+- (EP) Menu -> Gameplay Transition; Menu Controls
+- (MW) SFX; Double Game Background Image Size / Density
+- (AK) Finish Grenade Mechanics (Damage, Knockback & Stun)
+	   Increase Bullet Firing Speed, Begin Bullet Bouncing
+- (MdG) Ability Icons; Main Electric Projectile; Grenade Sprite
+- (MR) Capt. Izzy basic animations (Idle, Walking, Jumping, Falling, Shooting)
+
+3-29-17
+- (EP) Menu cursors visible when multiple selecting same icon, Movement lingering after wall slide, velocity lingering when not landing on floor, wall slide should not apply if cant wall jump, menu size should scale with screen size, HUD too high off bottom of screen, Emissive details on Character, Map Existing sounds into character actions, Map character icons onto HUD from Character Select. 
+- (MW) 2 Jumping Vocalizations (Up inflection), 2 Double Jump Vocalizations (higher pitch than base jump), quicker primary weapon sound.
+- (AK) Hitstun, Grenade speed / Power -> less spam more oomph
+- (MdG) Cont. 
+- (MR) Cont. (+ Wall Sliding Animation).
+
+4-3-17
+- (EP) Cont., Animation Integration, Music Integration, Menu Win Screen
+- (MW) Game Background, Game Logo
+- (AK) Music Integration, Projectile Sprites
+- (MdG) Projectile Refinement
+- (MR) Animation

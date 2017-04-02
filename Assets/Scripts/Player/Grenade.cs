@@ -35,7 +35,7 @@ public class Grenade : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        if (col)
+        if (col && collidedObj != null)
         {
             gameObject.transform.position = collidedObj.transform.position + collisionOffset;
         }
@@ -44,10 +44,8 @@ public class Grenade : MonoBehaviour {
     private void OnCollisionStay2D(Collision2D collision)
     {
         var armed = Time.time - timeCreated > armTime;
-        Debug.Log(armed);
         if (!col && armed)
         {
-            Debug.Log("COLLIDED");
             collisionOffset = gameObject.transform.position - collision.gameObject.transform.position;
             collidedObj = collision.gameObject;
             col = true;

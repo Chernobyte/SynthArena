@@ -42,6 +42,15 @@ public class Player : MonoBehaviour
     public float bulletSpeed = 5.0f;
     public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
+    public bool bouncing = false;
+    private float ability1CDTime = 8f;
+    private float ability2CDTime = 10f;
+    private float A1StartCD = 0f;
+    private float A2StartCD = 0f;
+    private bool A1OnCooldown = false;
+    private bool A2OnCooldown = false;
+    private float A1TimeSinceAbility = 100;
+    private float A2TimeSinceAbility = 100;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
@@ -75,7 +84,8 @@ public class Player : MonoBehaviour
     private bool wallJumpBufferState = false;
     private bool applyDecelerationThisTick;
     private bool lookingRight = true;
-    
+    private float currentStun;
+    private bool notStunned = true;
 
     private void Start() 
 	{
@@ -101,6 +111,9 @@ public class Player : MonoBehaviour
         HandleInput();
         HandleLookDirection();
         HandleAiming();
+        Ability1Cooldown();
+        Ability2Cooldown();
+        UpdateAbilitiesCD();
     }
 
     private void FixedUpdate()
@@ -108,9 +121,10 @@ public class Player : MonoBehaviour
         HandleJump();
         HandleGravity();
         ApplySpeedToRigidBody();
+        HandleHitStun();
     }
 
-    public void init(int playerNumber, Overlord overlord, PlayerUI playerUI)
+    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
@@ -125,8 +139,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ApplyForce(Vector2 force)
+    public void ApplyForce(Vector2 force, int weaponDamage , float timeStunned)
     {
+        currentSpeed += force.x;
+        currentFallSpeed += force.y;
+        if(weaponDamage!=0)
+        {
+            currentHealth -= weaponDamage;
+        }
+        currentStun = Time.time + timeStunned;
     }
 
     private void ApplySpeedToRigidBody()
@@ -431,29 +452,76 @@ public class Player : MonoBehaviour
         }
     }
 
-	IEnumerator FireRoutine(float duration)
-	{
-		yield return new WaitForSeconds (duration);
-		canFire = true;
-	}
+    private void HandleHitStun()
+    {
+        if (currentStun != 0)
+        {
+            if (Time.time > currentStun)
+            {
+                notStunned = true;
+                currentStun = 0;
+            }
+            else
+                notStunned = false;
+        }
+    }
 
-	private void FireWeapon()
-	{
-		GameObject curBullet = Instantiate (bullet, 
-											weapon.transform.position + (weapon.transform.right * bulletSpawnOffset),
+    private void Ability1Cooldown()
+    {
+        if (A1OnCooldown && A1StartCD != 0)
+        {
+            A1TimeSinceAbility = Time.time - A1StartCD;
+            if (A1TimeSinceAbility > ability1CDTime)
+            {
+                A1OnCooldown = false;
+                A1StartCD = 0f;
+            }
+        }
+    }
+
+    private void Ability2Cooldown()
+    {
+        if (A2OnCooldown && A2StartCD != 0)
+        {
+            A2TimeSinceAbility = Time.time - A2StartCD;
+            if (A2TimeSinceAbility > ability2CDTime)
+            {
+                A2OnCooldown = false;
+                A2StartCD = 0f;
+            }
+        }
+    }
+
+    IEnumerator FireRoutine(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        canFire = true;
+    }
+
+    private void FireWeapon()
+    {
+        GameObject curBullet = Instantiate(bullet,
+                                            weapon.transform.position + (weapon.transform.right * bulletSpawnOffset),
                                             weapon.transform.rotation);
-		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
-		rb.velocity = new Vector2(weapon.transform.right.x, weapon.transform.right.y) * bulletSpeed;
-	}
+        Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D>();
+        rb.velocity = (new Vector2(weapon.transform.right.x, weapon.transform.right.y)) * bulletSpeed;
+        curBullet.GetComponent<Bullet>().setBounce(bouncing);
+        AudioSource audio = GetComponent<AudioSource>();
+        audio.Play();
+    }
 
     private void Ability1()
     {
         gameObject.GetComponent<AbilityOne>().fire(weapon.transform);
+        A1OnCooldown = true;
+        A1StartCD = Time.time;
     }
 
     private void Ability2()
     {
-
+        gameObject.GetComponent<AbilityTwo>().fire(weapon.transform);
+        A2OnCooldown = true;
+        A2StartCD = Time.time;
     }
 
     private void PreJump()
@@ -620,5 +688,10 @@ public class Player : MonoBehaviour
     private void UpdateHealthBar()
     {
         playerUI.UpdateHealthBar(currentHealth, maxHealth);
+    }
+
+    private void UpdateAbilitiesCD()
+    {
+        playerUI.UpdateAbilitiesCD(A1TimeSinceAbility, ability1CDTime, A2TimeSinceAbility, ability2CDTime);
     }
 }

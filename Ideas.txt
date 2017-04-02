@@ -64,10 +64,11 @@ Skrush
 
 Sounds
 - Footsteps (Metallic)
-- Jumping (Whoosh?)
-- Laser Rifle
+- Jumping 
+- Shock Gun
 	- Firing
 	- Hitting Wall
+	- Air resistance
 - Laser Pistol
 	- Firing
 	- Hitting Wall
@@ -82,8 +83,7 @@ Art Assets
 	- Grenade
 	- Primary Attack (Electric Beam)
 	- Impact of Primary Fire on Surface (fizzle / lingering crackles)
-	- Double Jump Effect
-	- Dust cloud (wall sliding effect)
+	- Double Jump Effect (Accent on second grunt)
 - Level
 	- Background
 	- Walls / Floors

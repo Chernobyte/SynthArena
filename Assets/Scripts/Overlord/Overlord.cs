@@ -5,56 +5,65 @@ using UnityEngine;
 
 public class Overlord : MonoBehaviour {
 
-    Player[] players;
-    bool playersCached = false;
+    public GameObject debugPlayerPrefab;
+    public GameObject debugDummyPrefab;
 
-	void Start () {
-        cachePlayers();
-        initPlayers();
+    private List<PlayerSelection> playerSelections;
+    private SpawnPoint[] spawnPoints;
+    private Player[] players;
+    private PlayerUI[] playerUIs;
+    private bool playersCached = false;
+
+	void Start ()
+    {
+        Init();
 	}
 	
-	void Update () {
+	void Update()
+    {
 		
 	}
 
-    void cachePlayers()
+    private void Init()
     {
-        if (playersCached) return;
+        var charSelectOverlord = FindObjectOfType<CharSelectOverlord>();
 
-        GameObject[] playerGOs = GameObject.FindGameObjectsWithTag("Player");
-        players = playerGOs.Select(n => n.GetComponent<Player>()).ToArray();
-        playersCached = true;
-    }
-
-    void initPlayers()
-    {
-        var playerUIGOs = GameObject.FindGameObjectsWithTag("PlayerUI");
-        var playerUIs = playerUIGOs.Select(n => n.GetComponent<PlayerUI>()).ToArray();
-
-        // init present players
-        for (int i=0; i<players.Length; i++)
+        if (charSelectOverlord == null) // debug mode
         {
-            var playerId = i + 1;
-            var playerUI = playerUIs.Where(n => n.playerId == playerId).First();
-            players[i].init(playerId, this, playerUI);
-        }
 
-        // hide unused playerUIs
-        for (int i=players.Length; i<playerUIGOs.Length; i++)
-        {
-            var playerId = i + 1;
-            var playerUI = playerUIs.Where(n => n.playerId == playerId).First();
-            playerUI.gameObject.SetActive(false);
+            playerSelections = new List<PlayerSelection>()
+            {
+                new PlayerSelection(1, debugPlayerPrefab),
+                new PlayerSelection(2, debugDummyPrefab)
+            };
         }
-    }
-
-    public Player[] requestPlayers()
-    {
-        if (playersCached) return players;
         else
         {
-            cachePlayers();
-            return players;
+            playerSelections = charSelectOverlord.ReqeustPlayerSelections();
+            Destroy(charSelectOverlord);            
+        }
+
+        spawnPoints = FindObjectsOfType<SpawnPoint>();
+        playerUIs = FindObjectsOfType<PlayerUI>();
+
+        foreach (var selection in playerSelections)
+        {
+            if (selection.characterPrefab == null)
+                continue;
+
+            var spawnPoint = spawnPoints.First(n => n.playerId == selection.playerId);
+            var playerUI = playerUIs.First(n => n.playerId == selection.playerId);
+
+            var playerGO = Instantiate(selection.characterPrefab, spawnPoint.transform.position, Quaternion.identity);
+            var player = playerGO.GetComponent<Player>();
+            player.Init(selection.playerId, this, playerUI);
+        }
+
+        var inactivePlayerUIs = playerUIs.Where(n => !playerSelections.Exists(x => x.playerId == n.playerId && x.characterPrefab != null));
+
+        foreach (var playerUI in inactivePlayerUIs)
+        {
+            playerUI.gameObject.SetActive(false);
         }
     }
 }
