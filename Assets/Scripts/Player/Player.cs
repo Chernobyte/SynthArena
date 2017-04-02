@@ -94,7 +94,7 @@ public class Player : MonoBehaviour
         rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
     }
     
-    private void Update() 
+    private void Update()
 	{
         UpdateHealthBar();
         HandleInput();
@@ -164,6 +164,12 @@ public class Player : MonoBehaviour
             }
         }
 
+        if (currentFallSpeed < 0)
+        {
+            LowerBodyAnimator.SetBool("isJumping", false);
+            LowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
+        }
+
         applyDecelerationThisTick = false;
 
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
@@ -180,12 +186,6 @@ public class Player : MonoBehaviour
             else
             {
                 currentFallSpeed += gravity;
-
-                if (currentFallSpeed < 0)
-                {
-                    LowerBodyAnimator.SetBool("isJumping", false);
-                    LowerBodyAnimator.SetBool("isFalling", true);
-                }
 
                 if (onWallLeft || onWallRight)
                 {
@@ -220,7 +220,6 @@ public class Player : MonoBehaviour
                 }
 
                 jumpBufferState = false;
-                LowerBodyAnimator.SetBool("inJumpSquat", false);
             }
         }
         else
@@ -332,7 +331,6 @@ public class Player : MonoBehaviour
                     if (onGround)
                     {
                         jumpBufferState = true;
-                        LowerBodyAnimator.SetBool("inJumpSquat", true);
                     }
                     else
                     {
@@ -404,8 +402,8 @@ public class Player : MonoBehaviour
     private void PreJump()
     {
         currentJumpCount++;
+        LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         LowerBodyAnimator.SetBool("isJumping", true);
-        LowerBodyAnimator.SetBool("isFalling", false);
         fastFalling = false;
     }
 
@@ -435,7 +433,7 @@ public class Player : MonoBehaviour
 
         currentFallSpeed = airJumpStrength;
 
-        LowerBodyAnimator.SetBool("isFalling", false);
+        LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         LowerBodyAnimator.SetBool("isJumping", true);
     }
 
@@ -503,7 +501,7 @@ public class Player : MonoBehaviour
             currentFallSpeed = 0;
             fastFalling = false;
             
-            LowerBodyAnimator.SetBool("isFalling", false);
+            LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
             LowerBodyAnimator.SetBool("isJumping", false);
         }
     }
@@ -515,6 +513,8 @@ public class Player : MonoBehaviour
             onGround = false;
             currentJumpCount = 1;
             canJump = true;
+
+            LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         }
     }
 
