@@ -25,12 +25,13 @@ public class Player : MonoBehaviour
     
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
-    public GameObject backTriggerObject;
-    public GameObject forwardTriggerObject;
+    public GameObject leftTriggerObject;
+    public GameObject rightTriggerObject;
     public Animator upperBodyAnimator;
     public Animator lowerBodyAnimator;
 
     //for aiming
+    public GameObject sprites;
     public GameObject weapon;
     public GameObject arm;
     public Transform bracePosition;
@@ -43,7 +44,6 @@ public class Player : MonoBehaviour
     public float fireRate = 1.0f;
 
     private float aimAngle = 0.0f;
-    private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
     private bool canFire = true;
 
     //ability stuff
@@ -61,8 +61,8 @@ public class Player : MonoBehaviour
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
     private bool canJump = false;
-    private bool onWallBack = false;
-    private bool onWallForward = false;
+    private bool onWallLeft = false;
+    private bool onWallRight = false;
     private bool canWallJumpToLeft = false;
     private bool canWallJumpToRight = false;
     private bool onGround = false;
@@ -91,14 +91,16 @@ public class Player : MonoBehaviour
     {
         topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerEnter);
         bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit);
-        backTriggerObject.GetComponent<TriggerCallback>().Init(OnBackTriggerEnter, OnBackTriggerExit);
-        forwardTriggerObject.GetComponent<TriggerCallback>().Init(OnForwardTriggerEnter, OnForwardTriggerExit);
+        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit);
+        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
     }
     
     private void Update()
 	{
         UpdateHealthBar();
         HandleInput();
+        HandleLookDirection();
+        HandleAiming();
     }
 
     private void FixedUpdate()
@@ -189,10 +191,10 @@ public class Player : MonoBehaviour
             {
                 currentFallSpeed += gravity;
 
-                if (onWallBack || onWallForward)
+                if (onWallLeft || onWallRight)
                 {
-                    if (currentFallSpeed < maxFallSpeed / 2.0f)
-                        currentFallSpeed = maxFallSpeed / 2.0f;
+                    if (currentFallSpeed < maxFallSpeed / 1.5f)
+                        currentFallSpeed = maxFallSpeed / 1.5f;
                 }
                 else
                 {
@@ -232,11 +234,11 @@ public class Player : MonoBehaviour
 
                 wallJumpBufferState = false;
 
-                if (onWallBack)
+                if (onWallLeft)
                 {
                     direction = WallJumpDirection.Right;
                 }
-                else if (onWallForward)
+                else if (onWallRight)
                 {
                     direction = WallJumpDirection.Left;
                 }
@@ -273,17 +275,6 @@ public class Player : MonoBehaviour
         var ability1 = gamepad.L1();
         var ability2 = gamepad.L2();        
 
-		//// handle aiming (right stick)
-		//if (controllerStateR.magnitude > 0.2f) 
-		//{
-		//	aimAngle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
-		//	gunPos = Quaternion.AngleAxis(aimAngle, Vector3.forward) * (Vector3.right * fRadius);
-		//	//gun.position = transform.position + gunPos + gunPosOffset;
-
-		//	gun.rotation = Quaternion.AngleAxis(aimAngle, Vector3.forward);
-		//}
-		//gun.position = transform.position + gunPos + gunPosOffset;
-
 		if (fireState > 0.2f && canFire) 
 		{
 			FireWeapon();
@@ -307,22 +298,53 @@ public class Player : MonoBehaviour
         if (controllerStateR.x > 0)
         {
             lookingRight = true;
-            gameObject.transform.localScale = Vector3.one;
-            aimAngle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+            
         }
         // Right Stick Left Tilt
         else if (controllerStateR.x < 0)
         {
             lookingRight = false;
-            gameObject.transform.localScale = new Vector3(-1, 1, 1);
-            aimAngle = Mathf.Atan2(controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
+            
         }
         // No Right Stick X Input
         else
         {
 
         }
+    }
 
+    private void HandleLookDirection()
+    {
+        if (onWallLeft)
+        {
+            lookingRight = true;
+        }
+        else if (onWallRight)
+        {
+            lookingRight = false;
+        }
+
+        if (lookingRight)
+        {
+            sprites.transform.localScale = Vector3.one;
+        }
+        else
+        {
+            sprites.transform.localScale = new Vector3(-1, 1, 1);
+        }
+    }
+
+    private void HandleAiming()
+    {
+        if (lookingRight)
+        {
+            aimAngle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+        }
+        else
+        {
+            aimAngle = Mathf.Atan2(controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
+        }
+        
         var aimBlend = (aimAngle + 90.0f) / 180.0f;
         upperBodyAnimator.SetFloat("aimBlend", aimBlend);
     }
@@ -363,7 +385,7 @@ public class Player : MonoBehaviour
         // Left Stick Y Input
         if (controllerState.y < -0.8)
         {
-            if (!onGround && !onWallBack && !onWallForward)
+            if (!onGround && !onWallLeft && !onWallRight)
             {
                 fastFalling = true;
             }
@@ -381,14 +403,13 @@ public class Player : MonoBehaviour
 
             if (canJump)
             {
-                if (onWallBack && !onGround && canWallJumpToRight)
+                if (onWallLeft && !onGround && canWallJumpToRight)
                 {
                     wallJumpBufferState = true;
                 }
-                else if (onWallForward && !onGround && canWallJumpToLeft)
+                else if (onWallRight && !onGround && canWallJumpToLeft)
                 {
                     wallJumpBufferState = true;
-
                 }
                 else if (currentJumpCount < maxcurrentJumpCount)
                 {
@@ -554,49 +575,45 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void OnBackTriggerEnter(Collider2D collision)
+    public void OnLeftTriggerEnter(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallBack = true;
+            onWallLeft = true;
             fastFalling = false;
 
-            lowerBodyAnimator.SetBool("wallSlideLeft", true);
-
-            Debug.Log(" WALL");
+            lowerBodyAnimator.SetBool("wallSlide", true);
         }
     }
 
-    public void OnBackTriggerExit(Collider2D collision)
+    public void OnLeftTriggerExit(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallBack = false;
+            onWallLeft = false;
 
-            lowerBodyAnimator.SetBool("wallSlideLeft", false);
+            lowerBodyAnimator.SetBool("wallSlide", false);
         }
     }
 
-    public void OnForwardTriggerEnter(Collider2D collision)
+    public void OnRightTriggerEnter(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallForward = true;
+            onWallRight = true;
             fastFalling = false;
 
-            lowerBodyAnimator.SetBool("wallSlideRight", true);
-
-            Debug.Log("RIGHT WALL");
+            lowerBodyAnimator.SetBool("wallSlide", true);
         }
     }
 
-    public void OnForwardTriggerExit(Collider2D collision)
+    public void OnRightTriggerExit(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallForward = false;
+            onWallRight = false;
 
-            lowerBodyAnimator.SetBool("wallSlideRight", false);
+            lowerBodyAnimator.SetBool("wallSlide", false);
         }
     }
 
