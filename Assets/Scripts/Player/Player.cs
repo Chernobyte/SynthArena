@@ -315,7 +315,7 @@ public class Player : MonoBehaviour
         {
             lookingRight = false;
             gameObject.transform.localScale = new Vector3(-1, 1, 1);
-            aimAngle = Mathf.Atan2(-controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
+            aimAngle = Mathf.Atan2(controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
         }
         // No Right Stick X Input
         else
@@ -323,9 +323,8 @@ public class Player : MonoBehaviour
 
         }
 
-        Debug.Log(aimAngle);
-
-        weapon.transform.rotation = Quaternion.AngleAxis(aimAngle, Vector3.forward);
+        var aimBlend = (aimAngle + 90.0f) / 180.0f;
+        upperBodyAnimator.SetFloat("aimBlend", aimBlend);
     }
 
     private void HandleLeftStickInput()
