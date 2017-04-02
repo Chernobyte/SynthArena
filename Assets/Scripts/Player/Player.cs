@@ -25,8 +25,8 @@ public class Player : MonoBehaviour
     
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
-    public GameObject leftTriggerObject;
-    public GameObject rightTriggerObject;
+    public GameObject backTriggerObject;
+    public GameObject forwardTriggerObject;
     public Animator UpperBodyAnimator;
     public Animator LowerBodyAnimator;
 
@@ -40,7 +40,7 @@ public class Player : MonoBehaviour
     public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
 
-    private float angle = 0.0f;
+    private float aimAngle = 0.0f;
     private Vector3 gunPos = new Vector3(1.0f, 0.0f, 0.0f);
     private bool canFire = true;
 
@@ -59,8 +59,8 @@ public class Player : MonoBehaviour
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
     private bool canJump = false;
-    private bool onWallLeft = false;
-    private bool onWallRight = false;
+    private bool onWallBack = false;
+    private bool onWallForward = false;
     private bool canWallJumpToLeft = false;
     private bool canWallJumpToRight = false;
     private bool onGround = false;
@@ -72,6 +72,7 @@ public class Player : MonoBehaviour
     private bool jumpBufferState = false;
     private bool wallJumpBufferState = false;
     private bool applyDecelerationThisTick;
+    private bool lookingRight = true;
     
 
     private void Start() 
@@ -82,16 +83,14 @@ public class Player : MonoBehaviour
         InitializeTriggers();
 
         currentHealth = maxHealth;
-		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
-		gun.position = transform.position + gunPos + gunPosOffset;
     }
 
     private void InitializeTriggers()
     {
         topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerEnter);
         bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit);
-        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit);
-        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
+        backTriggerObject.GetComponent<TriggerCallback>().Init(OnBackTriggerEnter, OnBackTriggerExit);
+        forwardTriggerObject.GetComponent<TriggerCallback>().Init(OnForwardTriggerEnter, OnForwardTriggerExit);
     }
     
     private void Update()
@@ -173,9 +172,6 @@ public class Player : MonoBehaviour
 
         applyDecelerationThisTick = false;
 
-        Debug.Log(currentSpeed);
-        Debug.Log(currentFallSpeed);
-
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
     }
 
@@ -191,7 +187,7 @@ public class Player : MonoBehaviour
             {
                 currentFallSpeed += gravity;
 
-                if (onWallLeft || onWallRight)
+                if (onWallBack || onWallForward)
                 {
                     if (currentFallSpeed < maxFallSpeed / 2.0f)
                         currentFallSpeed = maxFallSpeed / 2.0f;
@@ -234,11 +230,11 @@ public class Player : MonoBehaviour
 
                 wallJumpBufferState = false;
 
-                if (onWallLeft)
+                if (onWallBack)
                 {
                     direction = WallJumpDirection.Right;
                 }
-                else if (onWallRight)
+                else if (onWallForward)
                 {
                     direction = WallJumpDirection.Left;
                 }
@@ -273,6 +269,24 @@ public class Player : MonoBehaviour
         var ability1 = gamepad.L1();
         var ability2 = gamepad.L2();
 
+        // Right Stick Right Tilt
+        if (controllerStateR.x > 0)
+        {
+            lookingRight = true;
+            gameObject.transform.localScale = Vector3.one;
+        }
+        // Right Stick Left Tilt
+        else if (controllerStateR.x < 0)
+        {
+            lookingRight = false;
+            gameObject.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        // No Right Stick X Input
+        else
+        {
+
+        }
+
         // Left Stick Right Tilt
         if (controllerState.x > 0.2)
         {
@@ -282,9 +296,8 @@ public class Player : MonoBehaviour
                 if (currentSpeed > maxSpeed)
                     currentSpeed = maxSpeed;
             }
-			LowerBodyAnimator.SetBool ("isRunning", true);
-			gameObject.transform.localScale = Vector3.one;
-			//gameObject.transform.rotation = Quaternion.identity; //should return x axis to face right
+			LowerBodyAnimator.SetBool("isRunning", true);
+            LowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? 1.0f : -1.0f);
         }
         // Left Stick Left Tilt
         else if (controllerState.x < -0.2)
@@ -296,24 +309,27 @@ public class Player : MonoBehaviour
                     currentSpeed = -maxSpeed;
             }
 			LowerBodyAnimator.SetBool ("isRunning", true);
-			gameObject.transform.localScale = new Vector3 (-1, 1, 1);
-			//gameObject.transform.rotation = Quaternion.Euler (Vector3.up * 180); //should flip x axis to face left
+            LowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? -1.0f : 1.0f);
         }
         // No Left Stick X Input
         else
         {
             applyDecelerationThisTick = true;
-			LowerBodyAnimator.SetBool ("isRunning", false);
+			LowerBodyAnimator.SetBool("isRunning", false);
         }
 
         // Left Stick Y Input
         if (controllerState.y < -0.8)
         {
-            if (!onGround && !onWallLeft && !onWallRight)
+            if (!onGround && !onWallBack && !onWallForward)
             {
                 fastFalling = true;
             }
         }
+
+        aimAngle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+
+        
 
         if (jumpInputReceived)
         {
@@ -321,11 +337,11 @@ public class Player : MonoBehaviour
 
             if (canJump)
             {
-                if (onWallLeft && !onGround && canWallJumpToRight)
+                if (onWallBack && !onGround && canWallJumpToRight)
                 {
                     wallJumpBufferState = true;
                 }
-                else if (onWallRight && !onGround && canWallJumpToLeft)
+                else if (onWallForward && !onGround && canWallJumpToLeft)
                 {
                     wallJumpBufferState = true;
                     
@@ -350,22 +366,22 @@ public class Player : MonoBehaviour
             jumpReleasedTime = Time.time;
         }
 
-		// handle aiming (right stick)
-		if (controllerStateR.magnitude > 0.2f) 
-		{
-			angle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
-			gunPos = Quaternion.AngleAxis(angle, Vector3.forward) * (Vector3.right * fRadius);
-			//gun.position = transform.position + gunPos + gunPosOffset;
+		//// handle aiming (right stick)
+		//if (controllerStateR.magnitude > 0.2f) 
+		//{
+		//	aimAngle = Mathf.Atan2 (controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+		//	gunPos = Quaternion.AngleAxis(aimAngle, Vector3.forward) * (Vector3.right * fRadius);
+		//	//gun.position = transform.position + gunPos + gunPosOffset;
 
-			gun.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-		}
-		gun.position = transform.position + gunPos + gunPosOffset;
+		//	gun.rotation = Quaternion.AngleAxis(aimAngle, Vector3.forward);
+		//}
+		//gun.position = transform.position + gunPos + gunPosOffset;
 
 		if (fireState > 0.2f && canFire) 
 		{
-			FireWeapon ();
+			FireWeapon();
 			canFire = false;
-			StartCoroutine (FireRoutine (fireRate));
+			StartCoroutine(FireRoutine (fireRate));
 		}
 
         if(ability1)
@@ -522,37 +538,49 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void OnLeftTriggerEnter(Collider2D collision)
+    public void OnBackTriggerEnter(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallLeft = true;
+            onWallBack = true;
             fastFalling = false;
+
+            LowerBodyAnimator.SetBool("wallSlideLeft", true);
+
+            Debug.Log(" WALL");
         }
     }
 
-    public void OnLeftTriggerExit(Collider2D collision)
+    public void OnBackTriggerExit(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallLeft = false;
+            onWallBack = false;
+
+            LowerBodyAnimator.SetBool("wallSlideLeft", false);
         }
     }
 
-    public void OnRightTriggerEnter(Collider2D collision)
+    public void OnForwardTriggerEnter(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallRight = true;
+            onWallForward = true;
             fastFalling = false;
+
+            LowerBodyAnimator.SetBool("wallSlideRight", true);
+
+            Debug.Log("RIGHT WALL");
         }
     }
 
-    public void OnRightTriggerExit(Collider2D collision)
+    public void OnForwardTriggerExit(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            onWallRight = false;
+            onWallForward = false;
+
+            LowerBodyAnimator.SetBool("wallSlideRight", false);
         }
     }
 
