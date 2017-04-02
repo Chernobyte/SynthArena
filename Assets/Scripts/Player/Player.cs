@@ -84,6 +84,7 @@ public class Player : MonoBehaviour
     private bool lookingRight = true;
     private float currentStun;
     private bool notStunned = true;
+    private Vector2 aimDirection;
 
     private void Start() 
 	{
@@ -92,6 +93,7 @@ public class Player : MonoBehaviour
         _audio = gameObject.GetComponent<AudioSource>();
 
         InitializeTriggers();
+        InitializeHurtboxes();
 
         currentHealth = maxHealth;
     }
@@ -103,7 +105,16 @@ public class Player : MonoBehaviour
         leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit);
         rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
     }
-    
+
+    private void InitializeHurtboxes()
+    {
+        var hurtboxes = GetComponentsInChildren<HitboxCallback>();
+        foreach (var hurtbox in hurtboxes)
+        {
+            hurtbox.Init(OnHitboxTriggerEnter, OnHitboxTriggerExit, this);
+        }
+    }
+
     private void Update()
 	{
         UpdateHealthBar();
@@ -317,14 +328,12 @@ public class Player : MonoBehaviour
         // Right Stick Right Tilt
         if (controllerStateR.x > 0)
         {
-            lookingRight = true;
-            
+            lookingRight = true;   
         }
         // Right Stick Left Tilt
         else if (controllerStateR.x < 0)
         {
             lookingRight = false;
-            
         }
         // No Right Stick X Input
         else
@@ -346,11 +355,11 @@ public class Player : MonoBehaviour
 
         if (lookingRight)
         {
-            sprites.transform.localScale = Vector3.one;
+            sprites.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
         else
         {
-            sprites.transform.localScale = new Vector3(-1, 1, 1);
+            sprites.transform.rotation = Quaternion.Euler(0, 180, 0);
         }
     }
 
@@ -364,7 +373,9 @@ public class Player : MonoBehaviour
         {
             aimAngle = Mathf.Atan2(controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
         }
-        
+
+        aimDirection = new Vector2(muzzle.transform.right.x, muzzle.transform.right.y);
+
         var aimBlend = (aimAngle + 90.0f) / 180.0f;
         upperBodyAnimator.SetFloat("aimBlend", aimBlend);
     }
@@ -499,11 +510,11 @@ public class Player : MonoBehaviour
 
     private void FireWeapon()
     {
-        var bulletInstance = Instantiate(bullet, muzzle.position, weapon.transform.rotation);
+        var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
 
         var rb = bulletInstance.GetComponent<Rigidbody2D>();
-        rb.velocity = (new Vector2(weapon.transform.right.x, weapon.transform.right.y)) * bulletSpeed;
-        bulletInstance.GetComponent<Bullet>().Initialize(3);
+
+        bulletInstance.GetComponent<Bullet>().Initialize(3, aimDirection, this);
         
         _audio.Play();
     }
@@ -681,6 +692,16 @@ public class Player : MonoBehaviour
 
             lowerBodyAnimator.SetBool("wallSlide", false);
         }
+    }
+
+    public void OnHitboxTriggerEnter(Collider2D collision)
+    {
+
+    }
+
+    public void OnHitboxTriggerExit(Collider2D collision)
+    {
+
     }
 
     private void UpdateHealthBar()
