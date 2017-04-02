@@ -3,117 +3,57 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour {
-	GameObject platform;
-    bool bounce;
-    float bounceTime = 2;
-    float bounceDuration = 0;
-    Vector2 normalVec;
-    Vector2 startVec;
-    Vector2 newVec;
-    Vector2 u;
-    Vector2 w;
 
-    float knockback = 2f;
-    Vector2 knockbackVector;
+    public float knockbackStrength = 2.0f;
+    public Vector2 knockbackDirection;
+    public float lifespan = 5.0f;
 
-	// Use this for initialization
-	void Start () {
-		platform = GameObject.FindWithTag ("Platform");
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		Vector3 diff = transform.position - platform.transform.position;
+    private int numBouncesRemaining = 0;
+    private float spawnTime;
+    private Vector2 oldVelocity;
+    private Rigidbody2D _rigidBody; 
 
-		if (diff.magnitude > 50f)
-			Destroy (gameObject);
-
-        if(Time.time - bounceDuration > bounceTime)
-        {
-            bounce = false;
-            bounceDuration = 0;
-        }
-
-	}
-
-    public void setBounce(bool active)
+	private void Start()
     {
-        bounce = active;
-        bounceDuration = Time.time;
+        spawnTime = Time.time;
+        _rigidBody = GetComponent<Rigidbody2D>();
+	}
+
+	private void Update()
+    {
+        Debug.Log(Time.time);
+        if (Time.time - spawnTime > lifespan)
+        {
+            Destroy(gameObject);
+        }
+	}
+
+    private void FixedUpdate()
+    {
+        oldVelocity = _rigidBody.velocity;
     }
 
-	private void OnTriggerEnter2D(Collider2D collision)
-	{
-        if (!bounce)
+    public void Initialize(int maxBounces)
+    {
+        numBouncesRemaining = maxBounces;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        var contact = collision.contacts[0];
+
+        if (numBouncesRemaining > 0)
         {
-            if (collision.gameObject.CompareTag("Platform") || collision.gameObject.CompareTag("Wall"))
-            {
-                Destroy(gameObject);
-            }
-            else if(collision.gameObject.CompareTag("Player"))
-            {
-                knockbackVector = gameObject.GetComponent<Rigidbody2D>().velocity;
-                knockbackVector.Normalize();
-                collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
-                Destroy(gameObject);
-            }
+            numBouncesRemaining--;
+
+            var reflectedVelocity = Vector2.Reflect(oldVelocity, contact.normal);
+            var rotation = Quaternion.FromToRotation(oldVelocity, reflectedVelocity);
+            _rigidBody.velocity = reflectedVelocity;
+            transform.rotation = rotation * transform.rotation;
         }
         else
         {
-           if( collision.gameObject.CompareTag("Platform"))
-           {
-                float velH = gameObject.GetComponent<Rigidbody2D>().velocity.x;
-                float velV = gameObject.GetComponent<Rigidbody2D>().velocity.y;
-                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(velH, -velV);
-                if (velH < 0 && velV < 0)
-                    gameObject.transform.Rotate(0, 0, -90);
-                else if (velH < 0)
-                    gameObject.transform.Rotate(0, 0, 90);
-                else if (velH > 0 && velV >0)
-                    gameObject.transform.Rotate(0, 0, -90);
-                else if (velH > 0)
-                    gameObject.transform.Rotate(0, 0, 90);
-            }
-            else if (collision.gameObject.CompareTag("Wall"))
-           {
-                float velH = gameObject.GetComponent<Rigidbody2D>().velocity.x;
-                float velV = gameObject.GetComponent<Rigidbody2D>().velocity.y;
-                gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(-velH, velV);
-                if (velH < 0 && velV < 0)
-                    gameObject.transform.Rotate(0, 0, 90);
-                else if (velH < 0)
-                    gameObject.transform.Rotate(0, 0, -90);
-                else if (velH > 0 && velV > 0)
-                    gameObject.transform.Rotate(0, 0, 90);
-                else if (velH > 0)
-                    gameObject.transform.Rotate(0, 0, -90);
-            }
-           if (collision.gameObject.CompareTag("Player"))
-           {
-                knockbackVector = new Vector2(collision.gameObject.transform.position.x - gameObject.transform.position.x, collision.gameObject.transform.position.y - gameObject.transform.position.y);
-                knockbackVector.Normalize();
-                collision.gameObject.GetComponent<Player>().ApplyForce(knockback * knockbackVector, 50, .1f);
-                Destroy(gameObject);
-            }
-        }
-   }
-
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        Debug.Log("Collide");
-        if(bounce)
-        {
-            if(hit.gameObject.CompareTag("Platform") || hit.gameObject.CompareTag("Wall"))
-            {
-                Debug.Log("bounce");
-                normalVec = hit.normal;
-                startVec = hit.gameObject.GetComponent<Rigidbody2D>().velocity;
-                float angle = Mathf.Atan2(startVec.y - normalVec.y, startVec.x - normalVec.x);
-                u = normalVec * ((normalVec.magnitude * startVec.magnitude * Mathf.Cos(angle)) / (normalVec.magnitude * normalVec.magnitude));
-                w = startVec - u;
-                newVec = w - u;
-                hit.gameObject.GetComponent<Rigidbody2D>().velocity = newVec;
-            }
+            Destroy(gameObject);
         }
     }
 }

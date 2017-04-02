@@ -34,13 +34,11 @@ public class Player : MonoBehaviour
     public GameObject sprites;
     public GameObject weapon;
     public GameObject arm;
-    public Transform bracePosition;
-    public Transform muzzlePos;
+    public Transform muzzle;
     
     // bullet
     public GameObject bullet;
     public float bulletSpeed = 5.0f;
-    public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
     public bool bouncing = false;
     private float ability1CDTime = 8f;
@@ -56,11 +54,11 @@ public class Player : MonoBehaviour
     private bool canFire = true;
 
     //ability stuff
-
     private Overlord overlord;
     private PlayerUI playerUI;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _collider;
+    private AudioSource _audio;
 
     private int playerNumber;
     private float currentSpeed = 0.0f;
@@ -91,6 +89,7 @@ public class Player : MonoBehaviour
 	{
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
+        _audio = gameObject.GetComponent<AudioSource>();
 
         InitializeTriggers();
 
@@ -500,14 +499,13 @@ public class Player : MonoBehaviour
 
     private void FireWeapon()
     {
-        GameObject curBullet = Instantiate(bullet,
-                                            weapon.transform.position + (weapon.transform.right * bulletSpawnOffset),
-                                            weapon.transform.rotation);
-        Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D>();
+        var bulletInstance = Instantiate(bullet, muzzle.position, weapon.transform.rotation);
+
+        var rb = bulletInstance.GetComponent<Rigidbody2D>();
         rb.velocity = (new Vector2(weapon.transform.right.x, weapon.transform.right.y)) * bulletSpeed;
-        curBullet.GetComponent<Bullet>().setBounce(bouncing);
-        AudioSource audio = GetComponent<AudioSource>();
-        audio.Play();
+        bulletInstance.GetComponent<Bullet>().Initialize(3);
+        
+        _audio.Play();
     }
 
     private void Ability1()
