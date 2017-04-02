@@ -27,16 +27,18 @@ public class Player : MonoBehaviour
     public GameObject bottomTriggerObject;
     public GameObject backTriggerObject;
     public GameObject forwardTriggerObject;
-    public Animator UpperBodyAnimator;
-    public Animator LowerBodyAnimator;
+    public Animator upperBodyAnimator;
+    public Animator lowerBodyAnimator;
 
     //for aiming
-    public Transform gun;
-    public float fRadius = 1.0f;
-    public float bulletSpeed = 5.0f;
-    public Vector3 gunPosOffset = new Vector3(0.0f, 0.0f, -0.1f); //use this to line up arm with character's shoulder
-                                                                  //bullet
+    public GameObject weapon;
+    public GameObject arm;
+    public Transform bracePosition;
+    public Transform muzzlePos;
+    
+    // bullet
     public GameObject bullet;
+    public float bulletSpeed = 5.0f;
     public float bulletSpawnOffset = 1.2f;
     public float fireRate = 1.0f;
 
@@ -165,10 +167,10 @@ public class Player : MonoBehaviour
 
         if (currentFallSpeed < 0)
         {
-            LowerBodyAnimator.SetBool("isJumping", false);
+            lowerBodyAnimator.SetBool("isJumping", false);
         }
 
-        LowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
+        lowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
 
         applyDecelerationThisTick = false;
 
@@ -262,109 +264,14 @@ public class Player : MonoBehaviour
         controllerState.y = gamepad.Move_Y();
         controllerStateR.x = gamepad.Aim_X();
         controllerStateR.y = gamepad.Aim_Y();
+
+        HandleLeftStickInput();
+        HandleRightStickInput();
+        HandleJumpInput();
         
-        var jumpInputReceived = gamepad.R1();
-        var jumpInputStopped = gamepad.R1Up();
 		var fireState = gamepad.R2();
         var ability1 = gamepad.L1();
-        var ability2 = gamepad.L2();
-
-        // Right Stick Right Tilt
-        if (controllerStateR.x > 0)
-        {
-            lookingRight = true;
-            gameObject.transform.localScale = Vector3.one;
-        }
-        // Right Stick Left Tilt
-        else if (controllerStateR.x < 0)
-        {
-            lookingRight = false;
-            gameObject.transform.localScale = new Vector3(-1, 1, 1);
-        }
-        // No Right Stick X Input
-        else
-        {
-
-        }
-
-        // Left Stick Right Tilt
-        if (controllerState.x > 0.2)
-        {
-            if (currentSpeed < maxSpeed)
-            {
-                currentSpeed += acceleration;
-                if (currentSpeed > maxSpeed)
-                    currentSpeed = maxSpeed;
-            }
-			LowerBodyAnimator.SetBool("isRunning", true);
-            LowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? 1.0f : -1.0f);
-        }
-        // Left Stick Left Tilt
-        else if (controllerState.x < -0.2)
-        {
-            if (currentSpeed > -maxSpeed)
-            {
-                currentSpeed -= acceleration;
-                if (currentSpeed < -maxSpeed)
-                    currentSpeed = -maxSpeed;
-            }
-			LowerBodyAnimator.SetBool ("isRunning", true);
-            LowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? -1.0f : 1.0f);
-        }
-        // No Left Stick X Input
-        else
-        {
-            applyDecelerationThisTick = true;
-			LowerBodyAnimator.SetBool("isRunning", false);
-        }
-
-        // Left Stick Y Input
-        if (controllerState.y < -0.8)
-        {
-            if (!onGround && !onWallBack && !onWallForward)
-            {
-                fastFalling = true;
-            }
-        }
-
-        aimAngle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
-
-        
-
-        if (jumpInputReceived)
-        {
-            jumpPressedTime = Time.time;
-
-            if (canJump)
-            {
-                if (onWallBack && !onGround && canWallJumpToRight)
-                {
-                    wallJumpBufferState = true;
-                }
-                else if (onWallForward && !onGround && canWallJumpToLeft)
-                {
-                    wallJumpBufferState = true;
-                    
-                }
-                else if (currentJumpCount < maxcurrentJumpCount)
-                {
-                    if (onGround)
-                    {
-                        jumpBufferState = true;
-                    }
-                    else
-                    {
-                        AirJump();
-                    }
-					
-                }
-            }
-        }
-
-        if (jumpInputStopped)
-        {
-            jumpReleasedTime = Time.time;
-        }
+        var ability2 = gamepad.L2();        
 
 		//// handle aiming (right stick)
 		//if (controllerStateR.magnitude > 0.2f) 
@@ -394,6 +301,116 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void HandleRightStickInput()
+    {
+        // Right Stick Right Tilt
+        if (controllerStateR.x > 0)
+        {
+            lookingRight = true;
+            gameObject.transform.localScale = Vector3.one;
+            aimAngle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
+        }
+        // Right Stick Left Tilt
+        else if (controllerStateR.x < 0)
+        {
+            lookingRight = false;
+            gameObject.transform.localScale = new Vector3(-1, 1, 1);
+            aimAngle = Mathf.Atan2(-controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
+        }
+        // No Right Stick X Input
+        else
+        {
+
+        }
+
+        Debug.Log(aimAngle);
+
+        weapon.transform.rotation = Quaternion.AngleAxis(aimAngle, Vector3.forward);
+    }
+
+    private void HandleLeftStickInput()
+    {
+        // Left Stick Right Tilt
+        if (controllerState.x > 0.2)
+        {
+            if (currentSpeed < maxSpeed)
+            {
+                currentSpeed += acceleration;
+                if (currentSpeed > maxSpeed)
+                    currentSpeed = maxSpeed;
+            }
+            lowerBodyAnimator.SetBool("isRunning", true);
+            lowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? 1.0f : -1.0f);
+        }
+        // Left Stick Left Tilt
+        else if (controllerState.x < -0.2)
+        {
+            if (currentSpeed > -maxSpeed)
+            {
+                currentSpeed -= acceleration;
+                if (currentSpeed < -maxSpeed)
+                    currentSpeed = -maxSpeed;
+            }
+            lowerBodyAnimator.SetBool("isRunning", true);
+            lowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? -1.0f : 1.0f);
+        }
+        // No Left Stick X Input
+        else
+        {
+            applyDecelerationThisTick = true;
+            lowerBodyAnimator.SetBool("isRunning", false);
+        }
+
+        // Left Stick Y Input
+        if (controllerState.y < -0.8)
+        {
+            if (!onGround && !onWallBack && !onWallForward)
+            {
+                fastFalling = true;
+            }
+        }
+    }
+
+    private void HandleJumpInput()
+    {
+        var jumpInputReceived = gamepad.R1();
+        var jumpInputStopped = gamepad.R1Up();
+
+        if (jumpInputReceived)
+        {
+            jumpPressedTime = Time.time;
+
+            if (canJump)
+            {
+                if (onWallBack && !onGround && canWallJumpToRight)
+                {
+                    wallJumpBufferState = true;
+                }
+                else if (onWallForward && !onGround && canWallJumpToLeft)
+                {
+                    wallJumpBufferState = true;
+
+                }
+                else if (currentJumpCount < maxcurrentJumpCount)
+                {
+                    if (onGround)
+                    {
+                        jumpBufferState = true;
+                    }
+                    else
+                    {
+                        AirJump();
+                    }
+                }
+            }
+        }
+
+        if (jumpInputStopped)
+        {
+            jumpReleasedTime = Time.time;
+        }
+    }
+
 	IEnumerator FireRoutine(float duration)
 	{
 		yield return new WaitForSeconds (duration);
@@ -403,15 +420,15 @@ public class Player : MonoBehaviour
 	private void FireWeapon()
 	{
 		GameObject curBullet = Instantiate (bullet, 
-											gun.transform.position + (gun.transform.right * bulletSpawnOffset), 
-											gun.transform.rotation);
+											weapon.transform.position + (weapon.transform.right * bulletSpawnOffset),
+                                            weapon.transform.rotation);
 		Rigidbody2D rb = curBullet.GetComponent<Rigidbody2D> ();
-		rb.velocity = new Vector2(gun.transform.right.x, gun.transform.right.y) * bulletSpeed;
+		rb.velocity = new Vector2(weapon.transform.right.x, weapon.transform.right.y) * bulletSpeed;
 	}
 
     private void Ability1()
     {
-        gameObject.GetComponent<AbilityOne>().fire(gun.transform);
+        gameObject.GetComponent<AbilityOne>().fire(weapon.transform);
     }
 
     private void Ability2()
@@ -422,8 +439,8 @@ public class Player : MonoBehaviour
     private void PreJump()
     {
         currentJumpCount++;
-        LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-        LowerBodyAnimator.SetBool("isJumping", true);
+        lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
+        lowerBodyAnimator.SetBool("isJumping", true);
         fastFalling = false;
     }
 
@@ -453,8 +470,8 @@ public class Player : MonoBehaviour
 
         currentFallSpeed = airJumpStrength;
 
-        LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-        LowerBodyAnimator.SetBool("isJumping", true);
+        lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
+        lowerBodyAnimator.SetBool("isJumping", true);
     }
 
     private enum WallJumpDirection { Left, Right };
@@ -521,8 +538,8 @@ public class Player : MonoBehaviour
             currentFallSpeed = 0;
             fastFalling = false;
             
-            LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-            LowerBodyAnimator.SetBool("isJumping", false);
+            lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
+            lowerBodyAnimator.SetBool("isJumping", false);
         }
     }
 
@@ -534,7 +551,7 @@ public class Player : MonoBehaviour
             currentJumpCount = 1;
             canJump = true;
 
-            LowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
+            lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         }
     }
 
@@ -545,7 +562,7 @@ public class Player : MonoBehaviour
             onWallBack = true;
             fastFalling = false;
 
-            LowerBodyAnimator.SetBool("wallSlideLeft", true);
+            lowerBodyAnimator.SetBool("wallSlideLeft", true);
 
             Debug.Log(" WALL");
         }
@@ -557,7 +574,7 @@ public class Player : MonoBehaviour
         {
             onWallBack = false;
 
-            LowerBodyAnimator.SetBool("wallSlideLeft", false);
+            lowerBodyAnimator.SetBool("wallSlideLeft", false);
         }
     }
 
@@ -568,7 +585,7 @@ public class Player : MonoBehaviour
             onWallForward = true;
             fastFalling = false;
 
-            LowerBodyAnimator.SetBool("wallSlideRight", true);
+            lowerBodyAnimator.SetBool("wallSlideRight", true);
 
             Debug.Log("RIGHT WALL");
         }
@@ -580,7 +597,7 @@ public class Player : MonoBehaviour
         {
             onWallForward = false;
 
-            LowerBodyAnimator.SetBool("wallSlideRight", false);
+            lowerBodyAnimator.SetBool("wallSlideRight", false);
         }
     }
 
