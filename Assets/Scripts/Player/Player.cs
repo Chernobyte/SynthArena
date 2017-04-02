@@ -23,11 +23,12 @@ public class Player : MonoBehaviour
     public int maxHealth = 2000;
     public int currentHealth;
     
-
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
     public GameObject leftTriggerObject;
     public GameObject rightTriggerObject;
+    public Animator UpperBodyAnimator;
+    public Animator LowerBodyAnimator;
 
     //for aiming
     public Transform gun;
@@ -71,9 +72,6 @@ public class Player : MonoBehaviour
     private bool jumpBufferState = false;
     private bool wallJumpBufferState = false;
     private bool applyDecelerationThisTick;
-
-	//animation
-	private Animator anim;
     
 
     private void Start() 
@@ -86,9 +84,6 @@ public class Player : MonoBehaviour
         currentHealth = maxHealth;
 		gunPos = new Vector3 (fRadius, 0.0f, 0.0f);
 		gun.position = transform.position + gunPos + gunPosOffset;
-
-		anim = gameObject.GetComponent<Animator> ();
-		//anim.
     }
 
     private void InitializeTriggers()
@@ -186,6 +181,12 @@ public class Player : MonoBehaviour
             {
                 currentFallSpeed += gravity;
 
+                if (currentFallSpeed < 0)
+                {
+                    LowerBodyAnimator.SetBool("isJumping", false);
+                    LowerBodyAnimator.SetBool("isFalling", true);
+                }
+
                 if (onWallLeft || onWallRight)
                 {
                     if (currentFallSpeed < maxFallSpeed / 2.0f)
@@ -219,6 +220,7 @@ public class Player : MonoBehaviour
                 }
 
                 jumpBufferState = false;
+                LowerBodyAnimator.SetBool("inJumpSquat", false);
             }
         }
         else
@@ -269,8 +271,7 @@ public class Player : MonoBehaviour
         var ability2 = gamepad.L2();
 
         // Left Stick Right Tilt
-        //if (controllerState.x > 0.2)
-		if(Input.GetKey(KeyCode.D))
+        if (controllerState.x > 0.2)
         {
             if (currentSpeed < maxSpeed)
             {
@@ -278,13 +279,12 @@ public class Player : MonoBehaviour
                 if (currentSpeed > maxSpeed)
                     currentSpeed = maxSpeed;
             }
-			anim.SetBool ("isRunning", true);
+			LowerBodyAnimator.SetBool ("isRunning", true);
 			gameObject.transform.localScale = Vector3.one;
 			//gameObject.transform.rotation = Quaternion.identity; //should return x axis to face right
         }
         // Left Stick Left Tilt
-        //else if (controllerState.x < -0.2)
-		else if(Input.GetKey(KeyCode.A))
+        else if (controllerState.x < -0.2)
         {
             if (currentSpeed > -maxSpeed)
             {
@@ -292,7 +292,7 @@ public class Player : MonoBehaviour
                 if (currentSpeed < -maxSpeed)
                     currentSpeed = -maxSpeed;
             }
-			anim.SetBool ("isRunning", true);
+			LowerBodyAnimator.SetBool ("isRunning", true);
 			gameObject.transform.localScale = new Vector3 (-1, 1, 1);
 			//gameObject.transform.rotation = Quaternion.Euler (Vector3.up * 180); //should flip x axis to face left
         }
@@ -300,7 +300,7 @@ public class Player : MonoBehaviour
         else
         {
             applyDecelerationThisTick = true;
-			anim.SetBool ("isRunning", false);
+			LowerBodyAnimator.SetBool ("isRunning", false);
         }
 
         // Left Stick Y Input
@@ -312,8 +312,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        //if (jumpInputReceived)
-		if(Input.GetKeyDown(KeyCode.Space))
+        if (jumpInputReceived)
         {
             jumpPressedTime = Time.time;
 
@@ -333,12 +332,13 @@ public class Player : MonoBehaviour
                     if (onGround)
                     {
                         jumpBufferState = true;
+                        LowerBodyAnimator.SetBool("inJumpSquat", true);
                     }
                     else
                     {
                         AirJump();
                     }
-					anim.SetBool ("isJumping", true);
+					
                 }
             }
         }
@@ -404,6 +404,8 @@ public class Player : MonoBehaviour
     private void PreJump()
     {
         currentJumpCount++;
+        LowerBodyAnimator.SetBool("isJumping", true);
+        LowerBodyAnimator.SetBool("isFalling", false);
         fastFalling = false;
     }
 
@@ -432,6 +434,9 @@ public class Player : MonoBehaviour
         }
 
         currentFallSpeed = airJumpStrength;
+
+        LowerBodyAnimator.SetBool("isFalling", false);
+        LowerBodyAnimator.SetBool("isJumping", true);
     }
 
     private enum WallJumpDirection { Left, Right };
@@ -494,12 +499,12 @@ public class Player : MonoBehaviour
             canJump = true;
             canWallJumpToLeft = true;
             canWallJumpToRight = true;
-            wallJumpBufferState = true;
             currentJumpCount = 0;
             currentFallSpeed = 0;
             fastFalling = false;
-
-			anim.SetBool ("isJumping", false);
+            
+            LowerBodyAnimator.SetBool("isFalling", false);
+            LowerBodyAnimator.SetBool("isJumping", false);
         }
     }
 
