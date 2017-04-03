@@ -80,7 +80,7 @@ public class Overlord : MonoBehaviour {
         if (losers.Count >= players.Count-1)
         {
             // TODO: Transition to Victory Screen
-            UnityEditor.EditorApplication.isPlaying = false;
+            // UnityEditor.EditorApplication.isPlaying = false;
             Application.Quit();
         }
     }
