@@ -5,21 +5,28 @@ using UnityEngine;
 public class AbilityTwo : MonoBehaviour {
 
     private float timeTill;
+    private ParticleSystem effect;
 
-	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
 		
 	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+
+	void FixedUpdate ()
+    {
 		if(Time.time - timeTill > 6)
+        {
             gameObject.GetComponent<Player>().bouncing = false;
+            if (effect != null)
+                effect.Stop();
+        }
     }
 
-    public void fire(Transform gun)
+    public void fire(ParticleSystem abilityEffect)
     {
         gameObject.GetComponent<Player>().bouncing = true;
         timeTill = Time.time;
+        effect = abilityEffect;
+        effect.Play();
     }
 }

@@ -7,8 +7,7 @@ public class AbilityOne : MonoBehaviour
 {
 
     Transform gunTrans = null;
-    float grenadeSpawnOffset = .9f;
-    float grenadeSpeed = 25f;
+    public float grenadeSpeed = 25.0f;
 
     public GameObject grenade;
 
@@ -22,17 +21,11 @@ public class AbilityOne : MonoBehaviour
 
     }
 
-    public void fire(Transform gun)
+    public void fire(Transform spawnLocation, Vector2 aimDirection)
     {
-        gunTrans = gun;
-        if (gunTrans != null)
-        {
-            GameObject curGrenade = Instantiate(grenade,
-                                            gunTrans.transform.position + (gunTrans.transform.right * grenadeSpawnOffset),
-                                            gunTrans.transform.rotation);
-            Rigidbody2D rb = curGrenade.GetComponent<Rigidbody2D>();
-            rb.velocity = new Vector2(gunTrans.transform.right.x, gunTrans.transform.right.y) * grenadeSpeed;
-        }
+        var grenadeInstance = Instantiate(grenade, spawnLocation.position, Quaternion.identity);
+
+        grenadeInstance.GetComponent<Grenade>().Initialize(aimDirection, grenadeSpeed);
     }
 
     

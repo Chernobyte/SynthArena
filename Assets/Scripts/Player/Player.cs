@@ -32,6 +32,7 @@ public class Player : MonoBehaviour
     public GameObject rightTriggerObject;
     public Animator upperBodyAnimator;
     public Animator lowerBodyAnimator;
+    public ParticleSystem ability2effect;
 
     //for aiming
     public GameObject sprites;
@@ -104,10 +105,10 @@ public class Player : MonoBehaviour
 
     private void InitializeTriggers()
     {
-        topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerEnter);
-        bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit);
-        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit);
-        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit);
+        topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerEnter, null);
+        bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit, null);
+        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit, null);
+        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit, null);
     }
 
     private void InitializeHurtboxes()
@@ -238,6 +239,10 @@ public class Player : MonoBehaviour
                         currentFallSpeed = maxFallSpeed;
                 }
             }
+        }
+        else if (onGround && currentFallSpeed < 0)
+        {
+            currentFallSpeed = 0;
         }
     }
 
@@ -541,8 +546,6 @@ public class Player : MonoBehaviour
     {
         var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
 
-        var rb = bulletInstance.GetComponent<Rigidbody2D>();
-
         int numBounces = 0;
 
         if (bouncing)
@@ -557,12 +560,12 @@ public class Player : MonoBehaviour
 
     private void Ability1()
     {
-        gameObject.GetComponent<AbilityOne>().fire(weapon.transform);
+        gameObject.GetComponent<AbilityOne>().fire(muzzle, aimDirection);
     }
 
     private void Ability2()
     {
-        gameObject.GetComponent<AbilityTwo>().fire(weapon.transform);
+        gameObject.GetComponent<AbilityTwo>().fire(ability2effect);
     }
 
     private void PreJump()

@@ -6,6 +6,7 @@ public class TriggerCallback: MonoBehaviour {
 
     Action<Collider2D> enterFunctionToCall;
     Action<Collider2D> exitFunctionToCall;
+    Action<Collider2D> stayFunctionToCall;
 
 	void Start () {
 	
@@ -15,7 +16,7 @@ public class TriggerCallback: MonoBehaviour {
 		
 	}
 
-    public void Init(Action<Collider2D> enter, Action<Collider2D> exit)
+    public void Init(Action<Collider2D> enter, Action<Collider2D> exit, Action<Collider2D> stay)
     {
         enterFunctionToCall = enter;
         exitFunctionToCall = exit;
@@ -23,11 +24,19 @@ public class TriggerCallback: MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        enterFunctionToCall(collision);
+        if (enterFunctionToCall != null)
+            enterFunctionToCall(collision);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        exitFunctionToCall(collision);
+        if (exitFunctionToCall != null)
+            exitFunctionToCall(collision);
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (stayFunctionToCall != null)
+            stayFunctionToCall(collision);
     }
 }

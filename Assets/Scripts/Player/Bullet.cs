@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour {
         _rigidBody.velocity = fireDirection * bulletSpeed;
 
         var hurtboxTrigger = hurtboxTriggerObject.GetComponent<TriggerCallback>();
-        hurtboxTrigger.Init(OnHurtboxTriggerEnter2D, OnHurtboxTriggerExit2D);
+        hurtboxTrigger.Init(OnHurtboxTriggerEnter2D, OnHurtboxTriggerExit2D, null);
     }
 
 	private void Update()
