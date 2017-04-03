@@ -92,7 +92,7 @@ public class Bullet : MonoBehaviour {
 
                 trueKnockbackDirection.Normalize();
 
-                player.ApplyForce(trueKnockbackDirection * knockbackStrength, damage, stunTime);
+                player.TakeHit(trueKnockbackDirection * knockbackStrength, damage, stunTime);
                 Destroy(gameObject);
             }
         }

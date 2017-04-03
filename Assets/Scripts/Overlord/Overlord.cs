@@ -10,9 +10,10 @@ public class Overlord : MonoBehaviour {
 
     private List<PlayerSelection> playerSelections;
     private SpawnPoint[] spawnPoints;
-    private Player[] players;
+    private List<Player> players = new List<Player>();
     private PlayerUI[] playerUIs;
     private bool playersCached = false;
+    private List<Player> losers = new List<Player>();
 
 	void Start ()
     {
@@ -58,7 +59,9 @@ public class Overlord : MonoBehaviour {
 
             var playerGO = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity);
             var player = playerGO.GetComponent<Player>();
-            player.Init(selection.playerId, this, playerUI);
+
+            players.Add(player);
+            player.Init(selection.playerId, this, playerUI, spawnPoint.transform);
             playerUI.Init(selection);
         }
 
@@ -67,6 +70,18 @@ public class Overlord : MonoBehaviour {
         foreach (var playerUI in inactivePlayerUIs)
         {
             playerUI.gameObject.SetActive(false);
+        }
+    }
+
+    public void RegisterLoser(Player player)
+    {
+        losers.Add(player);
+
+        if (losers.Count >= players.Count-1)
+        {
+            // TODO: Transition to Victory Screen
+            UnityEditor.EditorApplication.isPlaying = false;
+            Application.Quit();
         }
     }
 }

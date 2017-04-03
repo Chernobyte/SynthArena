@@ -43,6 +43,7 @@ Animation
 - Capt. Izzy stunned
 - Capt. Izzy wall jump
 - Capt. Izzy bullet sprite fizzle on collision
+- Capt. Izzy death
 
 Coding Features
 - Lives per player
@@ -59,6 +60,8 @@ Coding Features
 - Lights
 
 Coding Bugfixes
+- Limit knockback / total velocity to a certain value
+- Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
 - Character select icons visible when multiple hover (put each corner on a layer)
 - Horizontal movement lingering after wall slide
 - Velocity lingering when not landing on a valid floor (like a player's head)

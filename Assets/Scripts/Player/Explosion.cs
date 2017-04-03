@@ -28,7 +28,7 @@ public class Explosion : MonoBehaviour {
         {
             explosionVector = new Vector2 (coll.gameObject.transform.position.x - gameObject.transform.position.x, coll.gameObject.transform.position.y - gameObject.transform.position.y);
             explosionVector.Normalize();
-            coll.gameObject.GetComponent<Player>().ApplyForce(explosionForce*explosionVector,300,.4f);
+            coll.gameObject.GetComponent<Player>().TakeHit(explosionForce*explosionVector,300,.4f);
         }
     }
 }

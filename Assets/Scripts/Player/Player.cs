@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
     public int numBouncesOnAbility;
     public float ability1CooldownTime = 8f;
     public float ability2CooldownTime = 10f;
+    public int maxLives = 2;
+    public int respawnDelay = 5;
 
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
@@ -62,6 +64,7 @@ public class Player : MonoBehaviour
     private PlayerUI playerUI;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _collider;
+    private Transform spawnPoint;
 
     private int playerNumber;
     private float currentSpeed = 0.0f;
@@ -89,6 +92,9 @@ public class Player : MonoBehaviour
     private bool notStunned = true;
     private Vector2 aimDirection;
     private float lastValidAimAngle = 0f;
+    private int livesRemaining = 1;
+    private bool isDead;
+    private float deathTime;
 
     private void Start() 
 	{
@@ -99,6 +105,7 @@ public class Player : MonoBehaviour
         InitializeHurtboxes();
 
         currentHealth = maxHealth;
+        livesRemaining = maxLives;
 
         currentAbility1Cooldown = ability1CooldownTime;
         currentAbility2Cooldown = ability2CooldownTime;
@@ -123,11 +130,18 @@ public class Player : MonoBehaviour
 
     private void Update()
 	{
-        HandleAbilityCooldowns();
+        if (isDead)
+        {
+            HandleRespawn();
+        }
+        else
+        {
+            HandleAbilityCooldowns();
 
-        HandleInput();
-        HandleLookDirection();
-        HandleAiming();
+            HandleInput();
+            HandleLookDirection();
+            HandleAiming();
+        }
 
         UpdateHealthBar();
         UpdateAbilitiesCD();
@@ -141,11 +155,12 @@ public class Player : MonoBehaviour
         HandleHitStun();
     }
 
-    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI)
+    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
         this.playerUI = playerUI;
+        this.spawnPoint = spawnPoint;
 
         switch (playerNumber)
         {
@@ -156,15 +171,50 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void ApplyForce(Vector2 force, int weaponDamage , float timeStunned)
+    public void TakeHit(Vector2 force, int weaponDamage, float timeStunned)
     {
         currentSpeed += force.x;
         currentFallSpeed += force.y;
-        if(weaponDamage!=0)
-        {
-            currentHealth -= weaponDamage;
-        }
+        currentHealth -= weaponDamage;
         currentStun = Time.time + timeStunned;
+
+        if (currentHealth < 0)
+        {
+            currentHealth = 0;
+        }
+
+        if (!isDead && currentHealth == 0)
+        {
+            isDead = true;
+            deathTime = Time.time;
+
+            livesRemaining--;
+
+            if (livesRemaining == 0)
+            {
+                overlord.RegisterLoser(this);
+            }
+            else
+            {
+                // TODO: Animate Death & hide player after animation
+            }
+        }
+    }
+
+    private void HandleRespawn()
+    {
+        if (isDead && livesRemaining > 0 && Time.time - deathTime > respawnDelay)
+        {
+            Respawn();
+        }
+    }
+
+    private void Respawn()
+    {
+        currentHealth = maxHealth;
+        transform.position = spawnPoint.position;
+
+        isDead = false;
     }
 
     private void ApplySpeedToRigidBody()
@@ -745,7 +795,7 @@ public class Player : MonoBehaviour
 
     private void UpdateHealthBar()
     {
-        playerUI.UpdateHealthBar(currentHealth, maxHealth);
+        playerUI.UpdateHealthBar(currentHealth, maxHealth, livesRemaining);
     }
 
     private void UpdateAbilitiesCD()

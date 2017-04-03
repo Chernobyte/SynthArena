@@ -12,6 +12,7 @@ public class PlayerUI : MonoBehaviour {
     public Image A1Fill;
     public Image A2Icon;
     public Image A2Fill;
+    public Text LivesDisplay;
 
     private float healthBarFillAmount;
     private float A1FillAmount;
@@ -32,11 +33,13 @@ public class PlayerUI : MonoBehaviour {
         A2Icon.sprite = selection.characterIcons.ability2;
     }
 
-    public void UpdateHealthBar(int currentHealth, int maxHealth)
+    public void UpdateHealthBar(int currentHealth, int maxHealth, int livesRemaining)
     {
         healthBarFillAmount = (float)currentHealth / maxHealth;
 
         playerFill.fillAmount = healthBarFillAmount;
+
+        LivesDisplay.text = "Lives: " + livesRemaining;
     }
 
     public void UpdateAbilitiesCD(float currentA1CD, float maxA1CD, float currentA2CD, float maxA2CD)
