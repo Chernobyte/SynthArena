@@ -22,7 +22,10 @@ public class Player : MonoBehaviour
     public float maxSpeed = 10.0f;
     public int maxHealth = 2000;
     public int currentHealth;
-    
+    public int numBouncesOnAbility;
+    public float ability1CooldownTime = 8f;
+    public float ability2CooldownTime = 10f;
+
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
     public GameObject leftTriggerObject;
@@ -41,14 +44,11 @@ public class Player : MonoBehaviour
     public float bulletSpeed = 5.0f;
     public float fireRate = 1.0f;
     public bool bouncing = false;
-    private float ability1CDTime = 8f;
-    private float ability2CDTime = 10f;
-    private float A1StartCD = 0f;
-    private float A2StartCD = 0f;
-    private bool A1OnCooldown = false;
-    private bool A2OnCooldown = false;
-    private float A1TimeSinceAbility = 100;
-    private float A2TimeSinceAbility = 100;
+
+    private float ability1LastUseTime;
+    private float currentAbility1Cooldown;
+    private float ability2LastUseTime;
+    private float currentAbility2Cooldown;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
@@ -85,6 +85,7 @@ public class Player : MonoBehaviour
     private float currentStun;
     private bool notStunned = true;
     private Vector2 aimDirection;
+    private float lastValidAimAngle = 0f;
 
     private void Start() 
 	{
@@ -96,6 +97,9 @@ public class Player : MonoBehaviour
         InitializeHurtboxes();
 
         currentHealth = maxHealth;
+
+        currentAbility1Cooldown = ability1CooldownTime;
+        currentAbility2Cooldown = ability2CooldownTime;
     }
 
     private void InitializeTriggers()
@@ -117,12 +121,13 @@ public class Player : MonoBehaviour
 
     private void Update()
 	{
-        UpdateHealthBar();
+        HandleAbilityCooldowns();
+
         HandleInput();
         HandleLookDirection();
         HandleAiming();
-        Ability1Cooldown();
-        Ability2Cooldown();
+
+        UpdateHealthBar();
         UpdateAbilitiesCD();
     }
 
@@ -290,6 +295,23 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void HandleAbilityCooldowns()
+    {
+        if (currentAbility1Cooldown < ability1CooldownTime)
+        {
+            currentAbility1Cooldown = Time.time - ability1LastUseTime;
+            if (currentAbility1Cooldown > ability1CooldownTime)
+                currentAbility1Cooldown = ability1CooldownTime;
+        }
+
+        if (currentAbility2Cooldown < ability2CooldownTime)
+        {
+            currentAbility2Cooldown = Time.time - ability2LastUseTime;
+            if (currentAbility2Cooldown > ability2CooldownTime)
+                currentAbility2Cooldown = ability2CooldownTime;
+        }
+    }
+
     private void HandleInput()
     {
         //get controller state
@@ -301,10 +323,11 @@ public class Player : MonoBehaviour
         HandleLeftStickInput();
         HandleRightStickInput();
         HandleJumpInput();
+        HandleAbility1Input();
+        HandleAbility2Input();
         
 		var fireState = gamepad.R2();
-        var ability1 = gamepad.L1();
-        var ability2 = gamepad.L2();        
+        
 
 		if (fireState > 0.2f && canFire) 
 		{
@@ -312,15 +335,6 @@ public class Player : MonoBehaviour
 			canFire = false;
 			StartCoroutine(FireRoutine (fireRate));
 		}
-
-        if(ability1)
-        {
-            Ability1();
-        }
-        if(ability2>.2)
-        {
-            Ability2();
-        }
     }
 
     private void HandleRightStickInput()
@@ -375,6 +389,15 @@ public class Player : MonoBehaviour
         }
 
         aimDirection = new Vector2(muzzle.transform.right.x, muzzle.transform.right.y);
+
+        if (controllerStateR.y == 0 && controllerStateR.x == 0)
+        {
+            aimAngle = lastValidAimAngle;
+        }
+        else
+        {
+            lastValidAimAngle = aimAngle;
+        }
 
         var aimBlend = (aimAngle + 90.0f) / 180.0f;
         upperBodyAnimator.SetFloat("aimBlend", aimBlend);
@@ -462,6 +485,38 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void HandleAbility1Input()
+    {
+        var ability1 = gamepad.L1();
+        
+        if (ability1)
+        {
+            if (currentAbility1Cooldown == ability1CooldownTime)
+            {
+                ability1LastUseTime = Time.time;
+                currentAbility1Cooldown = 0;
+                Ability1();
+            }
+        }
+    }
+
+    private void HandleAbility2Input()
+    {
+        var ability2 = gamepad.L2();
+
+        if (ability2 != 0)
+        {
+            if (currentAbility2Cooldown == ability2CooldownTime)
+            {
+                ability2LastUseTime = Time.time;
+                currentAbility2Cooldown = 0;
+                Ability2();
+            }
+        }
+    }
+
+    
+
     private void HandleHitStun()
     {
         if (currentStun != 0)
@@ -473,32 +528,6 @@ public class Player : MonoBehaviour
             }
             else
                 notStunned = false;
-        }
-    }
-
-    private void Ability1Cooldown()
-    {
-        if (A1OnCooldown && A1StartCD != 0)
-        {
-            A1TimeSinceAbility = Time.time - A1StartCD;
-            if (A1TimeSinceAbility > ability1CDTime)
-            {
-                A1OnCooldown = false;
-                A1StartCD = 0f;
-            }
-        }
-    }
-
-    private void Ability2Cooldown()
-    {
-        if (A2OnCooldown && A2StartCD != 0)
-        {
-            A2TimeSinceAbility = Time.time - A2StartCD;
-            if (A2TimeSinceAbility > ability2CDTime)
-            {
-                A2OnCooldown = false;
-                A2StartCD = 0f;
-            }
         }
     }
 
@@ -514,7 +543,14 @@ public class Player : MonoBehaviour
 
         var rb = bulletInstance.GetComponent<Rigidbody2D>();
 
-        bulletInstance.GetComponent<Bullet>().Initialize(3, aimDirection, this);
+        int numBounces = 0;
+
+        if (bouncing)
+        {
+            numBounces = numBouncesOnAbility;
+        }
+
+        bulletInstance.GetComponent<Bullet>().Initialize(numBounces, aimDirection, this);
         
         _audio.Play();
     }
@@ -522,15 +558,11 @@ public class Player : MonoBehaviour
     private void Ability1()
     {
         gameObject.GetComponent<AbilityOne>().fire(weapon.transform);
-        A1OnCooldown = true;
-        A1StartCD = Time.time;
     }
 
     private void Ability2()
     {
         gameObject.GetComponent<AbilityTwo>().fire(weapon.transform);
-        A2OnCooldown = true;
-        A2StartCD = Time.time;
     }
 
     private void PreJump()
@@ -711,6 +743,6 @@ public class Player : MonoBehaviour
 
     private void UpdateAbilitiesCD()
     {
-        playerUI.UpdateAbilitiesCD(A1TimeSinceAbility, ability1CDTime, A2TimeSinceAbility, ability2CDTime);
+        playerUI.UpdateAbilitiesCD(currentAbility1Cooldown, ability1CooldownTime, currentAbility2Cooldown, ability2CooldownTime);
     }
 }

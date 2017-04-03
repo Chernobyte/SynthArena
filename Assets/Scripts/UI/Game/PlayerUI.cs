@@ -34,6 +34,7 @@ public class PlayerUI : MonoBehaviour {
     {
         A1FillAmount = 1 - currentA1CD/maxA1CD;
         A2FillAmount = 1 - currentA2CD/maxA2CD;
+
         if (currentA1CD > maxA1CD)
             A1FillAmount = 0;
         else
