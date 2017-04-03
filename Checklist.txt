@@ -1,0 +1,58 @@
+Sound (.WAV files) (! = provided, X = implemented)
+- Menu Music
+- Menu press start
+- Char Select selection change
+- Char Select selection confirm
+- Char Select selection undo
+- Battle Music
+- Capt. Izzy weapon fire
+- Capt. Izzy weapon hit wall
+- Capt. Izzy weapon hit player
+- Capt. Izzy weapon bouncing off wall
+- Capt. Izzy grenade launch (foomp)
+- Capt. Izzy grenade explosion
+- Capt. Izzy grenade impact surface
+- Capt. Izzy landing
+! Capt. Izzy footsteps
+- Capt. Izzy weapon overcharge
+- Capt. Izzy double jump sound (more instant sound)
+
+Art (! = provided, X = implemented)
+- Game background version 2 (larger, more dense)
+- Main Menu logo
+- Capt. Izzy 2nd Draft (Colored)
+	Includes:
+	- Portrait (Mugshot)
+	- Profile (Full Body)
+	- Ability 2 Icon (illustrate bouncing)
+	- Spritesheet (Separated Joints at Right Angles)
+- Skrush 1st Draft (Colored)
+	Includes:
+	- Portrait
+	- Profile
+	- Spritesheet
+	- Ability Icon 1 (TBD)
+	- Ability Icon 2 (TBD)
+	
+Animation
+- Capt. Izzy bullet sprite toggle
+- Capt. Izzy jumping backwards
+- Capt. Izzy stunned
+- Capt. Izzy wall jump
+- Capt. Izzy bullet sprite fizzle on collision
+
+Coding Features
+- Character Select -> Game Transition (black screen fade)
+- Game Start Countdown
+- Game End Notification & Pause
+- Victory Screen
+- Victory Screen -> Character Select Transition
+- Emmissive details on Capt. Izzy sprites (may not work in 2D)
+- Lights
+
+Coding Bugfixes
+- Character select icons visible when multiple hover (put each corner on a layer)
+- Horizontal movement lingering after wall slide
+- Velocity lingering when not landing on a valid floor (like a player's head)
+X Hud too high off bottom of screen
+- Menu changes shape with screen sizes
