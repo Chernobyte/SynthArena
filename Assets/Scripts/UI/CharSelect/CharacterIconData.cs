@@ -5,6 +5,7 @@ using UnityEngine;
 public class CharacterIconData : MonoBehaviour {
 
     public Sprite characterModel;
+    public Sprite characterIcon;
     public Sprite ability1;
     public Sprite ability2;
     public Sprite weapon;

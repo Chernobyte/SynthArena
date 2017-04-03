@@ -97,7 +97,7 @@ public class CharSelectCursor : MonoBehaviour {
             else if (state == CharSelectState.Selecting)
             {
                 var targetCharacterSelect = characterSelectOptions[currentCharSelectIndex];
-                overlord.ConfirmSelection(this, targetCharacterSelect.characterPrefab);
+                overlord.ConfirmSelection(this, targetCharacterSelect, targetCharacterSelect.characterPrefab);
                 state = CharSelectState.Ready;
                 updatePosition = true;
             }

@@ -6,8 +6,11 @@ using UnityEngine.UI;
 public class PlayerUI : MonoBehaviour {
 
     public int playerId;
+    public Image playerIcon;
     public Image playerFill;
+    public Image A1Icon;
     public Image A1Fill;
+    public Image A2Icon;
     public Image A2Fill;
 
     private float healthBarFillAmount;
@@ -20,7 +23,13 @@ public class PlayerUI : MonoBehaviour {
         A2Fill.color = new Color(0, 0, 0, .5f);
         A1Fill.fillAmount = 0;
         A2Fill.fillAmount = 0;
-       
+    }
+
+    public void Init(PlayerSelection selection)
+    {
+        playerIcon.sprite = selection.characterIcons.characterIcon;
+        A1Icon.sprite = selection.characterIcons.ability1;
+        A2Icon.sprite = selection.characterIcons.ability2;
     }
 
     public void UpdateHealthBar(int currentHealth, int maxHealth)

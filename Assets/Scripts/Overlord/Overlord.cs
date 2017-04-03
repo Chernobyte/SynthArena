@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class Overlord : MonoBehaviour {
 
-    public GameObject debugPlayerPrefab;
-    public GameObject debugDummyPrefab;
+    public CharacterIconData debugPlayerData;
+    public CharacterIconData debugDummyData;
 
     private List<PlayerSelection> playerSelections;
     private SpawnPoint[] spawnPoints;
@@ -33,8 +33,8 @@ public class Overlord : MonoBehaviour {
 
             playerSelections = new List<PlayerSelection>()
             {
-                new PlayerSelection(1, debugPlayerPrefab),
-                new PlayerSelection(2, debugDummyPrefab)
+                new PlayerSelection(1, debugPlayerData),
+                new PlayerSelection(4, debugDummyData)
             };
         }
         else
@@ -48,18 +48,21 @@ public class Overlord : MonoBehaviour {
 
         foreach (var selection in playerSelections)
         {
-            if (selection.characterPrefab == null)
+            var prefab = selection.characterIcons.characterPrefab;
+
+            if (prefab  == null)
                 continue;
 
             var spawnPoint = spawnPoints.First(n => n.playerId == selection.playerId);
             var playerUI = playerUIs.First(n => n.playerId == selection.playerId);
 
-            var playerGO = Instantiate(selection.characterPrefab, spawnPoint.transform.position, Quaternion.identity);
+            var playerGO = Instantiate(prefab, spawnPoint.transform.position, Quaternion.identity);
             var player = playerGO.GetComponent<Player>();
             player.Init(selection.playerId, this, playerUI);
+            playerUI.Init(selection);
         }
 
-        var inactivePlayerUIs = playerUIs.Where(n => !playerSelections.Exists(x => x.playerId == n.playerId && x.characterPrefab != null));
+        var inactivePlayerUIs = playerUIs.Where(n => !playerSelections.Exists(x => x.playerId == n.playerId && x.characterIcons.characterPrefab != null));
 
         foreach (var playerUI in inactivePlayerUIs)
         {

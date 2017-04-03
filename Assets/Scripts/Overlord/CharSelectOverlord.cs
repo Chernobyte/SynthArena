@@ -54,9 +54,9 @@ public class CharSelectOverlord : MonoBehaviour {
         }
     }
 
-    public void ConfirmSelection(CharSelectCursor cursor, GameObject characterPrefab)
+    public void ConfirmSelection(CharSelectCursor cursor, CharacterIconData characterIcons, GameObject characterPrefab)
     {
-        playerSelections.Add(new PlayerSelection(cursor.playerId, characterPrefab));
+        playerSelections.Add(new PlayerSelection(cursor.playerId, characterIcons));
 
         if (playerSelections.Count >= 1)
         //if (playerSelections.Count >= 2)

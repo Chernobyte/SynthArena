@@ -3,11 +3,11 @@
 public class PlayerSelection
 {
     public readonly int playerId;
-    public readonly GameObject characterPrefab;
+    public readonly CharacterIconData characterIcons;
 
-    public PlayerSelection(int playerId, GameObject characterPrefab)
+    public PlayerSelection(int playerId, CharacterIconData characterIcons)
     {
         this.playerId = playerId;
-        this.characterPrefab = characterPrefab;
+        this.characterIcons = characterIcons;
     }
 }
