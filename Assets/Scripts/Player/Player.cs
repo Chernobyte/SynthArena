@@ -33,6 +33,9 @@ public class Player : MonoBehaviour
     public Animator upperBodyAnimator;
     public Animator lowerBodyAnimator;
     public ParticleSystem ability2effect;
+    public AudioClip jumpSound;
+    public AudioClip doubleJumpSound;
+    public AudioClip weaponSound;
 
     //for aiming
     public GameObject sprites;
@@ -59,7 +62,6 @@ public class Player : MonoBehaviour
     private PlayerUI playerUI;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _collider;
-    private AudioSource _audio;
 
     private int playerNumber;
     private float currentSpeed = 0.0f;
@@ -92,7 +94,6 @@ public class Player : MonoBehaviour
 	{
 		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
-        _audio = gameObject.GetComponent<AudioSource>();
 
         InitializeTriggers();
         InitializeHurtboxes();
@@ -555,7 +556,7 @@ public class Player : MonoBehaviour
 
         bulletInstance.GetComponent<Bullet>().Initialize(numBounces, aimDirection, this);
         
-        _audio.Play();
+        AudioSource.PlayClipAtPoint(weaponSound, transform.position);
     }
 
     private void Ability1()
@@ -580,12 +581,14 @@ public class Player : MonoBehaviour
     {
         PreJump();
         currentFallSpeed = shortJumpStrength;
+        AudioSource.PlayClipAtPoint(jumpSound, transform.position);
     }
 
     private void Jump()
     {
         PreJump();
         currentFallSpeed = jumpStrength;
+        AudioSource.PlayClipAtPoint(jumpSound, transform.position);
     }
 
     private void AirJump()
@@ -604,6 +607,7 @@ public class Player : MonoBehaviour
 
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         lowerBodyAnimator.SetBool("isJumping", true);
+        AudioSource.PlayClipAtPoint(doubleJumpSound, transform.position);
     }
 
     private enum WallJumpDirection { Left, Right };

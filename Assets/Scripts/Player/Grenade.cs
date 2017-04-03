@@ -7,6 +7,8 @@ public class Grenade : MonoBehaviour {
     public GameObject explosion;
     public float armTime = 1.0f;
     public float explosionDelay = 2.0f;
+    public AudioClip armedSound;
+    public AudioClip explosionSound;
 
     private float timeCreated;
     private bool col = false;
@@ -41,11 +43,13 @@ public class Grenade : MonoBehaviour {
             {
                 armedEffect.Play();
             }
+            //AudioSource.PlayClipAtPoint(armedSound, transform.position);
         }
 
         if (readyToExplode)
         {
             var explosionInstance = Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
+            AudioSource.PlayClipAtPoint(explosionSound, transform.position);
             Destroy(gameObject);
         }
 

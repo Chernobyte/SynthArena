@@ -1,20 +1,23 @@
 Sound (.WAV files) (! = provided, X = implemented)
+- Tape deck (mechanical clicking) (for use on game start)
+- Main Menu music (high energy start directly after ^)
 - Menu Music
 - Menu press start
 - Char Select selection change
 - Char Select selection confirm
 - Char Select selection undo
 - Battle Music
-- Capt. Izzy weapon fire
+X Capt. Izzy weapon fire
 - Capt. Izzy weapon hit wall
 - Capt. Izzy weapon hit player
 - Capt. Izzy weapon bouncing off wall
 - Capt. Izzy grenade launch (foomp)
 - Capt. Izzy grenade explosion
 - Capt. Izzy grenade impact surface
-- Capt. Izzy landing
+- Capt. Izzy grenade arming
+- Capt. Izzy weapon overcharge (similar to grenade arming)
+- Capt. Izzy landing (heavier footstep)
 ! Capt. Izzy footsteps
-- Capt. Izzy weapon overcharge
 - Capt. Izzy double jump sound (more instant sound)
 
 Art (! = provided, X = implemented)
@@ -42,6 +45,11 @@ Animation
 - Capt. Izzy bullet sprite fizzle on collision
 
 Coding Features
+- Lives per player
+- Take players out of the game when they are out of lives
+- Place an X over players' huds when they have lost all their lives
+- Game ends when all but one player is alive
+- Game transitions placement information to victory screen
 - Character Select -> Game Transition (black screen fade)
 - Game Start Countdown
 - Game End Notification & Pause
