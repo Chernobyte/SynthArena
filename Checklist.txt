@@ -10,40 +10,58 @@ Sound (.WAV files) (! = provided, X = implemented)
 X Capt. Izzy weapon fire
 - Capt. Izzy weapon hit wall
 - Capt. Izzy weapon hit player
-- Capt. Izzy weapon bouncing off wall
+- Capt. Izzy weapon bouncing off wall ('pyonng')
 - Capt. Izzy grenade launch (foomp)
-- Capt. Izzy grenade explosion
-- Capt. Izzy grenade impact surface
-- Capt. Izzy grenade arming
+- Capt. Izzy grenade explosion (electric flair)
+- Capt. Izzy grenade impact surface (brief clank)
+- Capt. Izzy grenade arming (capacitor charging whine)
 - Capt. Izzy weapon overcharge (similar to grenade arming)
-- Capt. Izzy landing (heavier footstep)
 ! Capt. Izzy footsteps
 - Capt. Izzy double jump sound (more instant sound)
+- Skrush jump vocalization
+- Skrush jetpack use
+- Skrush rocket launch (same sound will be used for launching a mine)
+- Skrush rocket second stage
+- Skrush rocket explosion (deep boom)
+- Skrush footsteps (heavier than Capt. Izzy)
 
 Art (! = provided, X = implemented)
 - Game background version 2 (larger, more dense)
 - Main Menu logo
+- Stage Platform Sprites (TBD)
 - Capt. Izzy 2nd Draft (Colored)
 	Includes:
 	- Portrait (Mugshot)
 	- Profile (Full Body)
 	- Ability 2 Icon (illustrate bouncing)
 	- Spritesheet (Separated Joints at Right Angles)
+	- Double jump cloud poof (particle)
 - Skrush 1st Draft (Colored)
 	Includes:
 	- Portrait
 	- Profile
 	- Spritesheet
-	- Ability Icon 1 (TBD)
-	- Ability Icon 2 (TBD)
+	- Ability Icon 1 (Mine Launcher)
+	- Ability Icon 2 (Remote Trigger)
+	- Launcher (to be animated separately, very large, but not comically so)
+	- Rocket (FatMan-esque, not thin like an ICBM)
+	- Rocket flame (small, added to rocket when propulsed)
+	- Explosion (Smoky, red/orange fireball)
+	- Remote Mine (Halo Trip mine?, bigger than smash mine (should be visible but flat)
 	
 Animation
 - Capt. Izzy bullet sprite toggle
 - Capt. Izzy jumping backwards
-- Capt. Izzy stunned
+- Capt. Izzy stunned/pain (off-hand arm flailing)
 - Capt. Izzy wall jump
 - Capt. Izzy bullet sprite fizzle on collision
 - Capt. Izzy death
+- Skrush walking (very heavy-footed trudge)
+- Skrush jump (like bowser, very long squat)
+- Skrush aiming (Over-the-shoulder rocket, TF2 Soldier style)
+- Skrush landing (lots of inertia on upper body, very heavyset)
+- Skrush death
+- Skrush stunned/pain
 
 Coding Features
 - Lives per player
@@ -57,13 +75,20 @@ Coding Features
 - Victory Screen
 - Victory Screen -> Character Select Transition
 - Emmissive details on Capt. Izzy sprites (may not work in 2D)
-- Lights
+
+- Skrush:
+	- More health than Capt. Izzy, Slightly slower, heavier, higher damage
+	- Rocket Launcher (2 stages - launch & propulsion)
+	- Jetpack instead of double jump (like ROB Up-B in Brawl, still allows all abilities)
+	- Ability 1: Mine Layer (very fast projectile, sticks to surfaces, requires arm time & manual activation, turns red when ready)
+	- Ability 2: Destroy Mine (all visible, max of 3?, low CD, limited by # of mines laid)
 
 Coding Bugfixes
-- Limit knockback / total velocity to a certain value
 - Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
-- Character select icons visible when multiple hover (put each corner on a layer)
+- Extend character triggers & check if only inside one (onGround only if not on wall also)
 - Horizontal movement lingering after wall slide
+- Limit knockback / total velocity to a certain value
+- Character select icons visible when multiple hover (put each corner on a layer)
 - Velocity lingering when not landing on a valid floor (like a player's head)
-X Hud too high off bottom of screen
 - Menu changes shape with screen sizes
+X Hud too high off bottom of screen
