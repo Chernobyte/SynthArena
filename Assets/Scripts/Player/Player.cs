@@ -209,6 +209,7 @@ public class Player : MonoBehaviour
         }
     }
 
+
     private void Respawn()
     {
         currentHealth = maxHealth;
@@ -574,7 +575,7 @@ public class Player : MonoBehaviour
     
 
     private void HandleHitStun()
-    {
+    { 
         if (currentStun != 0)
         {
             if (Time.time > currentStun)
@@ -611,14 +612,19 @@ public class Player : MonoBehaviour
 
     private void Ability1()
     {
-        gameObject.GetComponent<AbilityOne>().fire(muzzle, aimDirection);
+        if(gameObject.GetComponent<AbilityOne>() != null)
+            gameObject.GetComponent<AbilityOne>().fire(muzzle, aimDirection);
+        else
+            gameObject.GetComponent<SkrushA1>().fire(muzzle, aimDirection);
     }
 
     private void Ability2()
     {
-        gameObject.GetComponent<AbilityTwo>().fire(ability2effect);
+        if (gameObject.GetComponent<AbilityTwo>() != null)
+            gameObject.GetComponent<AbilityTwo>().fire(ability2effect);
+        else
+            gameObject.GetComponent<SkrushA2>().fire(ability2effect);
     }
-
     private void PreJump()
     {
         currentJumpCount++;
