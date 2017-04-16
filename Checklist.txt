@@ -1,21 +1,20 @@
 Sound (.WAV files) (! = provided, X = implemented)
-- Tape deck (mechanical clicking) (for use on game start)
-- Main Menu music (high energy start directly after ^)
-- Menu Music
-- Menu press start
-- Char Select selection change
-- Char Select selection confirm
-- Char Select selection undo
+! Tape deck (mechanical clicking) (for use on game start)
+! Main Menu music (high energy start directly after ^)
+! Menu press start
+! Char Select selection change
+! Char Select selection confirm
+! Char Select selection undo
 - Battle Music
 X Capt. Izzy weapon fire
-- Capt. Izzy weapon hit wall
-- Capt. Izzy weapon hit player
-- Capt. Izzy weapon bouncing off wall ('pyonng')
-- Capt. Izzy grenade launch (foomp)
-- Capt. Izzy grenade explosion (electric flair)
-- Capt. Izzy grenade impact surface (brief clank)
-- Capt. Izzy grenade arming (capacitor charging whine)
-- Capt. Izzy weapon overcharge (similar to grenade arming)
+! Capt. Izzy weapon hit wall
+! Capt. Izzy weapon hit player
+? Capt. Izzy weapon bouncing off wall ('pyonng')
+! Capt. Izzy grenade launch (foomp)
+! Capt. Izzy grenade explosion (electric flair)
+! Capt. Izzy grenade impact surface (brief clank)
+! Capt. Izzy grenade arming (capacitor charging whine)
+! Capt. Izzy weapon overcharge (similar to grenade arming)
 ! Capt. Izzy footsteps
 - Capt. Izzy double jump sound (more instant sound)
 - Skrush jump vocalization
