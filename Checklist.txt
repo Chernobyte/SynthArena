@@ -1,4 +1,5 @@
 Sound (.WAV files) (! = provided, X = implemented)
+<<<<<<< HEAD
 ! Tape deck (mechanical clicking) (for use on game start)
 ! Main Menu music (high energy start directly after ^)
 ! Menu press start
@@ -15,6 +16,23 @@ X Capt. Izzy weapon fire
 ! Capt. Izzy grenade impact surface (brief clank)
 ! Capt. Izzy grenade arming (capacitor charging whine)
 ! Capt. Izzy weapon overcharge (similar to grenade arming)
+=======
+- Tape deck (mechanical clicking) (for use on game start)
+- Main Menu music (high energy start directly after ^)
+- Menu press start
+- Char Select selection change
+- Char Select selection confirm
+- Char Select selection undo
+- Battle Music
+X Capt. Izzy weapon fire
+- Capt. Izzy weapon hit then fizzle
+- Capt. Izzy weapon bouncing off wall ('pyonng')
+- Capt. Izzy grenade launch (foomp)
+X Capt. Izzy grenade explosion (electric flair)
+- Capt. Izzy grenade impact surface (brief clank)
+- Capt. Izzy grenade arming (capacitor charging whine, polaroid flash charge)
+- Capt. Izzy weapon overcharge (similar to grenade arming)
+>>>>>>> 9d1cce40d100f2ff3fb9a651126a494d6d268371
 ! Capt. Izzy footsteps
 - Capt. Izzy double jump sound (more instant sound)
 - Skrush jump vocalization
@@ -63,10 +81,11 @@ Animation
 - Skrush stunned/pain
 
 Coding Features
-- Lives per player
+- 3rd Party Input library
+X Lives per player
 - Take players out of the game when they are out of lives
 - Place an X over players' huds when they have lost all their lives
-- Game ends when all but one player is alive
+X Game ends when all but one player is alive
 - Game transitions placement information to victory screen
 - Character Select -> Game Transition (black screen fade)
 - Game Start Countdown
