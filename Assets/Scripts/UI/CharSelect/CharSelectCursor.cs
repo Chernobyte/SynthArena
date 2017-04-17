@@ -1,13 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XInputDotNetPure;
 
 public class CharSelectCursor : MonoBehaviour {
 
     public int playerId;
 
+    private PlayerIndex playerIndex;
+    private GamePadState gamePadState;
+    private GamePadState previousGamePadState;
     private float repeatCooldown = 0.2f;
-    private InputController gamepad;
     private CharSelectOverlord overlord;
     private CharacterIconData[] characterSelectOptions;
     private CharSelectInfoPanel panel;
@@ -22,14 +25,6 @@ public class CharSelectCursor : MonoBehaviour {
     void Start()
     {
         initialPosition = gameObject.transform.position;
-
-        switch (playerId)
-        {
-            case 1: gamepad = new InputController(ControllerNumber.ONE); break;
-            case 2: gamepad = new InputController(ControllerNumber.TWO); break;
-            case 3: gamepad = new InputController(ControllerNumber.THREE); break;
-            case 4: gamepad = new InputController(ControllerNumber.FOUR); break;
-        }
     }
 	
 	void Update()
@@ -43,6 +38,7 @@ public class CharSelectCursor : MonoBehaviour {
         this.overlord = overlord;
         this.characterSelectOptions = characterSelectOptions;
         this.panel = panel;
+        this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerId);
     }
 
     private enum CharSelectAction { Up, Down }
@@ -51,12 +47,21 @@ public class CharSelectCursor : MonoBehaviour {
 
     void HandleInput()
     {
-        //get controller state
-        controllerState.x = gamepad.Move_X();
-        controllerState.y = gamepad.Move_Y();
+        gamePadState = GamePad.GetState(playerIndex);
 
-        var confirmReceived = gamepad.A();
-        var revertReceived = gamepad.B();
+        //get controller state
+        controllerState.x = gamePadState.ThumbSticks.Left.X;
+        controllerState.y = gamePadState.ThumbSticks.Left.Y;
+
+        var confirmState = gamePadState.Buttons.A;
+        var previousConfirmState = previousGamePadState.Buttons.A;
+        bool confirmReceived, confirmStopped;
+        XInputDotNetHelpers.MapButtonStateToReceivedStopped(confirmState, previousConfirmState, out confirmReceived, out confirmStopped);
+
+        var revertState = gamePadState.Buttons.B;
+        var previousRevertState = previousGamePadState.Buttons.B;
+        bool revertReceived, revertStopped;        
+        XInputDotNetHelpers.MapButtonStateToReceivedStopped(revertState, previousRevertState, out revertReceived, out revertStopped);
 
         var timeSinceLastAction = Time.time - lastActionTime;
 
@@ -116,6 +121,8 @@ public class CharSelectCursor : MonoBehaviour {
                 updatePosition = true;
             }
         }
+
+        previousGamePadState = gamePadState;
     }
 
     void HandlePosition()
