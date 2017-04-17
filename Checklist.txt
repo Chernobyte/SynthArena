@@ -81,8 +81,10 @@ Animation
 - Skrush stunned/pain
 
 Coding Features
-- 3rd Party Input library
+X 3rd Party Input library
 X Lives per player
+- Generalize Player object
+- Add Skrush and Capt Izzy types that extend Player object
 - Take players out of the game when they are out of lives
 - Place an X over players' huds when they have lost all their lives
 X Game ends when all but one player is alive
@@ -102,6 +104,8 @@ X Game ends when all but one player is alive
 	- Ability 2: Destroy Mine (all visible, max of 3?, low CD, limited by # of mines laid)
 
 Coding Bugfixes
+- Wallslide should end on landing
+- Walking into a wall while still grounded should not change one's direction.
 - Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
 - Extend character triggers & check if only inside one (onGround only if not on wall also)
 - Horizontal movement lingering after wall slide
