@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using XInputDotNetPure;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -44,7 +45,7 @@ public class Player : MonoBehaviour
     public GameObject weapon;
     public GameObject arm;
     public Transform muzzle;
-    
+
     // bullet
     public GameObject bullet;
     public float bulletSpeed = 5.0f;
@@ -67,10 +68,12 @@ public class Player : MonoBehaviour
     private Transform spawnPoint;
 
     private int playerNumber;
+    private PlayerIndex playerIndex;
     private float currentSpeed = 0.0f;
     private float currentFallSpeed = 0.0f;
 
-    private InputController gamepad;
+    private GamePadState gamePadState;
+    private GamePadState previousGamePadState;
     private Vector2 controllerState;
     private Vector2 controllerStateR; //Right stick state
     private bool canJump = false;
@@ -96,9 +99,9 @@ public class Player : MonoBehaviour
     private bool isDead;
     private float deathTime;
 
-    private void Start() 
-	{
-		_rigidBody = gameObject.GetComponent<Rigidbody2D>();
+    private void Start()
+    {
+        _rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<BoxCollider2D>();
 
         InitializeTriggers();
@@ -129,7 +132,7 @@ public class Player : MonoBehaviour
     }
 
     private void Update()
-	{
+    {
         if (isDead)
         {
             HandleRespawn();
@@ -159,16 +162,9 @@ public class Player : MonoBehaviour
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
+        this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerNumber);
         this.playerUI = playerUI;
         this.spawnPoint = spawnPoint;
-
-        switch (playerNumber)
-        {
-            case 1: gamepad = new InputController(ControllerNumber.ONE); break;
-            case 2: gamepad = new InputController(ControllerNumber.TWO); break;
-            case 3: gamepad = new InputController(ControllerNumber.THREE); break;
-            case 4: gamepad = new InputController(ControllerNumber.FOUR); break;
-        }
     }
 
     public void TakeHit(Vector2 force, int weaponDamage, float timeStunned)
@@ -371,27 +367,29 @@ public class Player : MonoBehaviour
 
     private void HandleInput()
     {
-        //get controller state
-        controllerState.x = gamepad.Move_X();
-        controllerState.y = gamepad.Move_Y();
-        controllerStateR.x = gamepad.Aim_X();
-        controllerStateR.y = gamepad.Aim_Y();
+        gamePadState = GamePad.GetState(playerIndex);
+
+        controllerState.x = gamePadState.ThumbSticks.Left.X;
+        controllerState.y = gamePadState.ThumbSticks.Left.Y;
+        controllerStateR.x = gamePadState.ThumbSticks.Right.X;
+        controllerStateR.y = gamePadState.ThumbSticks.Right.Y;
 
         HandleLeftStickInput();
         HandleRightStickInput();
         HandleJumpInput();
         HandleAbility1Input();
         HandleAbility2Input();
-        
-		var fireState = gamepad.R2();
-        
 
-		if (fireState > 0.2f && canFire) 
-		{
-			FireWeapon();
-			canFire = false;
-			StartCoroutine(FireRoutine (fireRate));
-		}
+        var fireState = gamePadState.Triggers.Right;
+
+        if (fireState > 0.2f && canFire)
+        {
+            FireWeapon();
+            canFire = false;
+            StartCoroutine(FireRoutine(fireRate));
+        }
+
+        previousGamePadState = gamePadState;
     }
 
     private void HandleRightStickInput()
@@ -399,7 +397,7 @@ public class Player : MonoBehaviour
         // Right Stick Right Tilt
         if (controllerStateR.x > 0)
         {
-            lookingRight = true;   
+            lookingRight = true;
         }
         // Right Stick Left Tilt
         else if (controllerStateR.x < 0)
@@ -505,10 +503,13 @@ public class Player : MonoBehaviour
 
     private void HandleJumpInput()
     {
-        var jumpInputReceived = gamepad.R1();
-        var jumpInputStopped = gamepad.R1Up();
+        var jumpButtonState = gamePadState.Buttons.RightShoulder;
+        var previousJumpButtonState = previousGamePadState.Buttons.RightShoulder;
+        bool inputReceived, inputStopped;
 
-        if (jumpInputReceived)
+        XInputDotNetHelpers.MapButtonStateToReceivedStopped(jumpButtonState, previousJumpButtonState, out inputReceived, out inputStopped);
+
+        if (inputReceived)
         {
             jumpPressedTime = Time.time;
 
@@ -536,7 +537,7 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (jumpInputStopped)
+        if (inputStopped)
         {
             jumpReleasedTime = Time.time;
         }
@@ -544,9 +545,13 @@ public class Player : MonoBehaviour
 
     private void HandleAbility1Input()
     {
-        var ability1 = gamepad.L1();
-        
-        if (ability1)
+        var ability1ButtonState = gamePadState.Buttons.LeftShoulder;
+        var previousAbility1ButtonState = previousGamePadState.Buttons.LeftShoulder;
+        bool inputReceived, inputStopped;
+
+        XInputDotNetHelpers.MapButtonStateToReceivedStopped(ability1ButtonState, previousAbility1ButtonState, out inputReceived, out inputStopped);
+
+        if (inputReceived)
         {
             if (currentAbility1Cooldown == ability1CooldownTime)
             {
@@ -559,9 +564,9 @@ public class Player : MonoBehaviour
 
     private void HandleAbility2Input()
     {
-        var ability2 = gamepad.L2();
+        var ability2ButtonState = gamePadState.Triggers.Left;
 
-        if (ability2 != 0)
+        if (ability2ButtonState > 0)
         {
             if (currentAbility2Cooldown == ability2CooldownTime)
             {
@@ -572,10 +577,10 @@ public class Player : MonoBehaviour
         }
     }
 
-    
+
 
     private void HandleHitStun()
-    { 
+    {
         if (currentStun != 0)
         {
             if (Time.time > currentStun)
@@ -606,13 +611,13 @@ public class Player : MonoBehaviour
         }
 
         bulletInstance.GetComponent<Bullet>().Initialize(numBounces, aimDirection, this);
-        
+
         AudioSource.PlayClipAtPoint(weaponSound, transform.position);
     }
 
     private void Ability1()
     {
-        if(gameObject.GetComponent<AbilityOne>() != null)
+        if (gameObject.GetComponent<AbilityOne>() != null)
             gameObject.GetComponent<AbilityOne>().fire(muzzle, aimDirection);
         else
             gameObject.GetComponent<SkrushA1>().fire(muzzle, aimDirection);
@@ -729,7 +734,7 @@ public class Player : MonoBehaviour
             currentJumpCount = 0;
             currentFallSpeed = 0;
             fastFalling = false;
-            
+
             lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
             lowerBodyAnimator.SetBool("isJumping", false);
         }
