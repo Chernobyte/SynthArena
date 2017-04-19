@@ -64,7 +64,7 @@ public class Player : MonoBehaviour
     private Overlord overlord;
     private PlayerUI playerUI;
     private Rigidbody2D _rigidBody;
-    private BoxCollider2D _collider;
+    private CapsuleCollider2D _collider;
     private Transform spawnPoint;
 
     private int playerNumber;
@@ -103,7 +103,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         _rigidBody = gameObject.GetComponent<Rigidbody2D>();
-        _collider = gameObject.GetComponent<BoxCollider2D>();
+        _collider = gameObject.GetComponent<CapsuleCollider2D>();
 
         InitializeTriggers();
         InitializeHurtboxes();

@@ -49,10 +49,10 @@ public class Overlord : MonoBehaviour {
 
         foreach (var selection in playerSelections)
         {
-            var prefab = selection.characterIcons.characterPrefab;
-
-            if (prefab  == null)
+            if (selection.characterIcons == null)
                 continue;
+
+            var prefab = selection.characterIcons.characterPrefab;
 
             var spawnPoint = spawnPoints.First(n => n.playerId == selection.playerId);
             var playerUI = playerUIs.First(n => n.playerId == selection.playerId);
