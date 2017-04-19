@@ -17,7 +17,8 @@ public class MainMenu : MonoBehaviour {
 
     public void LoadGame()
     {
-        SceneManager.LoadScene("CharSelect");
+        //SceneManager.LoadScene("CharSelect");
+		StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect"));
     }
 
     public void QuitGame()
