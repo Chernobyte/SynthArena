@@ -1,5 +1,5 @@
 Sound (.WAV files) (! = provided, X = implemented)
-<<<<<<< HEAD
+
 ! Tape deck (mechanical clicking) (for use on game start)
 ! Main Menu music (high energy start directly after ^)
 ! Menu press start
@@ -16,23 +16,6 @@ X Capt. Izzy weapon fire
 ! Capt. Izzy grenade impact surface (brief clank)
 ! Capt. Izzy grenade arming (capacitor charging whine)
 ! Capt. Izzy weapon overcharge (similar to grenade arming)
-=======
-- Tape deck (mechanical clicking) (for use on game start)
-- Main Menu music (high energy start directly after ^)
-- Menu press start
-- Char Select selection change
-- Char Select selection confirm
-- Char Select selection undo
-- Battle Music
-X Capt. Izzy weapon fire
-- Capt. Izzy weapon hit then fizzle
-- Capt. Izzy weapon bouncing off wall ('pyonng')
-- Capt. Izzy grenade launch (foomp)
-X Capt. Izzy grenade explosion (electric flair)
-- Capt. Izzy grenade impact surface (brief clank)
-- Capt. Izzy grenade arming (capacitor charging whine, polaroid flash charge)
-- Capt. Izzy weapon overcharge (similar to grenade arming)
->>>>>>> 9d1cce40d100f2ff3fb9a651126a494d6d268371
 ! Capt. Izzy footsteps
 - Capt. Izzy double jump sound (more instant sound)
 - Skrush jump vocalization
@@ -60,7 +43,7 @@ Art (! = provided, X = implemented)
 	- Spritesheet
 	- Ability Icon 1 (Mine Launcher)
 	- Ability Icon 2 (Remote Trigger)
-	- Launcher (to be animated separately, very large, but not comically so)
+	- Launcher ([Over the shoulder bazooka] to be animated separately, very large, but not comically so)
 	- Rocket (FatMan-esque, not thin like an ICBM)
 	- Rocket flame (small, added to rocket when propulsed)
 	- Explosion (Smoky, red/orange fireball)

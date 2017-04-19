@@ -64,7 +64,7 @@ public class Player : MonoBehaviour
     private Overlord overlord;
     private PlayerUI playerUI;
     private Rigidbody2D _rigidBody;
-    private BoxCollider2D _collider;
+    private CapsuleCollider2D _collider;
     private Transform spawnPoint;
 
     private int playerNumber;
@@ -98,11 +98,12 @@ public class Player : MonoBehaviour
     private int livesRemaining = 1;
     private bool isDead;
     private float deathTime;
+    private List<GameObject> touchedPlatforms = new List<GameObject>();
 
     private void Start()
     {
         _rigidBody = gameObject.GetComponent<Rigidbody2D>();
-        _collider = gameObject.GetComponent<BoxCollider2D>();
+        _collider = gameObject.GetComponent<CapsuleCollider2D>();
 
         InitializeTriggers();
         InitializeHurtboxes();
@@ -116,10 +117,10 @@ public class Player : MonoBehaviour
 
     private void InitializeTriggers()
     {
-        topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerEnter, null);
+        topTriggerObject.GetComponent<TriggerCallback>().Init(null, null, null);
         bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit, null);
-        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit, null);
-        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit, null);
+        leftTriggerObject.GetComponent<TriggerCallback>().Init(null, OnLeftTriggerExit, null);
+        rightTriggerObject.GetComponent<TriggerCallback>().Init(null, OnRightTriggerExit, null);
     }
 
     private void InitializeHurtboxes()
@@ -266,6 +267,8 @@ public class Player : MonoBehaviour
 
     private void HandleGravity()
     {
+        lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
+
         if (!onGround)
         {
             if (fastFalling)
@@ -713,19 +716,27 @@ public class Player : MonoBehaviour
         currentFallSpeed = wallJumpStrength;
     }
 
-    public void OnTopTriggerEnter(Collider2D collision)
-    {
-
-    }
-
-    public void OnTopTriggerExit(Collider2D collision)
-    {
-
-    }
-
     public void OnBottomTriggerEnter(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Platform"))
+        {
+            touchedPlatforms.Add(collision.gameObject);
+            CheckTouchedPlatforms();
+        }
+    }
+
+    public void OnBottomTriggerExit(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            touchedPlatforms.Remove(collision.gameObject);
+            CheckTouchedPlatforms();
+        }
+    }
+
+    private void CheckTouchedPlatforms()
+    {
+        if (touchedPlatforms.Count > 0)
         {
             onGround = true;
             canJump = true;
@@ -738,21 +749,15 @@ public class Player : MonoBehaviour
             lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
             lowerBodyAnimator.SetBool("isJumping", false);
         }
-    }
-
-    public void OnBottomTriggerExit(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Platform"))
+        else
         {
             onGround = false;
             currentJumpCount = 1;
             canJump = true;
-
-            lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         }
     }
 
-    public void OnLeftTriggerEnter(Collider2D collision)
+    public void OnLeftTriggerStay(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
@@ -773,7 +778,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void OnRightTriggerEnter(Collider2D collision)
+    public void OnRightTriggerStay(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
         {

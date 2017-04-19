@@ -92,7 +92,8 @@ public class CharSelectOverlord : MonoBehaviour {
 
         if (canStartGame && startInputReceived)
         {
-            SceneManager.LoadScene("Game");
+            //SceneManager.LoadScene("Game");
+			StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
         }
     }
 }
