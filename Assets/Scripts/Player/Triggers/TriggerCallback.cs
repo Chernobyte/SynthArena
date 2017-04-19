@@ -20,6 +20,7 @@ public class TriggerCallback: MonoBehaviour {
     {
         enterFunctionToCall = enter;
         exitFunctionToCall = exit;
+        stayFunctionToCall = stay;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
