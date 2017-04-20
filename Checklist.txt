@@ -29,7 +29,7 @@ Art (! = provided, X = implemented)
 - Game background version 2 (larger, more dense)
 - Main Menu logo
 - Stage Platform Sprites (TBD)
-- Capt. Izzy 2nd Draft (Colored)
+X Capt. Izzy 2nd Draft (Colored)
 	Includes:
 	- Portrait (Mugshot)
 	- Profile (Full Body)
