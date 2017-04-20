@@ -78,6 +78,7 @@ X Game ends when all but one player is alive
 - Victory Screen
 - Victory Screen -> Character Select Transition
 - Emmissive details on Capt. Izzy sprites (may not work in 2D)
+- Change Character Select Ready Button to accept 2 or more players
 
 - Skrush:
 	- More health than Capt. Izzy, Slightly slower, heavier, higher damage
@@ -89,11 +90,11 @@ X Game ends when all but one player is alive
 Coding Bugfixes
 - Wallslide should end on landing
 - Walking into a wall while still grounded should not change one's direction.
-- Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
+X Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
 - Extend character triggers & check if only inside one (onGround only if not on wall also)
 - Horizontal movement lingering after wall slide
 - Limit knockback / total velocity to a certain value
 - Character select icons visible when multiple hover (put each corner on a layer)
 - Velocity lingering when not landing on a valid floor (like a player's head)
-- Menu changes shape with screen sizes
+X Menu changes shape with screen sizes
 X Hud too high off bottom of screen
