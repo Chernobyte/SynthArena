@@ -1,44 +1,92 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
 
     public AudioClip tapeDeck;
+    public AudioClip selectSound;
+    public AudioClip confirmSound;
 
-	// Use this for initialization
-	void Start () {
+    private AudioSource audioSource;
+    private Button[] buttons;
+    private bool inSequence = true;
+
+	void Start ()
+    {
+        audioSource = GetComponent<AudioSource>();
+        buttons = FindObjectsOfType<Button>();
         StartCoroutine(OpeningSequence());
-
     }
 
     IEnumerator OpeningSequence()
     {
-        AudioSource.PlayClipAtPoint(tapeDeck, Vector3.one);
+        EnterSequence();
+        audioSource.PlayOneShot(tapeDeck);
 
-        yield return new WaitForSecondsRealtime(2);
+        yield return new WaitForSeconds(2);
+
+        ExitSequence();
+
         var fader = GetComponent<SceneFader>();
         fader.enabled = true;
-
-        var audio = GetComponent<AudioSource>();
-        audio.Play();
+        
+        audioSource.Play();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     public void LoadGame()
     {
-        //SceneManager.LoadScene("CharSelect");
-		StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect", 2));
+        PlayConfirmSound();
+		StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect", 1));
+        EnterSequence();
     }
 
     public void QuitGame()
     {
-        // UnityEditor.EditorApplication.isPlaying = false;
         Application.Quit();
+    }
+
+    public void PlaySelectSound()
+    {
+        if (inSequence)
+            return;
+
+        audioSource.PlayOneShot(selectSound);
+    }
+
+    public void PlayConfirmSound()
+    {
+        if (inSequence)
+            return;
+
+        audioSource.PlayOneShot(confirmSound);
+    }
+
+    private void EnterSequence()
+    {
+        inSequence = true;
+        DisableButtons();
+    }
+
+    private void ExitSequence()
+    {
+        inSequence = false;
+        EnableButtons();
+    }
+
+    private void EnableButtons()
+    {
+        foreach (var button in buttons)
+        {
+            button.enabled = true;
+        }
+    }
+
+    private void DisableButtons()
+    {
+        foreach (var button in buttons)
+        {
+            button.enabled = false;
+        }
     }
 }
