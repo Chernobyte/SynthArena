@@ -12,7 +12,7 @@ public class CharSelectCursor : MonoBehaviour {
     private GamePadState previousGamePadState;
     private float repeatCooldown = 0.2f;
     private CharSelectOverlord overlord;
-    private CharacterIconData[] characterSelectOptions;
+    private CharacterInfo[] characterSelectOptions;
     private CharSelectInfoPanel panel;
     private Vector2 controllerState;
     private int currentCharSelectIndex;
@@ -33,7 +33,7 @@ public class CharSelectCursor : MonoBehaviour {
         HandlePosition();
 	}
 
-    public void Init(CharSelectOverlord overlord, CharacterIconData[] characterSelectOptions, CharSelectInfoPanel panel)
+    public void Init(CharSelectOverlord overlord, CharacterInfo[] characterSelectOptions, CharSelectInfoPanel panel)
     {
         this.overlord = overlord;
         this.characterSelectOptions = characterSelectOptions;

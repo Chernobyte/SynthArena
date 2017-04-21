@@ -5,14 +5,13 @@ using UnityEngine;
 
 public class Overlord : MonoBehaviour {
 
-    public CharacterIconData debugPlayerData;
-    public CharacterIconData debugDummyData;
+    public CharacterInfo debugPlayerData;
+    public CharacterInfo debugDummyData;
 
     private List<PlayerSelection> playerSelections;
     private SpawnPoint[] spawnPoints;
     private List<Player> players = new List<Player>();
     private PlayerUI[] playerUIs;
-    private bool playersCached = false;
     private List<Player> losers = new List<Player>();
 
 	void Start ()
@@ -40,7 +39,7 @@ public class Overlord : MonoBehaviour {
         }
         else
         {
-            playerSelections = charSelectOverlord.ReqeustPlayerSelections();
+            playerSelections = charSelectOverlord.RequestPlayerSelections();
             Destroy(charSelectOverlord);            
         }
 

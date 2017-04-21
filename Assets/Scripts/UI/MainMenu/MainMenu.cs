@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour {
@@ -17,6 +18,8 @@ public class MainMenu : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
         buttons = FindObjectsOfType<Button>();
         StartCoroutine(OpeningSequence());
+
+        DontDestroyOnLoad(audioSource);
     }
 
     IEnumerator OpeningSequence()
@@ -37,8 +40,10 @@ public class MainMenu : MonoBehaviour {
     public void LoadGame()
     {
         PlayConfirmSound();
-		StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect", 1));
-        EnterSequence();
+        SceneManager.LoadScene("CharSelect");
+
+		//StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect", 1));
+        //EnterSequence();
     }
 
     public void QuitGame()

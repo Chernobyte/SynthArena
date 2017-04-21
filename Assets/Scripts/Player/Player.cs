@@ -92,7 +92,6 @@ public class Player : MonoBehaviour
     private bool applyDecelerationThisTick;
     private bool lookingRight = true;
     private float currentStun;
-    private bool notStunned = true;
     private Vector2 aimDirection;
     private float lastValidAimAngle = 0f;
     private int livesRemaining = 1;
@@ -588,11 +587,8 @@ public class Player : MonoBehaviour
         {
             if (Time.time > currentStun)
             {
-                notStunned = true;
                 currentStun = 0;
             }
-            else
-                notStunned = false;
         }
     }
 
