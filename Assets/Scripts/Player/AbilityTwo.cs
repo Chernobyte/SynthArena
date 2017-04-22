@@ -16,7 +16,7 @@ public class AbilityTwo : MonoBehaviour {
     {
 		if(Time.time - timeTill > 6)
         {
-            gameObject.GetComponent<Player>().bouncing = false;
+            gameObject.GetComponent<CaptIzzy>().bouncing = false;
             if (effect != null)
                 effect.Stop();
         }
@@ -24,7 +24,7 @@ public class AbilityTwo : MonoBehaviour {
 
     public void fire(ParticleSystem abilityEffect)
     {
-        gameObject.GetComponent<Player>().bouncing = true;
+        gameObject.GetComponent<CaptIzzy>().bouncing = true;
         timeTill = Time.time;
         effect = abilityEffect;
         effect.Play();

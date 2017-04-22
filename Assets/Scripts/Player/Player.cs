@@ -4,102 +4,60 @@ using System.Linq;
 using XInputDotNetPure;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public abstract class Player : MonoBehaviour
 {
-    public int maxcurrentJumpCount = 2;
-    public float jumpPreBuffer = 0.1f;
-    public float jumpStrength = 20.0f;
-    public float shortJumpStrength = 14.0f;
-    public float airJumpStrength = 18.5f;
-    public float wallJumpStrength = 18.5f;
-    public float wallJumpHorizontalMultiplier = 1.3f;
-    public float shortWallJumpStrength = 14.0f;
-    public float shortWallJumpHorizontalMultiplier = 0.8f;
-    public float gravity = -1.0f;
-    public float maxFallSpeed = -10.0f;
+    protected int playerNumber;
+    protected PlayerIndex playerIndex;
+
+    public int maxHealth = 2000;
+    protected int currentHealth;
+    public int maxLives = 3;
+    protected int currentLives;
+
+    public float maxSpeed = 10.0f;
     public float acceleration = 0.7f;
     public float deceleration = 1.0f;
-    public float airDeceleration = 0.5f;
-    public float maxSpeed = 10.0f;
-    public int maxHealth = 2000;
-    public int currentHealth;
-    public int numBouncesOnAbility;
-    public float ability1CooldownTime = 8f;
-    public float ability2CooldownTime = 10f;
-    public int maxLives = 2;
-    public int respawnDelay = 5;
+    protected float currentSpeed;
+
+    public float gravity = -1.0f;
+    public float maxFallSpeed = -10.0f;
+    public float airDeceleration = 0.1f;
+    protected float currentFallSpeed;
+
+    public float maxAbility1Cooldown = 10.0f;
+    protected float currentAbility1Cooldown;
+    protected float ability1LastUseTime;
+    public float maxAbility2Cooldown = 10.0f;
+    protected float currentAbility2Cooldown;
+    protected float ability2LastUseTime;
 
     public GameObject topTriggerObject;
     public GameObject bottomTriggerObject;
     public GameObject leftTriggerObject;
     public GameObject rightTriggerObject;
-    public Animator upperBodyAnimator;
-    public Animator lowerBodyAnimator;
-    public ParticleSystem ability2effect;
-    public AudioClip jumpSound;
-    public AudioClip doubleJumpSound;
-    public AudioClip weaponSound;
+    protected CapsuleCollider2D _collider;
+    protected Rigidbody2D _rigidBody;
 
-    //for aiming
-    public GameObject sprites;
-    public GameObject weapon;
-    public GameObject arm;
-    public Transform muzzle;
+    protected Transform spawnPoint;
+    protected PlayerUI playerUI;
+    protected Overlord overlord;
 
-    // bullet
-    public GameObject bullet;
-    public float bulletSpeed = 5.0f;
-    public float fireRate = 1.0f;
-    public bool bouncing = false;
+    protected GamePadState gamePadState;
+    protected GamePadState previousGamePadState;
+    protected Vector2 controllerState;
+    protected Vector2 controllerStateR;
 
-    private float ability1LastUseTime;
-    private float currentAbility1Cooldown;
-    private float ability2LastUseTime;
-    private float currentAbility2Cooldown;
+    protected List<GameObject> touchedPlatforms = new List<GameObject>();
+    protected bool onGround = false;
+    protected bool onWallLeft = false;
+    protected bool onWallRight = false;
 
-    private float aimAngle = 0.0f;
-    private bool canFire = true;
+    protected bool isDead;
+    protected float deathTime;
+    protected float respawnDelay = 5;
+    protected float currentStunTime;
 
-    //ability stuff
-    private Overlord overlord;
-    private PlayerUI playerUI;
-    private Rigidbody2D _rigidBody;
-    private CapsuleCollider2D _collider;
-    private Transform spawnPoint;
-
-    private int playerNumber;
-    private PlayerIndex playerIndex;
-    private float currentSpeed = 0.0f;
-    private float currentFallSpeed = 0.0f;
-
-    private GamePadState gamePadState;
-    private GamePadState previousGamePadState;
-    private Vector2 controllerState;
-    private Vector2 controllerStateR; //Right stick state
-    private bool canJump = false;
-    private bool onWallLeft = false;
-    private bool onWallRight = false;
-    private bool canWallJumpToLeft = false;
-    private bool canWallJumpToRight = false;
-    private bool onGround = false;
-    private bool fastFalling = false;
-    private int currentJumpCount = 0;
-    private float gravityForce;
-    private float jumpPressedTime;
-    private float jumpReleasedTime;
-    private bool jumpBufferState = false;
-    private bool wallJumpBufferState = false;
-    private bool applyDecelerationThisTick;
-    private bool lookingRight = true;
-    private float currentStun;
-    private Vector2 aimDirection;
-    private float lastValidAimAngle = 0f;
-    private int livesRemaining = 1;
-    private bool isDead;
-    private float deathTime;
-    private List<GameObject> touchedPlatforms = new List<GameObject>();
-
-    private void Start()
+    protected void Start()
     {
         _rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<CapsuleCollider2D>();
@@ -108,21 +66,21 @@ public class Player : MonoBehaviour
         InitializeHurtboxes();
 
         currentHealth = maxHealth;
-        livesRemaining = maxLives;
+        currentLives = maxLives;
 
-        currentAbility1Cooldown = ability1CooldownTime;
-        currentAbility2Cooldown = ability2CooldownTime;
+        currentAbility1Cooldown = maxAbility1Cooldown;
+        currentAbility2Cooldown = maxAbility2Cooldown;
     }
 
-    private void InitializeTriggers()
+    protected void InitializeTriggers()
     {
-        topTriggerObject.GetComponent<TriggerCallback>().Init(null, null, null);
-        bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit, null);
-        leftTriggerObject.GetComponent<TriggerCallback>().Init(null, OnLeftTriggerExit, null);
-        rightTriggerObject.GetComponent<TriggerCallback>().Init(null, OnRightTriggerExit, null);
+        topTriggerObject.GetComponent<TriggerCallback>().Init(OnTopTriggerEnter, OnTopTriggerExit, OnTopTriggerStay);
+        bottomTriggerObject.GetComponent<TriggerCallback>().Init(OnBottomTriggerEnter, OnBottomTriggerExit, OnBottomTriggerStay);
+        leftTriggerObject.GetComponent<TriggerCallback>().Init(OnLeftTriggerEnter, OnLeftTriggerExit, OnLeftTriggerStay);
+        rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit, OnRightTriggerStay);
     }
 
-    private void InitializeHurtboxes()
+    protected void InitializeHurtboxes()
     {
         var hurtboxes = GetComponentsInChildren<HitboxCallback>();
         foreach (var hurtbox in hurtboxes)
@@ -131,48 +89,28 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Update()
+    protected virtual void HandleRespawn()
     {
-        if (isDead)
+        if (isDead && currentLives > 0 && Time.time - deathTime > respawnDelay)
         {
-            HandleRespawn();
+            Respawn();
         }
-        else
-        {
-            HandleAbilityCooldowns();
-
-            HandleInput();
-            HandleLookDirection();
-            HandleAiming();
-        }
-
-        UpdateHealthBar();
-        UpdateAbilitiesCD();
     }
 
-    private void FixedUpdate()
+    protected virtual void Respawn()
     {
-        HandleJump();
-        HandleGravity();
-        ApplySpeedToRigidBody();
-        HandleHitStun();
+        currentHealth = maxHealth;
+        transform.position = spawnPoint.position;
+
+        isDead = false;
     }
 
-    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint)
-    {
-        this.overlord = overlord;
-        this.playerNumber = playerNumber;
-        this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerNumber);
-        this.playerUI = playerUI;
-        this.spawnPoint = spawnPoint;
-    }
-
-    public void TakeHit(Vector2 force, int weaponDamage, float timeStunned)
+    public virtual void TakeHit(Vector2 force, int damage, float stunTime)
     {
         currentSpeed += force.x;
         currentFallSpeed += force.y;
-        currentHealth -= weaponDamage;
-        currentStun = Time.time + timeStunned;
+        currentHealth -= damage;
+        currentStunTime = Time.time + stunTime;
 
         if (currentHealth < 0)
         {
@@ -184,636 +122,120 @@ public class Player : MonoBehaviour
             isDead = true;
             deathTime = Time.time;
 
-            livesRemaining--;
+            currentLives--;
 
-            if (livesRemaining == 0)
+            if (currentLives == 0)
             {
                 overlord.RegisterLoser(this);
             }
             else
             {
-                // TODO: Animate Death & hide player after animation
+                HandleDeath();
             }
         }
     }
 
-    private void HandleRespawn()
+    protected virtual void HandleDeath()
     {
-        if (isDead && livesRemaining > 0 && Time.time - deathTime > respawnDelay)
-        {
-            Respawn();
-        }
     }
 
-
-    private void Respawn()
+    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint)
     {
-        currentHealth = maxHealth;
-        transform.position = spawnPoint.position;
-
-        isDead = false;
+        this.overlord = overlord;
+        this.playerNumber = playerNumber;
+        this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerNumber);
+        this.playerUI = playerUI;
+        this.spawnPoint = spawnPoint;
     }
 
-    private void ApplySpeedToRigidBody()
+    protected virtual void CalculateAbilityCooldowns()
     {
-        if (Mathf.Abs(currentSpeed) > Mathf.Abs(maxSpeed))
-        {
-            applyDecelerationThisTick = true;
-        }
-
-        if (applyDecelerationThisTick == true)
-        {
-            float actualDeceleration = deceleration;
-
-            if (!onGround)
-                actualDeceleration = airDeceleration;
-
-            if (currentSpeed < 0)
-            {
-                if (-actualDeceleration < currentSpeed)
-                {
-                    currentSpeed = 0;
-                }
-                else
-                {
-                    currentSpeed += actualDeceleration;
-                }
-            }
-            else if (currentSpeed > 0)
-            {
-                if (actualDeceleration > currentSpeed)
-                {
-                    currentSpeed = 0;
-                }
-                else
-                {
-                    currentSpeed -= actualDeceleration;
-                }
-            }
-        }
-
-        if (currentFallSpeed < 0)
-        {
-            lowerBodyAnimator.SetBool("isJumping", false);
-        }
-
-        lowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
-
-        applyDecelerationThisTick = false;
-
-        _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
-    }
-
-    private void HandleGravity()
-    {
-        lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-
-        if (!onGround)
-        {
-            if (fastFalling)
-            {
-                currentFallSpeed = maxFallSpeed * 1.5f;
-            }
-            else
-            {
-                currentFallSpeed += gravity;
-
-                if (onWallLeft || onWallRight)
-                {
-                    if (currentFallSpeed < maxFallSpeed / 1.5f)
-                        currentFallSpeed = maxFallSpeed / 1.5f;
-                }
-                else
-                {
-                    if (currentFallSpeed < maxFallSpeed)
-                        currentFallSpeed = maxFallSpeed;
-                }
-            }
-        }
-        else if (onGround && currentFallSpeed < 0)
-        {
-            currentFallSpeed = 0;
-        }
-    }
-
-    private void HandleJump()
-    {
-        var timeSinceJumpOrdered = Time.time - jumpPressedTime;
-        var jumpButtonHeldLength = jumpReleasedTime - jumpPressedTime;
-
-        if (onGround)
-        {
-            if (jumpBufferState && timeSinceJumpOrdered > jumpPreBuffer)
-            {
-                if (jumpButtonHeldLength < 0) // not yet released
-                {
-                    Jump();
-                }
-                else
-                {
-                    ShortJump();
-                }
-
-                jumpBufferState = false;
-            }
-        }
-        else
-        {
-            if (wallJumpBufferState && timeSinceJumpOrdered > jumpPreBuffer)
-            {
-                WallJumpDirection direction;
-
-                wallJumpBufferState = false;
-
-                if (onWallLeft)
-                {
-                    direction = WallJumpDirection.Right;
-                }
-                else if (onWallRight)
-                {
-                    direction = WallJumpDirection.Left;
-                }
-                else
-                {
-                    return;
-                }
-
-                if (jumpButtonHeldLength < 0) // not yet released
-                {
-                    WallJump(direction);
-                }
-                else
-                {
-                    ShortWallJump(direction);
-                }
-            }
-        }
-    }
-
-    private void HandleAbilityCooldowns()
-    {
-        if (currentAbility1Cooldown < ability1CooldownTime)
+        if (currentAbility1Cooldown < maxAbility1Cooldown)
         {
             currentAbility1Cooldown = Time.time - ability1LastUseTime;
-            if (currentAbility1Cooldown > ability1CooldownTime)
-                currentAbility1Cooldown = ability1CooldownTime;
+            if (currentAbility1Cooldown > maxAbility1Cooldown)
+                currentAbility1Cooldown = maxAbility1Cooldown;
         }
 
-        if (currentAbility2Cooldown < ability2CooldownTime)
+        if (currentAbility2Cooldown < maxAbility2Cooldown)
         {
             currentAbility2Cooldown = Time.time - ability2LastUseTime;
-            if (currentAbility2Cooldown > ability2CooldownTime)
-                currentAbility2Cooldown = ability2CooldownTime;
+            if (currentAbility2Cooldown > maxAbility2Cooldown)
+                currentAbility2Cooldown = maxAbility2Cooldown;
         }
     }
 
-    private void HandleInput()
+    protected void CalculateStun()
     {
-        gamePadState = GamePad.GetState(playerIndex);
-
-        controllerState.x = gamePadState.ThumbSticks.Left.X;
-        controllerState.y = gamePadState.ThumbSticks.Left.Y;
-        controllerStateR.x = gamePadState.ThumbSticks.Right.X;
-        controllerStateR.y = gamePadState.ThumbSticks.Right.Y;
-
-        HandleLeftStickInput();
-        HandleRightStickInput();
-        HandleJumpInput();
-        HandleAbility1Input();
-        HandleAbility2Input();
-
-        var fireState = gamePadState.Triggers.Right;
-
-        if (fireState > 0.2f && canFire)
+        if (currentStunTime != 0)
         {
-            FireWeapon();
-            canFire = false;
-            StartCoroutine(FireRoutine(fireRate));
-        }
-
-        previousGamePadState = gamePadState;
-    }
-
-    private void HandleRightStickInput()
-    {
-        // Right Stick Right Tilt
-        if (controllerStateR.x > 0)
-        {
-            lookingRight = true;
-        }
-        // Right Stick Left Tilt
-        else if (controllerStateR.x < 0)
-        {
-            lookingRight = false;
-        }
-        // No Right Stick X Input
-        else
-        {
-
-        }
-    }
-
-    private void HandleLookDirection()
-    {
-        if (onWallLeft)
-        {
-            lookingRight = true;
-        }
-        else if (onWallRight)
-        {
-            lookingRight = false;
-        }
-
-        if (lookingRight)
-        {
-            sprites.transform.rotation = Quaternion.Euler(0, 0, 0);
-        }
-        else
-        {
-            sprites.transform.rotation = Quaternion.Euler(0, 180, 0);
-        }
-    }
-
-    private void HandleAiming()
-    {
-        if (lookingRight)
-        {
-            aimAngle = Mathf.Atan2(controllerStateR.y, controllerStateR.x) * Mathf.Rad2Deg;
-        }
-        else
-        {
-            aimAngle = Mathf.Atan2(controllerStateR.y, -controllerStateR.x) * Mathf.Rad2Deg;
-        }
-
-        aimDirection = new Vector2(muzzle.transform.right.x, muzzle.transform.right.y);
-
-        if (controllerStateR.y == 0 && controllerStateR.x == 0)
-        {
-            aimAngle = lastValidAimAngle;
-        }
-        else
-        {
-            lastValidAimAngle = aimAngle;
-        }
-
-        var aimBlend = (aimAngle + 90.0f) / 180.0f;
-        upperBodyAnimator.SetFloat("aimBlend", aimBlend);
-    }
-
-    private void HandleLeftStickInput()
-    {
-        // Left Stick Right Tilt
-        if (controllerState.x > 0.2)
-        {
-            if (currentSpeed < maxSpeed)
+            if (Time.time > currentStunTime)
             {
-                currentSpeed += acceleration;
-                if (currentSpeed > maxSpeed)
-                    currentSpeed = maxSpeed;
-            }
-            lowerBodyAnimator.SetBool("isRunning", true);
-            lowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? 1.0f : -1.0f);
-        }
-        // Left Stick Left Tilt
-        else if (controllerState.x < -0.2)
-        {
-            if (currentSpeed > -maxSpeed)
-            {
-                currentSpeed -= acceleration;
-                if (currentSpeed < -maxSpeed)
-                    currentSpeed = -maxSpeed;
-            }
-            lowerBodyAnimator.SetBool("isRunning", true);
-            lowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? -1.0f : 1.0f);
-        }
-        // No Left Stick X Input
-        else
-        {
-            applyDecelerationThisTick = true;
-            lowerBodyAnimator.SetBool("isRunning", false);
-        }
-
-        // Left Stick Y Input
-        if (controllerState.y < -0.8)
-        {
-            if (!onGround && !onWallLeft && !onWallRight)
-            {
-                fastFalling = true;
+                currentStunTime = 0;
             }
         }
     }
 
-    private void HandleJumpInput()
+    protected void UpdatePlayerUI()
     {
-        var jumpButtonState = gamePadState.Buttons.RightShoulder;
-        var previousJumpButtonState = previousGamePadState.Buttons.RightShoulder;
-        bool inputReceived, inputStopped;
-
-        XInputDotNetHelpers.MapButtonStateToReceivedStopped(jumpButtonState, previousJumpButtonState, out inputReceived, out inputStopped);
-
-        if (inputReceived)
-        {
-            jumpPressedTime = Time.time;
-
-            if (canJump)
-            {
-                if (onWallLeft && !onGround && canWallJumpToRight)
-                {
-                    wallJumpBufferState = true;
-                }
-                else if (onWallRight && !onGround && canWallJumpToLeft)
-                {
-                    wallJumpBufferState = true;
-                }
-                else if (currentJumpCount < maxcurrentJumpCount)
-                {
-                    if (onGround)
-                    {
-                        jumpBufferState = true;
-                    }
-                    else
-                    {
-                        AirJump();
-                    }
-                }
-            }
-        }
-
-        if (inputStopped)
-        {
-            jumpReleasedTime = Time.time;
-        }
+        playerUI.UpdateHealthBar(currentHealth, maxHealth, currentLives);
+        playerUI.UpdateAbilitiesCD(currentAbility1Cooldown, maxAbility1Cooldown, currentAbility2Cooldown, maxAbility2Cooldown);
     }
 
-    private void HandleAbility1Input()
+    protected virtual void OnLeftTriggerEnter(Collider2D collision)
     {
-        var ability1ButtonState = gamePadState.Buttons.LeftShoulder;
-        var previousAbility1ButtonState = previousGamePadState.Buttons.LeftShoulder;
-        bool inputReceived, inputStopped;
-
-        XInputDotNetHelpers.MapButtonStateToReceivedStopped(ability1ButtonState, previousAbility1ButtonState, out inputReceived, out inputStopped);
-
-        if (inputReceived)
-        {
-            if (currentAbility1Cooldown == ability1CooldownTime)
-            {
-                ability1LastUseTime = Time.time;
-                currentAbility1Cooldown = 0;
-                Ability1();
-            }
-        }
     }
 
-    private void HandleAbility2Input()
+    protected virtual void OnLeftTriggerStay(Collider2D collision)
     {
-        var ability2ButtonState = gamePadState.Triggers.Left;
-
-        if (ability2ButtonState > 0)
-        {
-            if (currentAbility2Cooldown == ability2CooldownTime)
-            {
-                ability2LastUseTime = Time.time;
-                currentAbility2Cooldown = 0;
-                Ability2();
-            }
-        }
     }
 
-    private void HandleHitStun()
+    protected virtual void OnLeftTriggerExit(Collider2D collision)
     {
-        if (currentStun != 0)
-        {
-            if (Time.time > currentStun)
-            {
-                currentStun = 0;
-            }
-        }
     }
 
-    IEnumerator FireRoutine(float duration)
+    protected virtual void OnRightTriggerEnter(Collider2D collision)
     {
-        yield return new WaitForSeconds(duration);
-        canFire = true;
     }
 
-    private void FireWeapon()
+    protected virtual void OnRightTriggerStay(Collider2D collision)
     {
-        var bulletInstance = Instantiate(bullet, muzzle.position, muzzle.rotation);
-
-        int numBounces = 0;
-
-        if (bouncing)
-        {
-            numBounces = numBouncesOnAbility;
-        }
-
-        bulletInstance.GetComponent<Bullet>().Initialize(numBounces, aimDirection, this);
-
-        AudioSource.PlayClipAtPoint(weaponSound, transform.position);
     }
 
-    private void Ability1()
+    protected virtual void OnRightTriggerExit(Collider2D collision)
     {
-        if (gameObject.GetComponent<AbilityOne>() != null)
-            gameObject.GetComponent<AbilityOne>().fire(muzzle, aimDirection);
-        else
-            gameObject.GetComponent<SkrushA1>().fire(muzzle, aimDirection);
     }
 
-    private void Ability2()
+    protected virtual void OnBottomTriggerEnter(Collider2D collision)
     {
-        if (gameObject.GetComponent<AbilityTwo>() != null)
-            gameObject.GetComponent<AbilityTwo>().fire(ability2effect);
-        else
-            gameObject.GetComponent<SkrushA2>().fire(ability2effect);
-    }
-    private void PreJump()
-    {
-        currentJumpCount++;
-        lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-        lowerBodyAnimator.SetBool("isJumping", true);
-        fastFalling = false;
     }
 
-    private void ShortJump()
+    protected virtual void OnBottomTriggerStay(Collider2D collision)
     {
-        PreJump();
-        currentFallSpeed = shortJumpStrength;
-        AudioSource.PlayClipAtPoint(jumpSound, transform.position);
     }
 
-    private void Jump()
+    protected virtual void OnBottomTriggerExit(Collider2D collision)
     {
-        PreJump();
-        currentFallSpeed = jumpStrength;
-        AudioSource.PlayClipAtPoint(jumpSound, transform.position);
     }
 
-    private void AirJump()
+    protected virtual void OnTopTriggerEnter(Collider2D collision)
     {
-        currentJumpCount++;
-        fastFalling = false;
-        canWallJumpToRight = true;
-        canWallJumpToLeft = true;
-
-        if (controllerState.x > 0.2 || controllerState.x < -0.2)
-        {
-            currentSpeed = maxSpeed * controllerState.x;
-        }
-
-        currentFallSpeed = airJumpStrength;
-
-        lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-        lowerBodyAnimator.SetBool("isJumping", true);
-        AudioSource.PlayClipAtPoint(doubleJumpSound, transform.position);
     }
 
-    private enum WallJumpDirection { Left, Right };
-
-    private void ShortWallJump(WallJumpDirection direction)
+    protected virtual void OnTopTriggerStay(Collider2D collision)
     {
-        fastFalling = false;
-
-        if (direction == WallJumpDirection.Right)
-        {
-            currentSpeed = maxSpeed * shortWallJumpHorizontalMultiplier;
-            canWallJumpToRight = false;
-            canWallJumpToLeft = true;
-        }
-        else if (direction == WallJumpDirection.Left)
-        {
-            currentSpeed = -maxSpeed * shortWallJumpHorizontalMultiplier;
-            canWallJumpToLeft = false;
-            canWallJumpToRight = true;
-        }
-
-        currentFallSpeed = shortWallJumpStrength;
     }
 
-    private void WallJump(WallJumpDirection direction)
+    protected virtual void OnTopTriggerExit(Collider2D collision)
     {
-        fastFalling = false;
-
-        if (direction == WallJumpDirection.Right)
-        {
-            currentSpeed = maxSpeed * wallJumpHorizontalMultiplier;
-            canWallJumpToRight = false;
-            canWallJumpToLeft = true;
-        }
-        else if (direction == WallJumpDirection.Left)
-        {
-            currentSpeed = -maxSpeed * wallJumpHorizontalMultiplier;
-            canWallJumpToLeft = false;
-            canWallJumpToRight = true;
-        }
-
-        currentFallSpeed = wallJumpStrength;
     }
 
-    public void OnBottomTriggerEnter(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Platform"))
-        {
-            touchedPlatforms.Add(collision.gameObject);
-            CheckTouchedPlatforms();
-        }
-    }
-
-    public void OnBottomTriggerExit(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Platform"))
-        {
-            touchedPlatforms.Remove(collision.gameObject);
-            CheckTouchedPlatforms();
-        }
-    }
-
-    private void CheckTouchedPlatforms()
-    {
-        if (touchedPlatforms.Count > 0 && currentFallSpeed <= 0)
-        {
-            Debug.Log("LAND: " + Time.time);
-
-            onGround = true;
-            canJump = true;
-            canWallJumpToLeft = true;
-            canWallJumpToRight = true;
-            currentJumpCount = 0;
-            currentFallSpeed = 0;
-            fastFalling = false;
-
-            lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
-            lowerBodyAnimator.SetBool("isJumping", false);
-        }
-        else
-        {
-            Debug.Log("LEFT: " + Time.time);
-
-            onGround = false;
-            currentJumpCount = 1;
-            canJump = true;
-        }
-    }
-
-    public void OnLeftTriggerStay(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            onWallLeft = true;
-            fastFalling = false;
-
-            lowerBodyAnimator.SetBool("wallSlide", true);
-        }
-    }
-
-    public void OnLeftTriggerExit(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            onWallLeft = false;
-
-            lowerBodyAnimator.SetBool("wallSlide", false);
-        }
-    }
-
-    public void OnRightTriggerStay(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            onWallRight = true;
-            fastFalling = false;
-
-            lowerBodyAnimator.SetBool("wallSlide", true);
-        }
-    }
-
-    public void OnRightTriggerExit(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            onWallRight = false;
-
-            lowerBodyAnimator.SetBool("wallSlide", false);
-        }
-    }
-
-    public void OnHitboxTriggerEnter(Collider2D collision)
+    protected virtual void OnHitboxTriggerEnter(Collider2D collision)
     {
 
     }
 
-    public void OnHitboxTriggerExit(Collider2D collision)
+    protected virtual void OnHitboxTriggerExit(Collider2D collision)
     {
-
-    }
-
-    private void UpdateHealthBar()
-    {
-        playerUI.UpdateHealthBar(currentHealth, maxHealth, livesRemaining);
-    }
-
-    private void UpdateAbilitiesCD()
-    {
-        playerUI.UpdateAbilitiesCD(currentAbility1Cooldown, ability1CooldownTime, currentAbility2Cooldown, ability2CooldownTime);
     }
 }
