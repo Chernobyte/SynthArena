@@ -579,8 +579,6 @@ public class Player : MonoBehaviour
         }
     }
 
-
-
     private void HandleHitStun()
     {
         if (currentStun != 0)
@@ -732,8 +730,10 @@ public class Player : MonoBehaviour
 
     private void CheckTouchedPlatforms()
     {
-        if (touchedPlatforms.Count > 0)
+        if (touchedPlatforms.Count > 0 && currentFallSpeed <= 0)
         {
+            Debug.Log("LAND: " + Time.time);
+
             onGround = true;
             canJump = true;
             canWallJumpToLeft = true;
@@ -747,6 +747,8 @@ public class Player : MonoBehaviour
         }
         else
         {
+            Debug.Log("LEFT: " + Time.time);
+
             onGround = false;
             currentJumpCount = 1;
             canJump = true;

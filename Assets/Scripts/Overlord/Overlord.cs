@@ -36,11 +36,15 @@ public class Overlord : MonoBehaviour {
 
         if (charSelectOverlord == null) // debug mode
         {
-            playerSelections = new List<PlayerSelection>()
+            playerSelections = new List<PlayerSelection>();
+            if (debugPlayerData != null)
             {
-                new PlayerSelection(1, debugPlayerData),
-                new PlayerSelection(4, debugDummyData)
-            };
+                playerSelections.Add(new PlayerSelection(1, debugPlayerData));
+            }
+            if (debugDummyData != null)
+            {
+                playerSelections.Add(new PlayerSelection(4, debugDummyData));
+            }
         }
         else
         {
