@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class AbilityOne : MonoBehaviour
+public class FireGrenade : MonoBehaviour
 {
     public float grenadeSpeed = 25.0f;
 

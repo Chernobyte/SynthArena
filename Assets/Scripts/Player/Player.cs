@@ -41,6 +41,7 @@ public abstract class Player : MonoBehaviour
     protected Transform spawnPoint;
     protected PlayerUI playerUI;
     protected Overlord overlord;
+    protected AudioSource audioSource;
 
     protected GamePadState gamePadState;
     protected GamePadState previousGamePadState;
@@ -61,6 +62,7 @@ public abstract class Player : MonoBehaviour
     {
         _rigidBody = gameObject.GetComponent<Rigidbody2D>();
         _collider = gameObject.GetComponent<CapsuleCollider2D>();
+        audioSource = gameObject.GetComponent<AudioSource>();
 
         InitializeTriggers();
         InitializeHurtboxes();

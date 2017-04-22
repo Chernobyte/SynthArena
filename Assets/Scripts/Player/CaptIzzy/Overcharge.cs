@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AbilityTwo : MonoBehaviour {
+public class Overcharge : MonoBehaviour {
 
     private float timeTill;
     private ParticleSystem effect;

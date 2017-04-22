@@ -453,18 +453,12 @@ public class CaptIzzy : Player
 
     private void Ability1()
     {
-        if (gameObject.GetComponent<AbilityOne>() != null)
-            gameObject.GetComponent<AbilityOne>().fire(muzzle, aimDirection);
-        else
-            gameObject.GetComponent<SkrushA1>().fire(muzzle, aimDirection);
+        gameObject.GetComponent<FireGrenade>().fire(muzzle, aimDirection);
     }
 
     private void Ability2()
     {
-        if (gameObject.GetComponent<AbilityTwo>() != null)
-            gameObject.GetComponent<AbilityTwo>().fire(ability2effect);
-        else
-            gameObject.GetComponent<SkrushA2>().fire(ability2effect);
+        gameObject.GetComponent<Overcharge>().fire(ability2effect);
     }
     private void PreJump()
     {

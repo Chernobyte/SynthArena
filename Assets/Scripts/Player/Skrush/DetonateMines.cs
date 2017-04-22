@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkrushA2 : MonoBehaviour {
+public class DetonateMines : MonoBehaviour {
 
     private float timeTill;
     private ParticleSystem effect;
@@ -22,11 +22,7 @@ public class SkrushA2 : MonoBehaviour {
         }
     }
 
-    public void fire(ParticleSystem abilityEffect)
+    public void fire()
     {
-        gameObject.GetComponent<CaptIzzy>().bouncing = true;
-        timeTill = Time.time;
-        effect = abilityEffect;
-        effect.Play();
     }
 }
