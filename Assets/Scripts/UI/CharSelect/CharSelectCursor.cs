@@ -98,6 +98,7 @@ public class CharSelectCursor : MonoBehaviour {
             {
                 state = CharSelectState.Selecting;
                 updatePosition = true;
+                overlord.PlayConfirmSound();
             }
             else if (state == CharSelectState.Selecting)
             {
@@ -105,6 +106,7 @@ public class CharSelectCursor : MonoBehaviour {
                 overlord.ConfirmSelection(this, targetCharacterSelect, targetCharacterSelect.characterPrefab);
                 state = CharSelectState.Ready;
                 updatePosition = true;
+                overlord.PlayConfirmSound();
             }
         }
         else if (revertReceived)
@@ -114,11 +116,13 @@ public class CharSelectCursor : MonoBehaviour {
                 overlord.CancelSelection(this);
                 state = CharSelectState.Selecting;
                 updatePosition = true;
+                overlord.PlayRevertSound();
             }
             else if (state == CharSelectState.Selecting)
             {
                 state = CharSelectState.Inactive;
                 updatePosition = true;
+                overlord.PlayRevertSound();
             }
         }
 
@@ -147,6 +151,8 @@ public class CharSelectCursor : MonoBehaviour {
             gameObject.transform.position = targetCharacterSelect.transform.position;
             panel.DisplayCharacterInfo(targetCharacterSelect);
         }
+
+        overlord.PlaySelectSound();
 
         updatePosition = false;
     }

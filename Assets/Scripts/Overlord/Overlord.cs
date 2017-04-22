@@ -26,11 +26,16 @@ public class Overlord : MonoBehaviour {
 
     private void Init()
     {
+        var mainMenuOverlord = FindObjectOfType<MainMenuOverlord>();
+        if (mainMenuOverlord != null)
+        {
+            Destroy(mainMenuOverlord.gameObject);
+        }
+
         var charSelectOverlord = FindObjectOfType<CharSelectOverlord>();
 
         if (charSelectOverlord == null) // debug mode
         {
-
             playerSelections = new List<PlayerSelection>()
             {
                 new PlayerSelection(1, debugPlayerData),
@@ -40,7 +45,7 @@ public class Overlord : MonoBehaviour {
         else
         {
             playerSelections = charSelectOverlord.RequestPlayerSelections();
-            Destroy(charSelectOverlord);            
+            Destroy(charSelectOverlord.gameObject);            
         }
 
         spawnPoints = FindObjectsOfType<SpawnPoint>();

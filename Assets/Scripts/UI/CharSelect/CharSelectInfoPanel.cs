@@ -41,7 +41,7 @@ public class CharSelectInfoPanel : MonoBehaviour {
     {
         SetActiveColor();
 
-        InactiveText.gameObject.SetActive(true);
+        InactiveText.gameObject.GetComponent<Text>().enabled = true;
 
         ParentInfoObject.gameObject.SetActive(false);
     }
@@ -50,7 +50,7 @@ public class CharSelectInfoPanel : MonoBehaviour {
     {
         SetActiveColor();
 
-        InactiveText.gameObject.SetActive(false);
+        InactiveText.gameObject.GetComponent<Text>().enabled = false;
 
         ParentInfoObject.gameObject.SetActive(true);
 
@@ -68,7 +68,7 @@ public class CharSelectInfoPanel : MonoBehaviour {
     {
         SetNeutralColor();
 
-        InactiveText.gameObject.SetActive(false);
+        InactiveText.gameObject.GetComponent<Text>().enabled = false;
 
         ParentInfoObject.gameObject.SetActive(true);
 

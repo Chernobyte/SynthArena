@@ -9,12 +9,17 @@ public class CharSelectOverlord : MonoBehaviour {
 
     public Text startText;
 
+    public AudioClip selectSound;
+    public AudioClip confirmSound;
+    public AudioClip revertSound;
+
     private const int maxNumPlayers = 4;
     private CharSelectInfoPanel[] infoPanels;
     private List<PlayerSelection> playerSelections = new List<PlayerSelection>();
     private CharacterInfo[] charSelectOptions;
     private bool canStartGame = false;
     private AudioSource audioSource;
+    private MainMenuOverlord mainMenuOverlord;
 
     void Start()
     {
@@ -31,11 +36,15 @@ public class CharSelectOverlord : MonoBehaviour {
 
     private void InitAudio()
     {
-        audioSource = FindObjectOfType<AudioSource>();
-        if (audioSource == null)
+        mainMenuOverlord = FindObjectOfType<MainMenuOverlord>();
+        if (mainMenuOverlord == null)
         {
             audioSource = GetComponent<AudioSource>();
             audioSource.Play();
+        }
+        else
+        {
+            audioSource = mainMenuOverlord.GetComponent<AudioSource>();
         }
     }
 
@@ -101,8 +110,22 @@ public class CharSelectOverlord : MonoBehaviour {
         {
             DontDestroyOnLoad(gameObject);
 
-            //SceneManager.LoadScene("Game");
             StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
         }
+    }
+
+    public void PlaySelectSound()
+    {
+        audioSource.PlayOneShot(selectSound);
+    }
+
+    public void PlayConfirmSound()
+    {
+        audioSource.PlayOneShot(confirmSound);
+    }
+
+    public void PlayRevertSound()
+    {
+        audioSource.PlayOneShot(revertSound);
     }
 }
