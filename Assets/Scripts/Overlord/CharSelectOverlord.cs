@@ -9,19 +9,24 @@ public class CharSelectOverlord : MonoBehaviour {
 
     public Text startText;
 
+    public AudioClip selectSound;
+    public AudioClip confirmSound;
+    public AudioClip revertSound;
+
     private const int maxNumPlayers = 4;
     private CharSelectInfoPanel[] infoPanels;
     private List<PlayerSelection> playerSelections = new List<PlayerSelection>();
-    private CharacterIconData[] charSelectOptions;
+    private CharacterInfo[] charSelectOptions;
     private bool canStartGame = false;
+    private AudioSource audioSource;
+    private MainMenuOverlord mainMenuOverlord;
 
     void Start()
     {
+        InitAudio();
         InitCharSelectOptions();
         InitCharSelectInfoPanels();
         InitCharSelectCursors();
-
-        DontDestroyOnLoad(gameObject);
     }
 
     void Update()
@@ -29,10 +34,23 @@ public class CharSelectOverlord : MonoBehaviour {
         HandleInput();
     }
 
+    private void InitAudio()
+    {
+        mainMenuOverlord = FindObjectOfType<MainMenuOverlord>();
+        if (mainMenuOverlord == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+            audioSource.Play();
+        }
+        else
+        {
+            audioSource = mainMenuOverlord.GetComponent<AudioSource>();
+        }
+    }
+
     void InitCharSelectOptions()
     {
-        var charSelectOptionGOs = GameObject.FindGameObjectsWithTag("CharacterSelectOption");
-        charSelectOptions = charSelectOptionGOs.Select(n => n.GetComponent<CharacterIconData>()).OrderByDescending(n => n.transform.position.y).ToArray();
+        charSelectOptions = FindObjectsOfType<CharacterInfo>().OrderByDescending(n => n.transform.position.y).ToArray();
     }
 
     void InitCharSelectInfoPanels()
@@ -54,7 +72,7 @@ public class CharSelectOverlord : MonoBehaviour {
         }
     }
 
-    public void ConfirmSelection(CharSelectCursor cursor, CharacterIconData characterIcons, GameObject characterPrefab)
+    public void ConfirmSelection(CharSelectCursor cursor, CharacterInfo characterIcons, GameObject characterPrefab)
     {
         playerSelections.Add(new PlayerSelection(cursor.playerId, characterIcons));
 
@@ -78,7 +96,7 @@ public class CharSelectOverlord : MonoBehaviour {
             
     }
 
-    public List<PlayerSelection> ReqeustPlayerSelections()
+    public List<PlayerSelection> RequestPlayerSelections()
     {
         return playerSelections.ToList();
     }
@@ -88,12 +106,26 @@ public class CharSelectOverlord : MonoBehaviour {
         var startInputReceived = Input.GetButtonDown("Start");
         startText.gameObject.SetActive(canStartGame);
 
-        
-
         if (canStartGame && startInputReceived)
         {
-            //SceneManager.LoadScene("Game");
-			StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
+            DontDestroyOnLoad(gameObject);
+
+            StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
         }
+    }
+
+    public void PlaySelectSound()
+    {
+        audioSource.PlayOneShot(selectSound);
+    }
+
+    public void PlayConfirmSound()
+    {
+        audioSource.PlayOneShot(confirmSound);
+    }
+
+    public void PlayRevertSound()
+    {
+        audioSource.PlayOneShot(revertSound);
     }
 }

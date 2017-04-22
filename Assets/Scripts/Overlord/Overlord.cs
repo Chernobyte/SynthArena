@@ -5,14 +5,13 @@ using UnityEngine;
 
 public class Overlord : MonoBehaviour {
 
-    public CharacterIconData debugPlayerData;
-    public CharacterIconData debugDummyData;
+    public CharacterInfo debugPlayerData;
+    public CharacterInfo debugDummyData;
 
     private List<PlayerSelection> playerSelections;
     private SpawnPoint[] spawnPoints;
     private List<Player> players = new List<Player>();
     private PlayerUI[] playerUIs;
-    private bool playersCached = false;
     private List<Player> losers = new List<Player>();
 
 	void Start ()
@@ -27,11 +26,16 @@ public class Overlord : MonoBehaviour {
 
     private void Init()
     {
+        var mainMenuOverlord = FindObjectOfType<MainMenuOverlord>();
+        if (mainMenuOverlord != null)
+        {
+            Destroy(mainMenuOverlord.gameObject);
+        }
+
         var charSelectOverlord = FindObjectOfType<CharSelectOverlord>();
 
         if (charSelectOverlord == null) // debug mode
         {
-
             playerSelections = new List<PlayerSelection>()
             {
                 new PlayerSelection(1, debugPlayerData),
@@ -40,8 +44,8 @@ public class Overlord : MonoBehaviour {
         }
         else
         {
-            playerSelections = charSelectOverlord.ReqeustPlayerSelections();
-            Destroy(charSelectOverlord);            
+            playerSelections = charSelectOverlord.RequestPlayerSelections();
+            Destroy(charSelectOverlord.gameObject);            
         }
 
         spawnPoints = FindObjectsOfType<SpawnPoint>();

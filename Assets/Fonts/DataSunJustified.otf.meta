@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: aea1dcd943a446247ac97b8cfe18b9e5
+timeCreated: 1492714142
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: DataSunJustified
+  fontNames:
+  - DataSunJustified
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 0dbf0065d96758a4687b6a8458024254, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

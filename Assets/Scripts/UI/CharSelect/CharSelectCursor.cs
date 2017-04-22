@@ -12,7 +12,7 @@ public class CharSelectCursor : MonoBehaviour {
     private GamePadState previousGamePadState;
     private float repeatCooldown = 0.2f;
     private CharSelectOverlord overlord;
-    private CharacterIconData[] characterSelectOptions;
+    private CharacterInfo[] characterSelectOptions;
     private CharSelectInfoPanel panel;
     private Vector2 controllerState;
     private int currentCharSelectIndex;
@@ -33,7 +33,7 @@ public class CharSelectCursor : MonoBehaviour {
         HandlePosition();
 	}
 
-    public void Init(CharSelectOverlord overlord, CharacterIconData[] characterSelectOptions, CharSelectInfoPanel panel)
+    public void Init(CharSelectOverlord overlord, CharacterInfo[] characterSelectOptions, CharSelectInfoPanel panel)
     {
         this.overlord = overlord;
         this.characterSelectOptions = characterSelectOptions;
@@ -98,6 +98,7 @@ public class CharSelectCursor : MonoBehaviour {
             {
                 state = CharSelectState.Selecting;
                 updatePosition = true;
+                overlord.PlayConfirmSound();
             }
             else if (state == CharSelectState.Selecting)
             {
@@ -105,6 +106,7 @@ public class CharSelectCursor : MonoBehaviour {
                 overlord.ConfirmSelection(this, targetCharacterSelect, targetCharacterSelect.characterPrefab);
                 state = CharSelectState.Ready;
                 updatePosition = true;
+                overlord.PlayConfirmSound();
             }
         }
         else if (revertReceived)
@@ -114,11 +116,13 @@ public class CharSelectCursor : MonoBehaviour {
                 overlord.CancelSelection(this);
                 state = CharSelectState.Selecting;
                 updatePosition = true;
+                overlord.PlayRevertSound();
             }
             else if (state == CharSelectState.Selecting)
             {
                 state = CharSelectState.Inactive;
                 updatePosition = true;
+                overlord.PlayRevertSound();
             }
         }
 
@@ -147,6 +151,8 @@ public class CharSelectCursor : MonoBehaviour {
             gameObject.transform.position = targetCharacterSelect.transform.position;
             panel.DisplayCharacterInfo(targetCharacterSelect);
         }
+
+        overlord.PlaySelectSound();
 
         updatePosition = false;
     }

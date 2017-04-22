@@ -48,7 +48,7 @@ public class Grenade : MonoBehaviour {
 
         if (readyToExplode)
         {
-            var explosionInstance = Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
+            Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
             AudioSource.PlayClipAtPoint(explosionSound, transform.position);
             Destroy(gameObject);
         }

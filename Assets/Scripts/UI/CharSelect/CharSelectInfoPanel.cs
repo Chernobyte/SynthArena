@@ -7,13 +7,25 @@ public class CharSelectInfoPanel : MonoBehaviour {
 
     public int playerId;
 
-    public Image CharacterModel;
-    public Image Ability1;
-    public Image Ability2;
-    //public Image Weapon;
+    public Image CharacterIcon;
+    public Image CharacterIconFrame;
+    public Image Ability1Icon;
+    public Image Ability1IconFrame;
+    public Image Ability2Icon;
+    public Image Ability2IconFrame;
+    public Text CharacterName;
+    public Text WeaponTextHeader;
+    public Text WeaponText;
+    public Text Ability1TextHeader;
+    public Text Ability1Text;
+    public Text Ability2TextHeader;
+    public Text Ability2Text;
 
-    public GameObject InactiveOverlay;
-    public Image ReadyFilter; 
+    public GameObject ParentInfoObject;
+    public Text InactiveText;
+
+    public Color playerColor;
+    public static Color NeutralColor = Color.gray;
 
     void Start ()
     {
@@ -27,41 +39,86 @@ public class CharSelectInfoPanel : MonoBehaviour {
 
     public void DisplayInactiveInfo()
     {
-        InactiveOverlay.SetActive(true);
-        CharacterModel.gameObject.SetActive(false);
-        Ability1.gameObject.SetActive(false);
-        Ability2.gameObject.SetActive(false);
-        //Weapon.gameObject.SetActive(false);
-        ReadyFilter.gameObject.SetActive(false);
+        SetActiveColor();
+
+        InactiveText.gameObject.GetComponent<Text>().enabled = true;
+
+        ParentInfoObject.gameObject.SetActive(false);
     }
 
-    public void DisplayCharacterInfo(CharacterIconData data)
+    public void DisplayCharacterInfo(CharacterInfo data)
     {
-        InactiveOverlay.SetActive(false);
-        CharacterModel.gameObject.SetActive(true);
-        Ability1.gameObject.SetActive(true);
-        Ability2.gameObject.SetActive(true);
-        //Weapon.gameObject.SetActive(true);
-        ReadyFilter.gameObject.SetActive(false);
+        SetActiveColor();
 
-        CharacterModel.sprite = data.characterModel;
-        Ability1.sprite = data.ability1;
-        Ability2.sprite = data.ability2;
-        //Weapon.sprite = data.weapon;
+        InactiveText.gameObject.GetComponent<Text>().enabled = false;
+
+        ParentInfoObject.gameObject.SetActive(true);
+
+        CharacterIcon.sprite = data.characterModel;
+        Ability1Icon.sprite = data.ability1Icon;
+        Ability2Icon.sprite = data.ability2Icon;
+
+        CharacterName.text = data.characterName;
+        WeaponText.text = data.weaponName;
+        Ability1Text.text = data.ability1Name;
+        Ability2Text.text = data.ability2Name;
     }
 
-    public void DisplayConfirmInfo(CharacterIconData data)
+    public void DisplayConfirmInfo(CharacterInfo data)
     {
-        InactiveOverlay.SetActive(false);
-        CharacterModel.gameObject.SetActive(true);
-        Ability1.gameObject.SetActive(true);
-        Ability2.gameObject.SetActive(true);
-        //Weapon.gameObject.SetActive(true);
-        ReadyFilter.gameObject.SetActive(true);
+        SetNeutralColor();
 
-        CharacterModel.sprite = data.characterModel;
-        Ability1.sprite = data.ability1;
-        Ability2.sprite = data.ability2;
-        //Weapon.sprite = data.weapon;
+        InactiveText.gameObject.GetComponent<Text>().enabled = false;
+
+        ParentInfoObject.gameObject.SetActive(true);
+
+        CharacterIcon.sprite = data.characterModel;
+        Ability1Icon.sprite = data.ability1Icon;
+        Ability2Icon.sprite = data.ability2Icon;
+
+        CharacterName.text = data.characterName;
+        WeaponText.text = data.weaponName;
+        Ability1Text.text = data.ability1Name;
+        Ability2Text.text = data.ability2Name;
+    }
+
+    private void SetActiveColor()
+    {
+        CharacterIcon.color = Color.white;
+        Ability2Icon.color = Color.white;
+        Ability1Icon.color = Color.white;
+        
+        CharacterIconFrame.color = playerColor;
+        Ability1IconFrame.color = playerColor;
+        Ability2IconFrame.color = playerColor;
+        CharacterName.color = playerColor;
+        WeaponText.color = playerColor;
+        Ability1Text.color = playerColor;
+        Ability2Text.color = playerColor;
+        WeaponTextHeader.color = playerColor;
+        Ability1TextHeader.color = playerColor;
+        Ability2TextHeader.color = playerColor;
+
+        InactiveText.color = playerColor;
+    }
+
+    private void SetNeutralColor()
+    {
+        CharacterIcon.color = NeutralColor;
+        Ability2Icon.color = NeutralColor;
+        Ability1Icon.color = NeutralColor;
+
+        CharacterIconFrame.color = NeutralColor;
+        Ability1IconFrame.color = NeutralColor;
+        Ability2IconFrame.color = NeutralColor;
+        CharacterName.color = NeutralColor;
+        WeaponText.color = NeutralColor;
+        Ability1Text.color = NeutralColor;
+        Ability2Text.color = NeutralColor;
+        WeaponTextHeader.color = NeutralColor;
+        Ability1TextHeader.color = NeutralColor;
+        Ability2TextHeader.color = NeutralColor;
+
+        InactiveText.color = NeutralColor;
     }
 }

@@ -29,7 +29,7 @@ Art (! = provided, X = implemented)
 - Game background version 2 (larger, more dense)
 - Main Menu logo
 - Stage Platform Sprites (TBD)
-- Capt. Izzy 2nd Draft (Colored)
+X Capt. Izzy 2nd Draft (Colored)
 	Includes:
 	- Portrait (Mugshot)
 	- Profile (Full Body)
@@ -64,13 +64,10 @@ Animation
 - Skrush stunned/pain
 
 Coding Features
-X 3rd Party Input library
-X Lives per player
 - Generalize Player object
 - Add Skrush and Capt Izzy types that extend Player object
 - Take players out of the game when they are out of lives
 - Place an X over players' huds when they have lost all their lives
-X Game ends when all but one player is alive
 - Game transitions placement information to victory screen
 - Character Select -> Game Transition (black screen fade)
 - Game Start Countdown
@@ -78,22 +75,26 @@ X Game ends when all but one player is alive
 - Victory Screen
 - Victory Screen -> Character Select Transition
 - Emmissive details on Capt. Izzy sprites (may not work in 2D)
-
+- Change Character Select Ready Button to accept 2 or more players
 - Skrush:
 	- More health than Capt. Izzy, Slightly slower, heavier, higher damage
 	- Rocket Launcher (2 stages - launch & propulsion)
 	- Jetpack instead of double jump (like ROB Up-B in Brawl, still allows all abilities)
 	- Ability 1: Mine Layer (very fast projectile, sticks to surfaces, requires arm time & manual activation, turns red when ready)
 	- Ability 2: Destroy Mine (all visible, max of 3?, low CD, limited by # of mines laid)
+X 3rd Party Input library
+X Lives per player
+X Game ends when all but one player is alive
 
 Coding Bugfixes
+- Audio from menu should carry over to character select
 - Wallslide should end on landing
 - Walking into a wall while still grounded should not change one's direction.
-- Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
 - Extend character triggers & check if only inside one (onGround only if not on wall also)
 - Horizontal movement lingering after wall slide
 - Limit knockback / total velocity to a certain value
 - Character select icons visible when multiple hover (put each corner on a layer)
 - Velocity lingering when not landing on a valid floor (like a player's head)
-- Menu changes shape with screen sizes
+X Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
+X Menu changes shape with screen sizes
 X Hud too high off bottom of screen

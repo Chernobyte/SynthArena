@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: d1372d7f7a7321547ae6bbdd82465415
+timeCreated: 1492714142
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Datacron
+  fontNames:
+  - Datacron
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 24fa7bdc9e304284dacd6a1af27858af, type: 3}
+  - {fileID: 12800000, guid: 06f506ed0a6570149b9bb24a7edf0edc, type: 3}
+  - {fileID: 12800000, guid: 2336024ef84468b40b501e36399b74f9, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

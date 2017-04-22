@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 63ea31e9d6fadee448e9562bdf072e9c
+timeCreated: 1492714142
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Datacron Condensed
+  fontNames:
+  - Datacron Condensed
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 5ac0e85a7aac52c44a370f9ca77a160c, type: 3}
+  - {fileID: 12800000, guid: 05a096bea27ec6948acac4eab9ce6219, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

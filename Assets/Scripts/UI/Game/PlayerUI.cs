@@ -29,8 +29,8 @@ public class PlayerUI : MonoBehaviour {
     public void Init(PlayerSelection selection)
     {
         playerIcon.sprite = selection.characterIcons.characterIcon;
-        A1Icon.sprite = selection.characterIcons.ability1;
-        A2Icon.sprite = selection.characterIcons.ability2;
+        A1Icon.sprite = selection.characterIcons.ability1Icon;
+        A2Icon.sprite = selection.characterIcons.ability2Icon;
     }
 
     public void UpdateHealthBar(int currentHealth, int maxHealth, int livesRemaining)

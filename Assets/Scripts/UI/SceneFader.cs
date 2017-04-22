@@ -7,7 +7,7 @@ public class SceneFader : MonoBehaviour {
 
 	#region FIELDS
 	public Image fadeOutUIImage;
-	public float fadeSpeed = 0.8f; 
+	public float defaultFadeSpeed = 0.8f; 
 
 	public enum FadeDirection
 	{
@@ -44,10 +44,40 @@ public class SceneFader : MonoBehaviour {
 			}
 		}
 	}
-	#endregion
 
-	#region HELPERS
-	public IEnumerator FadeAndLoadScene(FadeDirection fadeDirection, string sceneToLoad) 
+    private IEnumerator Fade(FadeDirection fadeDirection, float fadeSpeed)
+    {
+        float alpha = (fadeDirection == FadeDirection.Out) ? 1 : 0;
+        float fadeEndValue = (fadeDirection == FadeDirection.Out) ? 0 : 1;
+        if (fadeDirection == FadeDirection.Out)
+        {
+            while (alpha >= fadeEndValue)
+            {
+                SetColorImage(ref alpha, fadeDirection, fadeSpeed);
+                yield return null;
+            }
+            fadeOutUIImage.enabled = false;
+        }
+        else
+        {
+            fadeOutUIImage.enabled = true;
+            while (alpha <= fadeEndValue)
+            {
+                SetColorImage(ref alpha, fadeDirection, fadeSpeed);
+                yield return null;
+            }
+        }
+    }
+    #endregion
+
+    #region HELPERS
+    public IEnumerator FadeAndLoadScene(FadeDirection fadeDirection, string sceneToLoad) 
+	{
+		yield return Fade(fadeDirection);
+		SceneManager.LoadScene(sceneToLoad);
+	}
+
+    public IEnumerator FadeAndLoadScene(FadeDirection fadeDirection, string sceneToLoad, float fadeSpeed) 
 	{
 		yield return Fade(fadeDirection);
 		SceneManager.LoadScene(sceneToLoad);
@@ -56,7 +86,13 @@ public class SceneFader : MonoBehaviour {
 	private void SetColorImage(ref float alpha, FadeDirection fadeDirection)
 	{
 		fadeOutUIImage.color = new Color (fadeOutUIImage.color.r,fadeOutUIImage.color.g, fadeOutUIImage.color.b, alpha);
-		alpha += Time.deltaTime * (1.0f / fadeSpeed) * ((fadeDirection == FadeDirection.Out)? -1 : 1) ;
+		alpha += Time.deltaTime * (1.0f / defaultFadeSpeed) * ((fadeDirection == FadeDirection.Out)? -1 : 1) ;
 	}
-	#endregion
+
+    private void SetColorImage(ref float alpha, FadeDirection fadeDirection, float fadeSpeed)
+    {
+        fadeOutUIImage.color = new Color(fadeOutUIImage.color.r, fadeOutUIImage.color.g, fadeOutUIImage.color.b, alpha);
+        alpha += Time.deltaTime * (1.0f / fadeSpeed) * ((fadeDirection == FadeDirection.Out) ? -1 : 1);
+    }
+    #endregion
 }
