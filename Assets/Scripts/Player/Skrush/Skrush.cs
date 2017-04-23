@@ -63,17 +63,10 @@ public class Skrush : Player
 
     private void Update()
     {
-        if (isDead)
-        {
-            HandleRespawn();
-        }
-        else
-        {
-            HandleInput();
+        HandleInput();
 
-            HandleLookDirection();
-            HandleAiming();
-        }
+        HandleLookDirection();
+        HandleAiming();
 
         UpdatePlayerUI();
     }
@@ -105,8 +98,6 @@ public class Skrush : Player
                 applyDecelerationThisTick = true;
             }
         }
-
-        
 
         if (applyDecelerationThisTick)
         {
@@ -166,6 +157,12 @@ public class Skrush : Player
 
     private void HandleGravity()
     {
+        if (!calculateGravity)
+        {
+            _rigidBody.velocity = new Vector2(0, 0);
+            return;
+        }
+
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
         if (jetpackEnabled)
@@ -269,15 +266,7 @@ public class Skrush : Player
     
     private void HandleInput()
     {
-        if (!acceptInput)
-            return;
-
         gamePadState = GamePad.GetState(playerIndex);
-
-        controllerState.x = gamePadState.ThumbSticks.Left.X;
-        controllerState.y = gamePadState.ThumbSticks.Left.Y;
-        controllerStateR.x = gamePadState.ThumbSticks.Right.X;
-        controllerStateR.y = gamePadState.ThumbSticks.Right.Y;
 
         HandleLeftStickInput();
         HandleRightStickInput();
@@ -285,7 +274,15 @@ public class Skrush : Player
         HandleAbility1Input();
         HandleAbility2Input();
 
-        var fireState = gamePadState.Triggers.Right;
+        float fireState;
+        if (acceptInput)
+        {
+            fireState = gamePadState.Triggers.Right;
+        }
+        else
+        {
+            fireState = 0;
+        }
 
         if (fireState > 0.2f && canFire)
         {
@@ -299,6 +296,17 @@ public class Skrush : Player
 
     private void HandleRightStickInput()
     {
+        if (acceptInput)
+        {
+            controllerStateR.x = gamePadState.ThumbSticks.Right.X;
+            controllerStateR.y = gamePadState.ThumbSticks.Right.Y;
+        }
+        else
+        {
+            controllerStateR.x = 0;
+            controllerStateR.y = 0;
+        }
+
         // Right Stick Right Tilt
         if (controllerStateR.x > 0)
         {
@@ -365,6 +373,17 @@ public class Skrush : Player
 
     private void HandleLeftStickInput()
     {
+        if (acceptInput)
+        {
+            controllerState.x = gamePadState.ThumbSticks.Left.X;
+            controllerState.y = gamePadState.ThumbSticks.Left.Y;
+        }
+        else
+        {
+            controllerState.x = 0;
+            controllerState.y = 0;
+        }
+
         // Left Stick Right Tilt
         if (controllerState.x > 0.2)
         {
@@ -434,8 +453,18 @@ public class Skrush : Player
 
     private void HandleJumpInput()
     {
-        var jumpButtonState = gamePadState.Buttons.RightShoulder;
-        var previousJumpButtonState = previousGamePadState.Buttons.RightShoulder;
+        ButtonState jumpButtonState;
+        ButtonState previousJumpButtonState;
+        if (acceptInput)
+        {
+            jumpButtonState = gamePadState.Buttons.RightShoulder;
+            previousJumpButtonState = previousGamePadState.Buttons.RightShoulder;
+        }
+        else
+        {
+            jumpButtonState = ButtonState.Released;
+            previousJumpButtonState = ButtonState.Released;
+        } 
         bool inputReceived, inputStopped;
 
         XInputDotNetHelpers.MapButtonStateToReceivedStopped(jumpButtonState, previousJumpButtonState, out inputReceived, out inputStopped);
@@ -465,8 +494,18 @@ public class Skrush : Player
 
     private void HandleAbility1Input()
     {
-        var ability1ButtonState = gamePadState.Buttons.LeftShoulder;
-        var previousAbility1ButtonState = previousGamePadState.Buttons.LeftShoulder;
+        ButtonState ability1ButtonState;
+        ButtonState previousAbility1ButtonState;
+        if (acceptInput)
+        {
+            ability1ButtonState = gamePadState.Buttons.LeftShoulder;
+            previousAbility1ButtonState = previousGamePadState.Buttons.LeftShoulder;
+        }
+        else
+        {
+            ability1ButtonState = ButtonState.Released;
+            previousAbility1ButtonState = ButtonState.Released;
+        }
         bool inputReceived, inputStopped;
 
         XInputDotNetHelpers.MapButtonStateToReceivedStopped(ability1ButtonState, previousAbility1ButtonState, out inputReceived, out inputStopped);
@@ -484,7 +523,15 @@ public class Skrush : Player
 
     private void HandleAbility2Input()
     {
-        var ability2ButtonState = gamePadState.Triggers.Left;
+        float ability2ButtonState;
+        if (acceptInput)
+        {
+            ability2ButtonState = gamePadState.Triggers.Left;
+        }
+        else
+        {
+            ability2ButtonState = 0;
+        }
 
         if (ability2ButtonState > 0)
         {

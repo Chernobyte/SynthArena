@@ -39,9 +39,9 @@ public class Rocket : MonoBehaviour {
     {
         if (Time.time - spawnTime > lifespan)
         {
-            Destroy(gameObject, 3.0f);
+            Destroy(gameObject);
         }
-        else if (!isThrusted && Time.time - spawnTime > thrustActivationDelay)
+        else if (!isDisabled && !isThrusted && Time.time - spawnTime > thrustActivationDelay)
         {
             isThrusted = true;
             particles.Play();

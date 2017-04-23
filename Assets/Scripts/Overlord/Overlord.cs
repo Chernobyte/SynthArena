@@ -23,7 +23,7 @@ public class Overlord : MonoBehaviour {
     private SpawnPoint[] spawnPoints;
     private List<Player> players = new List<Player>();
     private PlayerUI[] playerUIs;
-    private List<Player> losers = new List<Player>();
+    private List<PlayerPlacement> playerPlacements = new List<PlayerPlacement>();
     private AudioSource audioSource;
     private SceneFader fader;
     private float sceneLoadTime;
@@ -61,6 +61,7 @@ public class Overlord : MonoBehaviour {
                 startTimerText.SetTime(0);
 
                 players.ForEach(n => n.SetAcceptInput(true));
+                players.ForEach(n => n.SetCalculateGravity(true));
 
                 audioSource.PlayOneShot(countdownSound2);
 
@@ -160,12 +161,36 @@ public class Overlord : MonoBehaviour {
 
     public void RegisterLoser(Player player)
     {
-        losers.Add(player);
+        var placement = players.Count - playerPlacements.Count;
+        var selection = playerSelections.FirstOrDefault(n => n.playerId == player.PlayerId());
 
-        if (losers.Count == players.Count-1)
+        if (selection == null)
+        {
+            Debug.Log("Error: Unknown no selection with id = " + player.PlayerId());
+            return;
+        }
+
+        playerPlacements.Add(new PlayerPlacement(placement, selection));
+
+        if (playerPlacements.Count == players.Count-1)
+        {
+            var winner = playerSelections
+                .First(n => !playerPlacements.Exists(x => x.playerSelection.playerId == n.playerId));
+
+            playerPlacements.Add(new PlayerPlacement(1, winner));
+
+            GameOver();
+        }
+
+        else if (playerPlacements.Count > players.Count-1) // when the only player dies
         {
             GameOver();
         }
+    }
+
+    public List<PlayerPlacement> RequestPlacements()
+    {
+        return playerPlacements.ToList();
     }
 
     private void GameOver()
@@ -178,6 +203,8 @@ public class Overlord : MonoBehaviour {
 
         gameOverText.SetActive(true);
         gameOverText.GetComponent<Animator>().SetTrigger("Animate");
+
+        DontDestroyOnLoad(gameObject);
 
         StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "PostGame", 3.0f));
     }

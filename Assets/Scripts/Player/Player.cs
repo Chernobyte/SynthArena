@@ -62,6 +62,7 @@ public abstract class Player : MonoBehaviour
     protected float respawnDelay = 5;
     protected float currentStunTime;
     protected bool acceptInput = false;
+    protected bool calculateGravity = false;
 
     protected void Start()
     {
@@ -96,20 +97,24 @@ public abstract class Player : MonoBehaviour
         }
     }
 
-    protected virtual void HandleRespawn()
+    protected IEnumerator ScheduleRespawn()
     {
-        if (isDead && currentLives > 0 && Time.time - deathTime > respawnDelay)
-        {
-            Respawn();
-        }
+        yield return new WaitForSeconds(respawnDelay);
+
+        Respawn();
     }
 
     protected virtual void Respawn()
     {
         currentHealth = maxHealth;
         transform.position = spawnPoint.position;
-
+        acceptInput = true;
         isDead = false;
+    }
+
+    public int PlayerId()
+    {
+        return playerNumber;
     }
 
     public virtual void TakeHit(Vector2 force, int damage, float stunTime)
@@ -136,24 +141,25 @@ public abstract class Player : MonoBehaviour
 
         if (!isDead && currentHealth == 0)
         {
-            isDead = true;
-            deathTime = Time.time;
-
-            currentLives--;
-
-            if (currentLives == 0)
-            {
-                overlord.RegisterLoser(this);
-            }
-            else
-            {
-                HandleDeath();
-            }
+            HandleDeath();
         }
     }
 
     protected virtual void HandleDeath()
     {
+        isDead = true;
+        acceptInput = false;
+        deathTime = Time.time;
+        currentLives--;
+
+        if (currentLives == 0)
+        {
+            overlord.RegisterLoser(this);
+        }
+        else
+        {
+            StartCoroutine(ScheduleRespawn());
+        }
     }
 
     public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint)
@@ -168,6 +174,11 @@ public abstract class Player : MonoBehaviour
     public void SetAcceptInput(bool value)
     {
         acceptInput = value;
+    }
+
+    public void SetCalculateGravity(bool value)
+    {
+        calculateGravity = value;
     }
 
     protected virtual void CalculateAbilityCooldowns()
@@ -200,6 +211,9 @@ public abstract class Player : MonoBehaviour
 
     protected void UpdatePlayerUI()
     {
+        if (playerUI == null)
+            return;
+
         playerUI.UpdateHealthBar(currentHealth, maxHealth, currentLives);
         playerUI.UpdateAbilitiesCD(currentAbility1Cooldown, maxAbility1Cooldown, currentAbility2Cooldown, maxAbility2Cooldown);
     }
