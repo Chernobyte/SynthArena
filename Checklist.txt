@@ -1,40 +1,40 @@
 Sound (.WAV files) (! = provided, X = implemented)
 
-! Tape deck (mechanical clicking) (for use on game start)
-! Main Menu music (high energy start directly after ^)
-! Menu press start
-! Char Select selection change
-! Char Select selection confirm
-! Char Select selection undo
-- Battle Music
+X Tape deck (mechanical clicking) (for use on game start)
+X Main Menu music (high energy start directly after ^)
+X Menu press start
+X Char Select selection change
+X Char Select selection confirm
+X Char Select selection undo
+X Battle Music
 X Capt. Izzy weapon fire
 ! Capt. Izzy weapon hit wall
 ! Capt. Izzy weapon hit player
 ? Capt. Izzy weapon bouncing off wall ('pyonng')
 ! Capt. Izzy grenade launch (foomp)
-! Capt. Izzy grenade explosion (electric flair)
+X Capt. Izzy grenade explosion (electric flair)
 ! Capt. Izzy grenade impact surface (brief clank)
 ! Capt. Izzy grenade arming (capacitor charging whine)
 ! Capt. Izzy weapon overcharge (similar to grenade arming)
 ! Capt. Izzy footsteps
 - Capt. Izzy double jump sound (more instant sound)
-- Skrush jump vocalization
-- Skrush jetpack use
-- Skrush rocket launch (same sound will be used for launching a mine)
-- Skrush rocket second stage
-- Skrush rocket explosion (deep boom)
-- Skrush footsteps (heavier than Capt. Izzy)
+X Skrush jump vocalization
+X Skrush jetpack use
+! Skrush rocket launch (same sound will be used for launching a mine)
+X Skrush rocket second stage
+X Skrush rocket explosion (deep boom)
+! Skrush footsteps (heavier than Capt. Izzy)
 
 Art (! = provided, X = implemented)
 - Game background version 2 (larger, more dense)
-- Main Menu logo
+X Main Menu logo
 - Stage Platform Sprites (TBD)
 X Capt. Izzy 2nd Draft (Colored)
 	Includes:
-	- Portrait (Mugshot)
-	- Profile (Full Body)
+	X Portrait (Mugshot)
+	X Profile (Full Body)
 	- Ability 2 Icon (illustrate bouncing)
-	- Spritesheet (Separated Joints at Right Angles)
+	X Spritesheet (Separated Joints at Right Angles)
 	- Double jump cloud poof (particle)
 - Skrush 1st Draft (Colored)
 	Includes:
@@ -45,8 +45,8 @@ X Capt. Izzy 2nd Draft (Colored)
 	- Ability Icon 2 (Remote Trigger)
 	- Launcher ([Over the shoulder bazooka] to be animated separately, very large, but not comically so)
 	- Rocket (FatMan-esque, not thin like an ICBM)
-	- Rocket flame (small, added to rocket when propulsed)
-	- Explosion (Smoky, red/orange fireball)
+	X Rocket flame (small, added to rocket when propulsed)
+	X Explosion (Smoky, red/orange fireball)
 	- Remote Mine (Halo Trip mine?, bigger than smash mine (should be visible but flat)
 	
 Animation
@@ -64,8 +64,8 @@ Animation
 - Skrush stunned/pain
 
 Coding Features
-- Generalize Player object
-- Add Skrush and Capt Izzy types that extend Player object
+X Generalize Player object
+X Add Skrush and Capt Izzy types that extend Player object
 - Take players out of the game when they are out of lives
 - Place an X over players' huds when they have lost all their lives
 - Game transitions placement information to victory screen
@@ -78,8 +78,8 @@ Coding Features
 - Change Character Select Ready Button to accept 2 or more players
 - Skrush:
 	- More health than Capt. Izzy, Slightly slower, heavier, higher damage
-	- Rocket Launcher (2 stages - launch & propulsion)
-	- Jetpack instead of double jump (like ROB Up-B in Brawl, still allows all abilities)
+	X Rocket Launcher (2 stages - launch & propulsion)
+	X Jetpack instead of double jump (like ROB Up-B in Brawl, still allows all abilities)
 	- Ability 1: Mine Layer (very fast projectile, sticks to surfaces, requires arm time & manual activation, turns red when ready)
 	- Ability 2: Destroy Mine (all visible, max of 3?, low CD, limited by # of mines laid)
 X 3rd Party Input library
@@ -87,14 +87,14 @@ X Lives per player
 X Game ends when all but one player is alive
 
 Coding Bugfixes
-- Audio from menu should carry over to character select
 - Wallslide should end on landing
 - Walking into a wall while still grounded should not change one's direction.
 - Extend character triggers & check if only inside one (onGround only if not on wall also)
 - Horizontal movement lingering after wall slide
-- Limit knockback / total velocity to a certain value
 - Character select icons visible when multiple hover (put each corner on a layer)
-- Velocity lingering when not landing on a valid floor (like a player's head)
+X Limit knockback / total velocity to a certain value
+X Audio from menu should carry over to character select
+X [Fixed by capsule collider] Velocity lingering when not landing on a valid floor (like a player's head)
 X Character floats when moving up a slope (no longer technically on ground) (use a capsule collider)
 X Menu changes shape with screen sizes
 X Hud too high off bottom of screen
