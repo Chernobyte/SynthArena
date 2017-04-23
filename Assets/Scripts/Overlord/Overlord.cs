@@ -1,4 +1,5 @@
 ﻿
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,6 +16,8 @@ public class Overlord : MonoBehaviour {
     public AudioClip countdownSound1;
     public AudioClip countdownSound2;
     public AudioSource battleMusicPlayer;
+    public GameObject gameOverText;
+    public Image endGameFadeMask;
 
     private List<PlayerSelection> playerSelections;
     private SpawnPoint[] spawnPoints;
@@ -29,6 +32,7 @@ public class Overlord : MonoBehaviour {
     private int timerInitialFontSize;
     private int previousSecond;
     private bool initialized = false;
+    private bool gameIsOver = false;
 
 	void Start ()
     {
@@ -75,13 +79,11 @@ public class Overlord : MonoBehaviour {
                 startTimerText.SetScaleFactor(scale);
             }
         }
-        else
+        else if (!gameIsOver)
         {
             var gameTime = Time.time - (sceneLoadTime + startTimerDuration);
             startTimerText.SetTime(gameTime);
         }
-
-        
 	}
 
     private void Init()
@@ -160,11 +162,23 @@ public class Overlord : MonoBehaviour {
     {
         losers.Add(player);
 
-        if (losers.Count >= players.Count-1)
+        if (losers.Count == players.Count-1)
         {
-            // TODO: Transition to Victory Screen
-            // UnityEditor.EditorApplication.isPlaying = false;
-            Application.Quit();
+            GameOver();
         }
+    }
+
+    private void GameOver()
+    {
+        gameIsOver = true;
+
+        players.ForEach(n => n.SetAcceptInput(false));
+
+        fader.fadeOutUIImage = endGameFadeMask;
+
+        gameOverText.SetActive(true);
+        gameOverText.GetComponent<Animator>().SetTrigger("Animate");
+
+        StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "PostGame", 3.0f));
     }
 }

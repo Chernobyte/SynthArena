@@ -79,7 +79,7 @@ public class SceneFader : MonoBehaviour {
 
     public IEnumerator FadeAndLoadScene(FadeDirection fadeDirection, string sceneToLoad, float fadeSpeed) 
 	{
-		yield return Fade(fadeDirection);
+		yield return Fade(fadeDirection, fadeSpeed);
 		SceneManager.LoadScene(sceneToLoad);
 	}
 
