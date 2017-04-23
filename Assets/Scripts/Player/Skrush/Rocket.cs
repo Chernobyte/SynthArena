@@ -16,8 +16,11 @@ public class Rocket : MonoBehaviour {
     private Player parentPlayer;
     private Rigidbody2D _rigidBody;
     private Vector2 fireDirection;
-    private bool isActivated;
+    private bool isThrusted;
+    private bool isDisabled;
     private AudioSource audioSource;
+    private ParticleSystem particles;
+    private SpriteRenderer _renderer;
 
     private void Start()
     {
@@ -28,24 +31,31 @@ public class Rocket : MonoBehaviour {
         var hurtboxTrigger = hurtboxTriggerObject.GetComponent<TriggerCallback>();
         hurtboxTrigger.Init(OnHurtboxTriggerEnter2D, null, null);
         audioSource = GetComponent<AudioSource>();
+        particles = GetComponent<ParticleSystem>();
+        _renderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
         if (Time.time - spawnTime > lifespan)
         {
-            Destroy(gameObject);
+            ScheduleRemove();
         }
-        else if (!isActivated && Time.time - spawnTime > thrustActivationDelay)
+        else if (!isThrusted && Time.time - spawnTime > thrustActivationDelay)
         {
-            isActivated = true;
+            isThrusted = true;
+            particles.Play();
             audioSource.PlayOneShot(thrustSound);
         }
     }
 
     private void FixedUpdate()
     {
-        if (isActivated)
+        if (isDisabled)
+        {
+            _rigidBody.velocity = Vector2.zero;
+        }
+        else if (isThrusted)
         {
             _rigidBody.velocity = fireDirection * thrustSpeed;
         }
@@ -64,18 +74,35 @@ public class Rocket : MonoBehaviour {
 
     private void Explode()
     {
+        isDisabled = true;
+        particles.Stop();
+        _renderer.enabled = false;
+
         Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
+
+        ScheduleRemove();
+    }
+
+    private IEnumerator ScheduleRemove()
+    {
+        yield return new WaitForSeconds(3.0f);
 
         Destroy(gameObject);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (isDisabled)
+            return;
+
         Explode();
     }
 
     private void OnHurtboxTriggerEnter2D(Collider2D collider)
     {
+        if (isDisabled)
+            return;
+
         var hitbox = collider.gameObject.GetComponent<HitboxCallback>();
 
         if (hitbox != null)

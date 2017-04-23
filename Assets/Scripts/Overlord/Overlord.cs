@@ -13,6 +13,7 @@ public class Overlord : MonoBehaviour {
     private List<Player> players = new List<Player>();
     private PlayerUI[] playerUIs;
     private List<Player> losers = new List<Player>();
+    private AudioSource audioSource;
 
 	void Start ()
     {
@@ -52,6 +53,9 @@ public class Overlord : MonoBehaviour {
             Destroy(charSelectOverlord.gameObject);            
         }
 
+        audioSource = GetComponent<AudioSource>();
+        audioSource.Play();
+
         spawnPoints = FindObjectsOfType<SpawnPoint>();
         playerUIs = FindObjectsOfType<PlayerUI>();
 
@@ -79,6 +83,7 @@ public class Overlord : MonoBehaviour {
         {
             playerUI.gameObject.SetActive(false);
         }
+
     }
 
     public void RegisterLoser(Player player)

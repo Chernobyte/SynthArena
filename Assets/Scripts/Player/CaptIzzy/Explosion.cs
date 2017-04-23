@@ -4,19 +4,21 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour {
 
-    float explosionStart;
     public float explosionForce;
     Vector2 explosionVector;
-    public int damage = 100; 
+    public int damage = 100;
 
+    private ParticleSystem particle;
+    private AudioSource audioSource;
+    
 	void Start ()
     {
-        explosionStart = Time.time;
+        particle = GetComponent<ParticleSystem>();
 	}
 	
 	void FixedUpdate ()
     {
-		if(Time.time - explosionStart >.3)
+		if (!particle.IsAlive())
         {
             Destroy(gameObject);
         }
