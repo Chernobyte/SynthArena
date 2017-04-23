@@ -18,6 +18,7 @@ public abstract class Player : MonoBehaviour
     protected int currentLives;
 
     public float maxSpeed = 10.0f;
+    public float maxAirSpeed = 10.0f;
     public float acceleration = 0.7f;
     public float deceleration = 1.0f;
     protected float currentSpeed;

@@ -13,7 +13,8 @@ public class Skrush : Player
     public float maxJumpCount = 1;
 
     public float maxJetpackTimer = 5.0f;
-    public float jetpackStrength = 1.0f;
+    public float jetpackStrength = 0.3f;
+    public float maxJetpackSpeed = 5.0f;
 
     public float fireRate = 1.0f;
 
@@ -26,6 +27,9 @@ public class Skrush : Player
     public GameObject mine;
     public float mineSpeed = 7.0f;
     public float maxMines = 3;
+
+    public ParticleSystem leftJetpackParticles;
+    public ParticleSystem rightJetpackParticles;
 
     public AudioClip jumpSound;
     public AudioClip jetpackStartSound;
@@ -43,6 +47,8 @@ public class Skrush : Player
     private float jumpPressedTime;
     private float jumpReleasedTime;
     private bool jumpBufferState = false;
+    private bool jetpackEnabled;
+    private float jetpackToggleTime;
 
     private float gravityForce;
     private bool applyDecelerationThisTick;
@@ -63,7 +69,6 @@ public class Skrush : Player
         }
         else
         {
-            CalculateAbilityCooldowns();
             HandleInput();
 
             HandleLookDirection();
@@ -75,6 +80,9 @@ public class Skrush : Player
 
     private void FixedUpdate()
     {
+        CalculateAbilityCooldowns();
+        CalculateJetpackTimer();
+
         HandleJump();
         HandleGravity();
         ApplySpeedToRigidBody();
@@ -83,12 +91,24 @@ public class Skrush : Player
 
     private void ApplySpeedToRigidBody()
     {
-        if (Mathf.Abs(currentSpeed) > Mathf.Abs(maxSpeed))
+        if (onGround)
         {
-            applyDecelerationThisTick = true;
+            if (Mathf.Abs(currentSpeed) > Mathf.Abs(maxSpeed))
+            {
+                applyDecelerationThisTick = true;
+            }
+        }
+        else
+        {
+            if (Mathf.Abs(currentSpeed) > Mathf.Abs(maxAirSpeed))
+            {
+                applyDecelerationThisTick = true;
+            }
         }
 
-        if (applyDecelerationThisTick == true)
+        
+
+        if (applyDecelerationThisTick)
         {
             float actualDeceleration = deceleration;
 
@@ -131,8 +151,6 @@ public class Skrush : Player
             transform.position += new Vector3(0, displacement.y);
         }
 
-        Debug.Log(_rigidBody.velocity);
-
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
 
         if (onGround && currentFallSpeed < 0.5f)
@@ -150,7 +168,14 @@ public class Skrush : Player
     {
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
-        if (fastFalling)
+        if (jetpackEnabled)
+        {
+            if (currentFallSpeed < maxJetpackSpeed)
+            {
+                currentFallSpeed += jetpackStrength;
+            }
+        }
+        else if (fastFalling)
         {
             currentFallSpeed = maxFallSpeed * 1.5f;
         }
@@ -192,12 +217,56 @@ public class Skrush : Player
                 jumpBufferState = false;
             }
         }
+    }
+
+    private void setJetpack(bool value)
+    {
+        jetpackEnabled = value;
+        if (jetpackEnabled)
+        {
+            leftJetpackParticles.Play();
+            rightJetpackParticles.Play();
+            audioSource.Play();
+        }
         else
         {
-            // TODO: Jetpack
+            
+            leftJetpackParticles.Stop();
+            rightJetpackParticles.Stop();
+            audioSource.Stop();
         }
     }
 
+    private void CalculateJetpackTimer()
+    {
+        if (jetpackEnabled)
+        {
+            if (currentJetpackTimer <= 0)
+            {
+                currentJetpackTimer = 0;
+                setJetpack(false);
+            }
+            else
+            {
+                currentJetpackTimer -= Time.deltaTime;
+            }
+        }
+        else
+        {
+            if (currentJetpackTimer > maxJetpackTimer)
+                currentJetpackTimer = maxJetpackTimer;
+
+            if (currentJetpackTimer == maxJetpackTimer)
+            {
+
+            }
+            else
+            {
+                currentJetpackTimer += Time.deltaTime;
+            }
+        }
+    }
+    
     private void HandleInput()
     {
         gamePadState = GamePad.GetState(playerIndex);
@@ -296,24 +365,50 @@ public class Skrush : Player
         // Left Stick Right Tilt
         if (controllerState.x > 0.2)
         {
-            if (currentSpeed < maxSpeed)
+            if (onGround)
             {
-                currentSpeed += acceleration;
-                if (currentSpeed > maxSpeed)
-                    currentSpeed = maxSpeed;
+                if (currentSpeed < maxSpeed)
+                {
+                    currentSpeed += acceleration;
+                    if (currentSpeed > maxSpeed)
+                        currentSpeed = maxSpeed;
+                }
             }
+            else
+            {
+                if (currentSpeed < maxAirSpeed)
+                {
+                    currentSpeed += acceleration;
+                    if (currentSpeed > maxAirSpeed)
+                        currentSpeed = maxAirSpeed;
+                }
+            }
+            
             lowerBodyAnimator.SetBool("isRunning", true);
             lowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? 1.0f : -1.0f);
         }
         // Left Stick Left Tilt
         else if (controllerState.x < -0.2)
         {
-            if (currentSpeed > -maxSpeed)
+            if (onGround)
             {
-                currentSpeed -= acceleration;
-                if (currentSpeed < -maxSpeed)
-                    currentSpeed = -maxSpeed;
+                if (currentSpeed > -maxSpeed)
+                {
+                    currentSpeed -= acceleration;
+                    if (currentSpeed < -maxSpeed)
+                        currentSpeed = -maxSpeed;
+                }
             }
+            else
+            {
+                if (currentSpeed > -maxAirSpeed)
+                {
+                    currentSpeed -= acceleration;
+                    if (currentSpeed < -maxAirSpeed)
+                        currentSpeed = -maxAirSpeed;
+                }
+            }
+            
             lowerBodyAnimator.SetBool("isRunning", true);
             lowerBodyAnimator.SetFloat("backpedalMultiplier", lookingRight ? -1.0f : 1.0f);
         }
@@ -354,7 +449,7 @@ public class Skrush : Player
                 }
                 else
                 {
-                    // TODO: Jetpack
+                    setJetpack(!jetpackEnabled);
                 }
             }
         }
@@ -491,6 +586,8 @@ public class Skrush : Player
             canJump = true;
             currentJumpCount = 0;
             fastFalling = false;
+
+            setJetpack(false);
 
             lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
             lowerBodyAnimator.SetBool("isJumping", false);
