@@ -39,7 +39,7 @@ public class Rocket : MonoBehaviour {
     {
         if (Time.time - spawnTime > lifespan)
         {
-            ScheduleRemove();
+            Destroy(gameObject, 3.0f);
         }
         else if (!isThrusted && Time.time - spawnTime > thrustActivationDelay)
         {
@@ -80,14 +80,7 @@ public class Rocket : MonoBehaviour {
 
         Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
 
-        ScheduleRemove();
-    }
-
-    private IEnumerator ScheduleRemove()
-    {
-        yield return new WaitForSeconds(3.0f);
-
-        Destroy(gameObject);
+        Destroy(gameObject, 3.0f);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

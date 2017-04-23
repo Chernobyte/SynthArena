@@ -2,11 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Overlord : MonoBehaviour {
 
     public CharacterInfo debugPlayerData;
     public CharacterInfo debugDummyData;
+    public TimerText startTimerText;
+    public float startTimerDuration = 5.0f;
+    public Transform timerFinalPosition;
+    public float timerFinalScale;
+    public AudioClip countdownSound1;
+    public AudioClip countdownSound2;
+    public AudioSource battleMusicPlayer;
 
     private List<PlayerSelection> playerSelections;
     private SpawnPoint[] spawnPoints;
@@ -14,6 +22,13 @@ public class Overlord : MonoBehaviour {
     private PlayerUI[] playerUIs;
     private List<Player> losers = new List<Player>();
     private AudioSource audioSource;
+    private SceneFader fader;
+    private float sceneLoadTime;
+    private bool startSequenceComplete = false;
+    private Vector3 timerInitialPosition;
+    private int timerInitialFontSize;
+    private int previousSecond;
+    private bool initialized = false;
 
 	void Start ()
     {
@@ -22,20 +37,65 @@ public class Overlord : MonoBehaviour {
 	
 	void Update()
     {
-		
+        if (!initialized)
+            return;
+
+        if (!startSequenceComplete)
+        {
+            var timeUntil = startTimerDuration - (Time.time - sceneLoadTime);
+            var second = (int)timeUntil;
+            if (previousSecond != second)
+            {
+                audioSource.PlayOneShot(countdownSound1);
+                previousSecond = second;
+            }
+
+            if (timeUntil <= 0)
+            {
+                startSequenceComplete = true;
+
+                startTimerText.SetTime(0);
+
+                players.ForEach(n => n.SetAcceptInput(true));
+
+                audioSource.PlayOneShot(countdownSound2);
+
+                battleMusicPlayer.Play();
+            }
+            else
+            {
+                startTimerText.SetTime(-timeUntil);
+                var lerpFactor = timeUntil / startTimerDuration;
+                
+                var lerpPos = Vector3.Lerp(timerFinalPosition.position, timerInitialPosition, lerpFactor);
+
+                var scale = Mathf.Lerp(timerFinalScale, 1, lerpFactor);
+
+                startTimerText.transform.position = lerpPos;
+                startTimerText.SetScaleFactor(scale);
+            }
+        }
+        else
+        {
+            var gameTime = Time.time - (sceneLoadTime + startTimerDuration);
+            startTimerText.SetTime(gameTime);
+        }
+
+        
 	}
 
     private void Init()
     {
-        var mainMenuOverlord = FindObjectOfType<MainMenuOverlord>();
-        if (mainMenuOverlord != null)
-        {
-            Destroy(mainMenuOverlord.gameObject);
-        }
+        sceneLoadTime = Time.time;
+
+        bool debug = false;
 
         var charSelectOverlord = FindObjectOfType<CharSelectOverlord>();
 
-        if (charSelectOverlord == null) // debug mode
+        if (charSelectOverlord == null)
+            debug = true;
+
+        if (debug)
         {
             playerSelections = new List<PlayerSelection>();
             if (debugPlayerData != null)
@@ -49,15 +109,20 @@ public class Overlord : MonoBehaviour {
         }
         else
         {
+            var mainMenuOverlord = FindObjectOfType<MainMenuOverlord>();
+            if (mainMenuOverlord != null)
+            {
+                Destroy(mainMenuOverlord.gameObject);
+            }
+
             playerSelections = charSelectOverlord.RequestPlayerSelections();
-            Destroy(charSelectOverlord.gameObject);            
+            Destroy(charSelectOverlord.gameObject);
         }
 
         audioSource = GetComponent<AudioSource>();
-        audioSource.Play();
-
         spawnPoints = FindObjectsOfType<SpawnPoint>();
         playerUIs = FindObjectsOfType<PlayerUI>();
+        timerInitialPosition = new Vector3(startTimerText.transform.position.x, startTimerText.transform.position.y);
 
         foreach (var selection in playerSelections)
         {
@@ -84,6 +149,11 @@ public class Overlord : MonoBehaviour {
             playerUI.gameObject.SetActive(false);
         }
 
+        fader = GetComponent<SceneFader>();
+
+        StartCoroutine(fader.Fade(SceneFader.FadeDirection.Out, startTimerDuration));
+
+        initialized = true;
     }
 
     public void RegisterLoser(Player player)

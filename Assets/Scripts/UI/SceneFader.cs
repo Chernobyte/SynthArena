@@ -19,12 +19,12 @@ public class SceneFader : MonoBehaviour {
 	#region MONOBHEAVIOR
 	void OnEnable()
 	{
-		StartCoroutine(Fade(FadeDirection.Out));
-	}
+        //StartCoroutine(Fade(FadeDirection.Out));
+    }
 	#endregion
 
 	#region FADE
-	private IEnumerator Fade(FadeDirection fadeDirection) 
+	public IEnumerator Fade(FadeDirection fadeDirection) 
 	{
 		float alpha = (fadeDirection == FadeDirection.Out)? 1 : 0;
 		float fadeEndValue = (fadeDirection == FadeDirection.Out)? 0 : 1;
@@ -45,7 +45,7 @@ public class SceneFader : MonoBehaviour {
 		}
 	}
 
-    private IEnumerator Fade(FadeDirection fadeDirection, float fadeSpeed)
+    public IEnumerator Fade(FadeDirection fadeDirection, float fadeSpeed)
     {
         float alpha = (fadeDirection == FadeDirection.Out) ? 1 : 0;
         float fadeEndValue = (fadeDirection == FadeDirection.Out) ? 0 : 1;

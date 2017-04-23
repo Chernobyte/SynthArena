@@ -61,6 +61,7 @@ public abstract class Player : MonoBehaviour
     protected float deathTime;
     protected float respawnDelay = 5;
     protected float currentStunTime;
+    protected bool acceptInput = false;
 
     protected void Start()
     {
@@ -162,6 +163,11 @@ public abstract class Player : MonoBehaviour
         this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerNumber);
         this.playerUI = playerUI;
         this.spawnPoint = spawnPoint;
+    }
+
+    public void SetAcceptInput(bool value)
+    {
+        acceptInput = value;
     }
 
     protected virtual void CalculateAbilityCooldowns()

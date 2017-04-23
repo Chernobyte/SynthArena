@@ -226,6 +226,9 @@ public class CaptIzzy : Player
 
     private void HandleInput()
     {
+        if (!acceptInput)
+            return;
+
         gamePadState = GamePad.GetState(playerIndex);
 
         controllerState.x = gamePadState.ThumbSticks.Left.X;
