@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class FireGrenade : MonoBehaviour
 {
-    public float grenadeSpeed = 25.0f;
+    public float grenadeSpeed = 10.0f;
 
     public GameObject grenade;
 

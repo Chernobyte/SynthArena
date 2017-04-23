@@ -144,38 +144,30 @@ public class CaptIzzy : Player
         applyDecelerationThisTick = false;
         onGroundPrevious = onGround;
     }
-        
 
     private void HandleGravity()
     {
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
-        //if (!onGround)
-        //{
-            if (fastFalling)
+        if (fastFalling)
+        {
+            currentFallSpeed = maxFallSpeed * 1.5f;
+        }
+        else
+        {
+            currentFallSpeed += gravity;
+
+            if (onWallLeft || onWallRight)
             {
-                currentFallSpeed = maxFallSpeed * 1.5f;
+                if (currentFallSpeed < maxFallSpeed / 1.5f)
+                    currentFallSpeed = maxFallSpeed / 1.5f;
             }
             else
             {
-                currentFallSpeed += gravity;
-
-                if (onWallLeft || onWallRight)
-                {
-                    if (currentFallSpeed < maxFallSpeed / 1.5f)
-                        currentFallSpeed = maxFallSpeed / 1.5f;
-                }
-                else
-                {
-                    if (currentFallSpeed < maxFallSpeed)
-                        currentFallSpeed = maxFallSpeed;
-                }
+                if (currentFallSpeed < maxFallSpeed)
+                    currentFallSpeed = maxFallSpeed;
             }
-        //}
-        //else if (onGround && currentFallSpeed < 0.5)
-        //{
-        //    currentFallSpeed = -0.01f;
-        //}
+        }
     }
 
     private void HandleJump()

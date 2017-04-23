@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Mine : MonoBehaviour
 {
-    public float speed = 5.0f;
     public GameObject hurtboxTriggerObject;
     public float rotationInterval = 1.0f;
 
@@ -16,12 +15,13 @@ public class Mine : MonoBehaviour
     private Vector2 fireDirection;
     private Rigidbody2D _rigidBody;
     private float rotationProgress;
-    
+    private float startingSpeed;
+    public GameObject explosion;
 
     private void Start()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
-        _rigidBody.velocity = fireDirection * speed;
+        _rigidBody.velocity = fireDirection * startingSpeed;
 
         var hurtboxTrigger = hurtboxTriggerObject.GetComponent<TriggerCallback>();
         hurtboxTrigger.Init(OnHurtboxTriggerEnter2D, null, null);
@@ -50,11 +50,17 @@ public class Mine : MonoBehaviour
         }
     }
 
-    public void Initialize(Vector2 direction, Player player)
+    public void Initialize(Vector2 direction, float speed)
     {
-        parentPlayer = player;
-
+        startingSpeed = speed;
         fireDirection = direction.normalized;
+    }
+
+    public void Explode()
+    {
+        Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
+
+        Destroy(gameObject);
     }
 
     private void OnCollisionStay2D(Collision2D collision)

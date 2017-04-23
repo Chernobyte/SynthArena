@@ -6,6 +6,9 @@ using UnityEngine;
 
 public abstract class Player : MonoBehaviour
 {
+    private static float speedCeiling = 20.0f;
+    private static float fallSpeedCeiling = 60.0f;
+
     protected int playerNumber;
     protected PlayerIndex playerIndex;
 
@@ -110,7 +113,17 @@ public abstract class Player : MonoBehaviour
     public virtual void TakeHit(Vector2 force, int damage, float stunTime)
     {
         currentSpeed += force.x;
+        if (currentSpeed > speedCeiling)
+            currentSpeed = speedCeiling;
+        else if (currentSpeed < -speedCeiling)
+            currentSpeed = -speedCeiling;
+
         currentFallSpeed += force.y;
+        if (currentFallSpeed > fallSpeedCeiling)
+            currentFallSpeed = fallSpeedCeiling;
+        else if (currentFallSpeed < -fallSpeedCeiling)
+            currentFallSpeed = -fallSpeedCeiling;
+
         currentHealth -= damage;
         currentStunTime = Time.time + stunTime;
 

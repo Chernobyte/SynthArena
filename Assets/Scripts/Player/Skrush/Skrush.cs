@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using XInputDotNetPure;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Skrush : Player
 {
@@ -22,6 +24,8 @@ public class Skrush : Player
     public Transform muzzle;
     public GameObject rocket;
     public GameObject mine;
+    public float mineSpeed = 7.0f;
+    public float maxMines = 3;
 
     public AudioClip jumpSound;
     public AudioClip jetpackStartSound;
@@ -49,6 +53,7 @@ public class Skrush : Player
     private Vector2 aimDirection;
     private float lastValidAimAngle = 0f;
     private bool onGroundPrevious;
+    private List<Mine> deployedMines = new List<Mine>();
 
     private void Update()
     {
@@ -126,6 +131,8 @@ public class Skrush : Player
             transform.position += new Vector3(0, displacement.y);
         }
 
+        Debug.Log(_rigidBody.velocity);
+
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
 
         if (onGround && currentFallSpeed < 0.5f)
@@ -143,31 +150,24 @@ public class Skrush : Player
     {
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
-        if (!onGround)
+        if (fastFalling)
         {
-            if (fastFalling)
+            currentFallSpeed = maxFallSpeed * 1.5f;
+        }
+        else
+        {
+            currentFallSpeed += gravity;
+
+            if (onWallLeft || onWallRight)
             {
-                currentFallSpeed = maxFallSpeed * 1.5f;
+                if (currentFallSpeed < maxFallSpeed / 1.5f)
+                    currentFallSpeed = maxFallSpeed / 1.5f;
             }
             else
             {
-                currentFallSpeed += gravity;
-
-                if (onWallLeft || onWallRight)
-                {
-                    if (currentFallSpeed < maxFallSpeed / 1.5f)
-                        currentFallSpeed = maxFallSpeed / 1.5f;
-                }
-                else
-                {
-                    if (currentFallSpeed < maxFallSpeed)
-                        currentFallSpeed = maxFallSpeed;
-                }
+                if (currentFallSpeed < maxFallSpeed)
+                    currentFallSpeed = maxFallSpeed;
             }
-        }
-        else if (onGround && currentFallSpeed < 0)
-        {
-            currentFallSpeed = 0;
         }
     }
 
@@ -416,12 +416,28 @@ public class Skrush : Player
 
     private void Ability1()
     {
-        gameObject.GetComponent<DeployMine>().fire(muzzle, aimDirection);
+        var mineInstance = Instantiate(mine, muzzle.position, Quaternion.identity);
+        var mineComponent = mineInstance.GetComponent<Mine>();
+        mineComponent.Initialize(aimDirection, mineSpeed);
+
+        deployedMines.Add(mineComponent);
+
+        if (deployedMines.Count > maxMines)
+        {
+            var firstMine = deployedMines.First();
+            deployedMines.Remove(firstMine);
+            firstMine.Explode();
+        }
     }
 
     private void Ability2()
     {
-        gameObject.GetComponent<DetonateMines>().fire();
+        foreach (var mineComponent in deployedMines)
+        {
+            mineComponent.Explode();
+        }
+
+        deployedMines.Clear();
     }
     private void PreJump()
     {
@@ -473,8 +489,6 @@ public class Skrush : Player
         {
             onGround = true;
             canJump = true;
-            canWallJumpToLeft = true;
-            canWallJumpToRight = true;
             currentJumpCount = 0;
             fastFalling = false;
 
