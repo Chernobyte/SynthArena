@@ -54,6 +54,7 @@ public class CaptIzzy : Player
     private float currentStun;
     private Vector2 aimDirection;
     private float lastValidAimAngle = 0f;
+    private bool onGroundPrevious;
 
     private void Update()
     {
@@ -119,24 +120,38 @@ public class CaptIzzy : Player
             }
         }
 
-        if (currentFallSpeed < 0)
+        if (onGroundPrevious)
         {
-            lowerBodyAnimator.SetBool("isJumping", false);
+            var displacement = new Vector3(_rigidBody.velocity.x * Time.deltaTime, _rigidBody.velocity.y * Time.deltaTime);
+
+            if (-Mathf.Abs(displacement.x) < displacement.y && displacement.y < 0)
+            {
+                displacement.y = -Mathf.Abs(displacement.x) - 0.001f;
+            }
+
+            transform.position += new Vector3(0, displacement.y);
         }
 
-        lowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
-
-        applyDecelerationThisTick = false;
-
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
+
+        if (onGround && currentFallSpeed < 0.5f)
+            currentFallSpeed = 0;
+
+        lowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
+        if (currentFallSpeed < 0)
+            lowerBodyAnimator.SetBool("isJumping", false);
+        
+        applyDecelerationThisTick = false;
+        onGroundPrevious = onGround;
     }
+        
 
     private void HandleGravity()
     {
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
-        if (!onGround)
-        {
+        //if (!onGround)
+        //{
             if (fastFalling)
             {
                 currentFallSpeed = maxFallSpeed * 1.5f;
@@ -156,11 +171,11 @@ public class CaptIzzy : Player
                         currentFallSpeed = maxFallSpeed;
                 }
             }
-        }
-        else if (onGround && currentFallSpeed < 0)
-        {
-            currentFallSpeed = 0;
-        }
+        //}
+        //else if (onGround && currentFallSpeed < 0.5)
+        //{
+        //    currentFallSpeed = -0.01f;
+        //}
     }
 
     private void HandleJump()
@@ -448,7 +463,7 @@ public class CaptIzzy : Player
 
         bulletInstance.GetComponent<Bullet>().Initialize(numBounces, aimDirection, this);
 
-        AudioSource.PlayClipAtPoint(weaponSound, transform.position);
+        audioSource.PlayOneShot(weaponSound);
     }
 
     private void Ability1()
@@ -472,14 +487,14 @@ public class CaptIzzy : Player
     {
         PreJump();
         currentFallSpeed = shortJumpStrength;
-        AudioSource.PlayClipAtPoint(jumpSound, transform.position);
+        audioSource.PlayOneShot(jumpSound);
     }
 
     private void Jump()
     {
         PreJump();
         currentFallSpeed = jumpStrength;
-        AudioSource.PlayClipAtPoint(jumpSound, transform.position);
+        audioSource.PlayOneShot(jumpSound);
     }
 
     private void AirJump()
@@ -498,7 +513,7 @@ public class CaptIzzy : Player
 
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
         lowerBodyAnimator.SetBool("isJumping", true);
-        AudioSource.PlayClipAtPoint(doubleJumpSound, transform.position);
+        audioSource.PlayOneShot(doubleJumpSound);
     }
 
     private enum WallJumpDirection { Left, Right };
@@ -547,7 +562,9 @@ public class CaptIzzy : Player
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
-            touchedPlatforms.Add(collision.gameObject);
+            if (!touchedPlatforms.Contains(collision.gameObject))
+                touchedPlatforms.Add(collision.gameObject);
+
             CheckTouchedPlatforms();
         }
     }
@@ -556,7 +573,9 @@ public class CaptIzzy : Player
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
-            touchedPlatforms.Remove(collision.gameObject);
+            if (touchedPlatforms.Contains(collision.gameObject))
+                touchedPlatforms.Remove(collision.gameObject);
+
             CheckTouchedPlatforms();
         }
     }
@@ -570,7 +589,6 @@ public class CaptIzzy : Player
             canWallJumpToLeft = true;
             canWallJumpToRight = true;
             currentJumpCount = 0;
-            currentFallSpeed = 0;
             fastFalling = false;
 
             lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);

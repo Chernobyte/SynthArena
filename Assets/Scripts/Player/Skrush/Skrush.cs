@@ -48,6 +48,7 @@ public class Skrush : Player
     private float currentStun;
     private Vector2 aimDirection;
     private float lastValidAimAngle = 0f;
+    private bool onGroundPrevious;
 
     private void Update()
     {
@@ -113,16 +114,29 @@ public class Skrush : Player
             }
         }
 
-        if (currentFallSpeed < 0)
+        if (onGroundPrevious)
         {
-            lowerBodyAnimator.SetBool("isJumping", false);
+            var displacement = new Vector3(_rigidBody.velocity.x * Time.deltaTime, _rigidBody.velocity.y * Time.deltaTime);
+
+            if (-Mathf.Abs(displacement.x) < displacement.y && displacement.y < 0)
+            {
+                displacement.y = -Mathf.Abs(displacement.x) - 0.001f;
+            }
+
+            transform.position += new Vector3(0, displacement.y);
         }
 
-        lowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
-
-        applyDecelerationThisTick = false;
-
         _rigidBody.velocity = new Vector2(currentSpeed, currentFallSpeed);
+
+        if (onGround && currentFallSpeed < 0.5f)
+            currentFallSpeed = 0;
+
+        lowerBodyAnimator.SetFloat("fallSpeed", currentFallSpeed);
+        if (currentFallSpeed < 0)
+            lowerBodyAnimator.SetBool("isJumping", false);
+        
+        applyDecelerationThisTick = false;
+        onGroundPrevious = onGround;
     }
 
     private void HandleGravity()
@@ -402,7 +416,7 @@ public class Skrush : Player
 
     private void Ability1()
     {
-        gameObject.GetComponent<DeployMine>().fire();
+        gameObject.GetComponent<DeployMine>().fire(muzzle, aimDirection);
     }
 
     private void Ability2()
@@ -435,7 +449,9 @@ public class Skrush : Player
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
-            touchedPlatforms.Add(collision.gameObject);
+            if (!touchedPlatforms.Contains(collision.gameObject))
+                touchedPlatforms.Add(collision.gameObject);
+
             CheckTouchedPlatforms();
         }
     }
@@ -444,7 +460,9 @@ public class Skrush : Player
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
-            touchedPlatforms.Remove(collision.gameObject);
+            if (touchedPlatforms.Contains(collision.gameObject))
+                touchedPlatforms.Remove(collision.gameObject);
+
             CheckTouchedPlatforms();
         }
     }
@@ -455,8 +473,9 @@ public class Skrush : Player
         {
             onGround = true;
             canJump = true;
+            canWallJumpToLeft = true;
+            canWallJumpToRight = true;
             currentJumpCount = 0;
-            currentFallSpeed = 0;
             fastFalling = false;
 
             lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
