@@ -12,7 +12,7 @@ public class CharSelectCursor : MonoBehaviour {
     private GamePadState previousGamePadState;
     private float repeatCooldown = 0.2f;
     private CharSelectOverlord overlord;
-    private CharacterInfo[] characterSelectOptions;
+    private CharacterSelectOption[] characterSelectOptions;
     private CharSelectInfoPanel panel;
     private Vector2 controllerState;
     private int currentCharSelectIndex;
@@ -21,6 +21,7 @@ public class CharSelectCursor : MonoBehaviour {
     private bool updatePosition = false;
     private CharSelectState state = CharSelectState.Inactive;
     private Vector3 initialPosition;
+    private Color playerColor;
 
     void Start()
     {
@@ -33,12 +34,13 @@ public class CharSelectCursor : MonoBehaviour {
         HandlePosition();
 	}
 
-    public void Init(CharSelectOverlord overlord, CharacterInfo[] characterSelectOptions, CharSelectInfoPanel panel)
+    public void Init(CharSelectOverlord overlord, CharacterSelectOption[] characterSelectOptions, CharSelectInfoPanel panel)
     {
         this.overlord = overlord;
         this.characterSelectOptions = characterSelectOptions;
         this.panel = panel;
         this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerId);
+        this.playerColor = PlayerColor.GetColorFromId(playerId);
     }
 
     private enum CharSelectAction { Up, Down }
@@ -103,7 +105,7 @@ public class CharSelectCursor : MonoBehaviour {
             else if (state == CharSelectState.Selecting)
             {
                 var targetCharacterSelect = characterSelectOptions[currentCharSelectIndex];
-                overlord.ConfirmSelection(this, targetCharacterSelect, targetCharacterSelect.characterPrefab);
+                overlord.ConfirmSelection(this, targetCharacterSelect.toCharacterInfo(), targetCharacterSelect.characterPrefab, playerColor);
                 state = CharSelectState.Ready;
                 updatePosition = true;
                 overlord.PlayConfirmSound();
@@ -144,12 +146,12 @@ public class CharSelectCursor : MonoBehaviour {
         else if (state == CharSelectState.Ready)
         {
             gameObject.transform.position = initialPosition;
-            panel.DisplayConfirmInfo(targetCharacterSelect);
+            panel.DisplayConfirmInfo(targetCharacterSelect.toCharacterInfo());
         }
         else if (state == CharSelectState.Selecting)
         {
             gameObject.transform.position = targetCharacterSelect.transform.position;
-            panel.DisplayCharacterInfo(targetCharacterSelect);
+            panel.DisplayCharacterInfo(targetCharacterSelect.toCharacterInfo());
         }
 
         overlord.PlaySelectSound();

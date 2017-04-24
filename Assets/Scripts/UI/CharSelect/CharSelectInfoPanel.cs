@@ -23,12 +23,15 @@ public class CharSelectInfoPanel : MonoBehaviour {
 
     public GameObject ParentInfoObject;
     public Text InactiveText;
-
-    public Color playerColor;
+    
     public static Color NeutralColor = Color.gray;
+
+    private Color playerColor;
 
     void Start ()
     {
+        playerColor = PlayerColor.GetColorFromId(playerId);
+
         DisplayInactiveInfo();
 	}
 	

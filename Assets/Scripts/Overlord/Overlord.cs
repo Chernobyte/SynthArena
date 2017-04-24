@@ -7,8 +7,8 @@ using UnityEngine.UI;
 
 public class Overlord : MonoBehaviour {
 
-    public CharacterInfo debugPlayerData;
-    public CharacterInfo debugDummyData;
+    public CharacterSelectOption debugPlayerData;
+    public CharacterSelectOption debugDummyData;
     public TimerText startTimerText;
     public float startTimerDuration = 5.0f;
     public Transform timerFinalPosition;
@@ -103,11 +103,11 @@ public class Overlord : MonoBehaviour {
             playerSelections = new List<PlayerSelection>();
             if (debugPlayerData != null)
             {
-                playerSelections.Add(new PlayerSelection(1, debugPlayerData));
+                playerSelections.Add(new PlayerSelection(1, PlayerColor.One, debugPlayerData.toCharacterInfo()));
             }
             if (debugDummyData != null)
             {
-                playerSelections.Add(new PlayerSelection(4, debugDummyData));
+                playerSelections.Add(new PlayerSelection(4, PlayerColor.Four, debugDummyData.toCharacterInfo()));
             }
         }
         else
@@ -127,10 +127,15 @@ public class Overlord : MonoBehaviour {
         playerUIs = FindObjectsOfType<PlayerUI>();
         timerInitialPosition = new Vector3(startTimerText.transform.position.x, startTimerText.transform.position.y);
 
+        
+
         foreach (var selection in playerSelections)
         {
             if (selection.characterIcons == null)
+            {
                 continue;
+            }
+                
 
             var prefab = selection.characterIcons.characterPrefab;
 

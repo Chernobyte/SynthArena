@@ -16,7 +16,7 @@ public class CharSelectOverlord : MonoBehaviour {
     private const int maxNumPlayers = 4;
     private CharSelectInfoPanel[] infoPanels;
     private List<PlayerSelection> playerSelections = new List<PlayerSelection>();
-    private CharacterInfo[] charSelectOptions;
+    private CharacterSelectOption[] charSelectOptions;
     private bool canStartGame = false;
     private AudioSource audioSource;
     private MainMenuOverlord mainMenuOverlord;
@@ -50,7 +50,7 @@ public class CharSelectOverlord : MonoBehaviour {
 
     void InitCharSelectOptions()
     {
-        charSelectOptions = FindObjectsOfType<CharacterInfo>().OrderByDescending(n => n.transform.position.y).ToArray();
+        charSelectOptions = FindObjectsOfType<CharacterSelectOption>().OrderByDescending(n => n.transform.position.y).ToArray();
     }
 
     void InitCharSelectInfoPanels()
@@ -72,9 +72,9 @@ public class CharSelectOverlord : MonoBehaviour {
         }
     }
 
-    public void ConfirmSelection(CharSelectCursor cursor, CharacterInfo characterIcons, GameObject characterPrefab)
+    public void ConfirmSelection(CharSelectCursor cursor, CharacterInfo characterIcons, GameObject characterPrefab, Color playerColor)
     {
-        playerSelections.Add(new PlayerSelection(cursor.playerId, characterIcons));
+        playerSelections.Add(new PlayerSelection(cursor.playerId, playerColor, characterIcons));
 
         if (playerSelections.Count >= 1)
         //if (playerSelections.Count >= 2)
@@ -98,7 +98,7 @@ public class CharSelectOverlord : MonoBehaviour {
 
     public List<PlayerSelection> RequestPlayerSelections()
     {
-        return playerSelections.ToList();
+        return playerSelections;
     }
 
     private void HandleInput()
