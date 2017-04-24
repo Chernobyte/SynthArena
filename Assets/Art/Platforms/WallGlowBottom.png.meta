@@ -1,11 +1,10 @@
 fileFormatVersion: 2
-guid: c2740b068f1ac6545a1d94d9ed9b9cae
-timeCreated: 1493017235
+guid: 4143bfee70d97da45b1bbf554aaf8bf2
+timeCreated: 1493017223
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: PlatformGlow_Edge
-    21300002: PlatformGlow_Base
+    21300000: WallGlow_Bottom
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -72,26 +71,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: PlatformGlow_Edge
+      name: WallGlow_Bottom
       rect:
         serializedVersion: 2
-        x: 0
+        x: 49
         y: 0
-        width: 85
-        height: 200
-      alignment: 6
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: PlatformGlow_Base
-      rect:
-        serializedVersion: 2
-        x: 85
-        y: 0
-        width: 115
-        height: 200
+        width: 151
+        height: 225
       alignment: 6
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
