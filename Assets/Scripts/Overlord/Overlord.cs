@@ -33,8 +33,12 @@ public class Overlord : MonoBehaviour {
     private int previousSecond;
     private bool initialized = false;
     private bool gameIsOver = false;
+    private float gameOverTime;
+    private float postGameTransitionTime = 3.0f;
+    private float battleMusicInitialVolume;
 
-	void Start ()
+
+    void Start ()
     {
         Init();
 	}
@@ -71,7 +75,7 @@ public class Overlord : MonoBehaviour {
             {
                 startTimerText.SetTime(-timeUntil);
                 var lerpFactor = timeUntil / startTimerDuration;
-                
+
                 var lerpPos = Vector3.Lerp(timerFinalPosition.position, timerInitialPosition, lerpFactor);
 
                 var scale = Mathf.Lerp(timerFinalScale, 1, lerpFactor);
@@ -84,6 +88,18 @@ public class Overlord : MonoBehaviour {
         {
             var gameTime = Time.time - (sceneLoadTime + startTimerDuration);
             startTimerText.SetTime(gameTime);
+        }
+        else if (gameIsOver)
+        {
+            var timeLeft = (gameOverTime + postGameTransitionTime) - Time.time;
+            if (timeLeft < 0)
+                timeLeft = 0;
+
+            var lerpFactor = timeLeft / postGameTransitionTime;
+            var volume = Mathf.Lerp(0, battleMusicInitialVolume, lerpFactor);
+            battleMusicPlayer.volume = volume;
+
+            Debug.Log(volume);
         }
 	}
 
@@ -127,8 +143,6 @@ public class Overlord : MonoBehaviour {
         playerUIs = FindObjectsOfType<PlayerUI>();
         timerInitialPosition = new Vector3(startTimerText.transform.position.x, startTimerText.transform.position.y);
 
-        
-
         foreach (var selection in playerSelections)
         {
             if (selection.characterIcons == null)
@@ -156,6 +170,8 @@ public class Overlord : MonoBehaviour {
         {
             playerUI.gameObject.SetActive(false);
         }
+
+        battleMusicInitialVolume = battleMusicPlayer.volume;
 
         fader = GetComponent<SceneFader>();
 
@@ -201,6 +217,7 @@ public class Overlord : MonoBehaviour {
     private void GameOver()
     {
         gameIsOver = true;
+        gameOverTime = Time.time;
 
         players.ForEach(n => n.SetAcceptInput(false));
 
@@ -211,6 +228,6 @@ public class Overlord : MonoBehaviour {
 
         DontDestroyOnLoad(gameObject);
 
-        StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "PostGame", 3.0f));
+        StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "PostGame", postGameTransitionTime));
     }
 }

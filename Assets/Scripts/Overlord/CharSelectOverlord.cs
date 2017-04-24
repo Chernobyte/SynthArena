@@ -21,6 +21,8 @@ public class CharSelectOverlord : MonoBehaviour {
     private AudioSource audioSource;
     private MainMenuOverlord mainMenuOverlord;
     private SceneFader fader;
+    private bool beginLoweringVolume;
+    private float beginLoweringVolumeTime;
 
     void Start()
     {
@@ -35,6 +37,7 @@ public class CharSelectOverlord : MonoBehaviour {
     void Update()
     {
         HandleInput();
+        HandleVolume();
     }
 
     private void InitAudio()
@@ -114,7 +117,10 @@ public class CharSelectOverlord : MonoBehaviour {
         {
             DontDestroyOnLoad(gameObject);
 
-            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
+            beginLoweringVolume = true;
+            beginLoweringVolumeTime = Time.time;
+
+            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "Game", 2.0f));
         }
 
         if (selectInputReceived)
@@ -122,8 +128,22 @@ public class CharSelectOverlord : MonoBehaviour {
             if (mainMenuOverlord != null)
                 Destroy(mainMenuOverlord.gameObject);
 
-            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "MainMenu"));
+            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "MainMenu", 2.0f));
         }
+    }
+
+    private void HandleVolume()
+    {
+        if (!beginLoweringVolume)
+            return;
+
+        var timeLeft = (beginLoweringVolumeTime + 2.0f) - Time.time;
+        if (timeLeft < 0)
+            timeLeft = 0;
+
+        var lerpFactor = timeLeft / 2.0f;
+        var volume = Mathf.Lerp(0, 1, lerpFactor);
+        audioSource.volume = volume;
     }
 
     public void PlaySelectSound()
