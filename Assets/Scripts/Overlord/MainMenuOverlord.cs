@@ -22,7 +22,7 @@ public class MainMenuOverlord : MonoBehaviour {
         DontDestroyOnLoad(audioSource);
     }
 
-    IEnumerator OpeningSequence()
+    private IEnumerator OpeningSequence()
     {
         EnterSequence();
         audioSource.PlayOneShot(tapeDeck);
@@ -32,7 +32,7 @@ public class MainMenuOverlord : MonoBehaviour {
         ExitSequence();
 
         var fader = GetComponent<SceneFader>();
-        fader.enabled = true;
+        StartCoroutine(fader.Fade(SceneFader.FadeDirection.Out, 2.0f));
         
         audioSource.Play();
     }
@@ -41,9 +41,6 @@ public class MainMenuOverlord : MonoBehaviour {
     {
         PlayConfirmSound();
         SceneManager.LoadScene("CharSelect");
-
-		//StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect", 1));
-        //EnterSequence();
     }
 
     public void QuitGame()

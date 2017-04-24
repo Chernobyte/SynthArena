@@ -20,9 +20,12 @@ public class CharSelectOverlord : MonoBehaviour {
     private bool canStartGame = false;
     private AudioSource audioSource;
     private MainMenuOverlord mainMenuOverlord;
+    private SceneFader fader;
 
     void Start()
     {
+        fader = GetComponent<SceneFader>();
+
         InitAudio();
         InitCharSelectOptions();
         InitCharSelectInfoPanels();
@@ -93,7 +96,6 @@ public class CharSelectOverlord : MonoBehaviour {
         {
             canStartGame = false;
         }
-            
     }
 
     public List<PlayerSelection> RequestPlayerSelections()
@@ -103,14 +105,24 @@ public class CharSelectOverlord : MonoBehaviour {
 
     private void HandleInput()
     {
-        var startInputReceived = Input.GetButtonDown("Start");
         startText.gameObject.SetActive(canStartGame);
+
+        var startInputReceived = Input.GetButtonDown("Start");
+        var selectInputReceived = Input.GetButtonDown("Select");
 
         if (canStartGame && startInputReceived)
         {
             DontDestroyOnLoad(gameObject);
 
-            StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
+            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
+        }
+
+        if (selectInputReceived)
+        {
+            if (mainMenuOverlord != null)
+                Destroy(mainMenuOverlord.gameObject);
+
+            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "MainMenu"));
         }
     }
 
