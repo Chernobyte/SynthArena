@@ -25,14 +25,23 @@ public class PostGameOverlord : MonoBehaviour
     public Text winnerText;
     public Text startText;
 
+    public AudioClip firstPlaceSound;
+    public AudioClip secondPlaceSound;
+    public AudioClip thirdPlaceSound;
+    public AudioClip fourthPlaceSound;
+
+    public ParticleSystem appearParticles;
+
     private bool debug;
     private List<PlayerPlacement> playerPlacements = new List<PlayerPlacement>();
     private bool canAdvance;
     private bool hasAdvanced;
+    private AudioSource audioSource;
 
     void Start()
     {
         var previousOverlord = FindObjectOfType<Overlord>();
+        audioSource = GetComponent<AudioSource>();
 
         if (previousOverlord == null)
             debug = true;
@@ -62,9 +71,9 @@ public class PostGameOverlord : MonoBehaviour
             Destroy(previousOverlord.gameObject);
         }
 
-        RenderPlacements();
+        playerPlacements = playerPlacements.OrderByDescending(n => n.placement).ToList();
 
-        StartCoroutine(ScheduleStartText());
+        StartCoroutine(RenderPlacements());
     }
 
     void Update()
@@ -84,34 +93,61 @@ public class PostGameOverlord : MonoBehaviour
             startText.enabled = true;
     }
 
-    private void RenderPlacements()
+    private IEnumerator RenderPlacements()
     {
         foreach (var placement in playerPlacements)
         {
+            yield return new WaitForSeconds(1.0f);
+
             var prefab = placement.playerSelection.characterIcons.characterPrefab;
             var color = placement.playerSelection.playerColor;
+            AudioClip appearSound = null;
+            Vector3 position = Vector3.zero;
+            SpriteRenderer numberSprite = null;
 
             switch (placement.placement)
             {
                 case 1:
-                    Instantiate(prefab, firstLocation.position, Quaternion.identity);
-                    OneSprite.color = color;
+                    position = firstLocation.position;
+                    numberSprite = OneSprite;
                     winnerText.text = "Player " + placement.playerSelection.playerId + " Wins!";
+                    appearSound = firstPlaceSound;
                     break;
                 case 2:
-                    Instantiate(prefab, secondLocation.position, Quaternion.identity);
-                    TwoSprite.color = color;
+                    position = secondLocation.position;
+                    numberSprite = TwoSprite;
+                    appearSound = secondPlaceSound;
                     break;
                 case 3:
-                    Instantiate(prefab, thirdLocation.position, Quaternion.identity);
-                    ThreeSprite.color = color;
+                    position = thirdLocation.position;
+                    numberSprite = ThreeSprite;
+                    appearSound = thirdPlaceSound;
                     break;
                 case 4:
-                    Instantiate(prefab, fourthLocation.position, Quaternion.identity);
-                    FourSprite.color = color;
+                    position = fourthLocation.position;
+                    numberSprite = FourSprite;
+                    appearSound = fourthPlaceSound;
                     break;
             }
+
+            Instantiate(prefab, position, Quaternion.identity);
+
+            if (appearSound != null)
+                audioSource.PlayOneShot(appearSound);
+
+            if (numberSprite != null)
+                numberSprite.color = color;
+
+            appearParticles.transform.position = position;
+            appearParticles.Play();
         }
+
+        yield return new WaitForSeconds(1.0f);
+
+        winnerText.gameObject.SetActive(true);
+        winnerText.GetComponent<Animator>().SetTrigger("Appear");
+
+        StartCoroutine(ScheduleStartText());
     }
 
     private void HandleInput()
