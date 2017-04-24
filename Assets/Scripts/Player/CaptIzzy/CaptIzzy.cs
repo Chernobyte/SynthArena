@@ -68,6 +68,7 @@ public class CaptIzzy : Player
 
     private void FixedUpdate()
     {
+        CalculateAbilityCooldowns();
         HandleJump();
         HandleGravity();
         ApplySpeedToRigidBody();
