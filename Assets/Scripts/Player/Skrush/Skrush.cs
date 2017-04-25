@@ -76,6 +76,7 @@ public class Skrush : Player
         HandleGravity();
         ApplySpeedToRigidBody();
         CalculateStun();
+        CheckDeath();
     }
 
     private void ApplySpeedToRigidBody()
@@ -161,12 +162,11 @@ public class Skrush : Player
 
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
-        if (jetpackEnabled) // and not dead?
+        if (jetpackEnabled)
         {
             if (currentFallSpeed < maxJetpackSpeed)
             {
                 currentFallSpeed += jetpackStrength;
-                lowerBodyAnimator.SetBool("isJumping", true);
             }
         }
         else if (fastFalling)
@@ -216,6 +216,8 @@ public class Skrush : Player
     private void setJetpack(bool value)
     {
         jetpackEnabled = value;
+        lowerBodyAnimator.SetBool("isJetpacking", jetpackEnabled);
+
         if (jetpackEnabled)
         {
             leftJetpackParticles.Play();
@@ -258,6 +260,14 @@ public class Skrush : Player
             {
                 currentJetpackTimer += Time.deltaTime;
             }
+        }
+    }
+
+    private void CheckDeath()
+    {
+        if (isDead)
+        {
+            setJetpack(false);
         }
     }
     
