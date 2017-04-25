@@ -68,7 +68,8 @@ public abstract class Player : MonoBehaviour
     protected bool isDead;
     protected float deathTime;
     protected float respawnDelay = 5;
-    protected float currentStunTime;
+    protected float currentStunDuration = 0;
+    protected bool isStunned;
     protected bool acceptInput = false;
     protected bool calculateGravity = false;
     protected float forceRespawnInputBuffer = 2.0f;
@@ -167,7 +168,11 @@ public abstract class Player : MonoBehaviour
             currentFallSpeed = -fallSpeedCeiling;
 
         currentHealth -= damage;
-        currentStunTime = Time.time + stunTime;
+
+        if (currentStunDuration < stunTime)
+        {
+            currentStunDuration = stunTime;
+        }
 
         if (currentHealth < 0)
         {
@@ -242,12 +247,26 @@ public abstract class Player : MonoBehaviour
 
     protected void CalculateStun()
     {
-        if (currentStunTime != 0)
+        Debug.Log(currentStunDuration);
+        Debug.Log(isStunned);
+
+        if (currentStunDuration > 0)
         {
-            if (Time.time > currentStunTime)
-            {
-                currentStunTime = 0;
-            }
+            currentStunDuration -= Time.deltaTime;   
+        }
+
+        if (currentStunDuration < 0)
+        {
+            currentStunDuration = 0;
+        }
+
+        if (currentStunDuration == 0)
+        {
+            isStunned = false;
+        }
+        else
+        {
+            isStunned = true;
         }
     }
 

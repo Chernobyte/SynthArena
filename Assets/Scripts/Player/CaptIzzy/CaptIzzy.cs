@@ -234,7 +234,7 @@ public class CaptIzzy : Player
         float fireState;
         ButtonState backState;
 
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             fireState = gamePadState.Triggers.Right;
             backState = gamePadState.Buttons.Back;
@@ -262,7 +262,7 @@ public class CaptIzzy : Player
 
     private void HandleRightStickInput()
     {
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             controllerStateR.x = gamePadState.ThumbSticks.Right.X;
             controllerStateR.y = gamePadState.ThumbSticks.Right.Y;
@@ -339,7 +339,7 @@ public class CaptIzzy : Player
 
     private void HandleLeftStickInput()
     {
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             controllerState.x = gamePadState.ThumbSticks.Left.X;
             controllerState.y = gamePadState.ThumbSticks.Left.Y;
@@ -395,7 +395,7 @@ public class CaptIzzy : Player
     {
         ButtonState jumpButtonState;
         ButtonState previousJumpButtonState;
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             jumpButtonState = gamePadState.Buttons.RightShoulder;
             previousJumpButtonState = previousGamePadState.Buttons.RightShoulder;
@@ -447,7 +447,7 @@ public class CaptIzzy : Player
     {
         ButtonState ability1ButtonState;
         ButtonState previousAbility1ButtonState;
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             ability1ButtonState = gamePadState.Buttons.LeftShoulder;
             previousAbility1ButtonState = previousGamePadState.Buttons.LeftShoulder;
@@ -475,7 +475,7 @@ public class CaptIzzy : Player
     private void HandleAbility2Input()
     {
         float ability2ButtonState;
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             ability2ButtonState = gamePadState.Triggers.Left;
         }
