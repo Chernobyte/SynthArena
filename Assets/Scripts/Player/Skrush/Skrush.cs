@@ -161,11 +161,12 @@ public class Skrush : Player
 
         lowerBodyAnimator.SetInteger("jumpCount", currentJumpCount);
 
-        if (jetpackEnabled)
+        if (jetpackEnabled) // and not dead?
         {
             if (currentFallSpeed < maxJetpackSpeed)
             {
                 currentFallSpeed += jetpackStrength;
+                lowerBodyAnimator.SetBool("isJumping", true);
             }
         }
         else if (fastFalling)
