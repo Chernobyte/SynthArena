@@ -5,9 +5,12 @@ using UnityEngine.UI;
 
 public class MainMenuOverlord : MonoBehaviour {
 
+    public AudioClip startupSound;
     public AudioClip tapeDeck;
     public AudioClip selectSound;
     public AudioClip confirmSound;
+
+    public Animator logoAnimator;
 
     private AudioSource audioSource;
     private Button[] buttons;
@@ -25,9 +28,14 @@ public class MainMenuOverlord : MonoBehaviour {
     private IEnumerator OpeningSequence()
     {
         EnterSequence();
+
         audioSource.PlayOneShot(tapeDeck);
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(6.0f);
+
+        audioSource.PlayOneShot(startupSound);
+
+        yield return new WaitForSeconds(5.0f);
 
         ExitSequence();
 
