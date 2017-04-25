@@ -1,12 +1,12 @@
 fileFormatVersion: 2
 guid: c8646625303e0754fbf304d2cf02aba8
-timeCreated: 1493019631
+timeCreated: 1493082579
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: WallEdge
     21300002: WallBase
-    21300004: WallCorner
+    21300004: WallBottom
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -99,13 +99,13 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: WallCorner
+      name: WallBottom
       rect:
         serializedVersion: 2
         x: 49
-        y: 0
+        y: 76
         width: 161
-        height: 225
+        height: 149
       alignment: 6
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
