@@ -16,13 +16,18 @@ public class CharSelectOverlord : MonoBehaviour {
     private const int maxNumPlayers = 4;
     private CharSelectInfoPanel[] infoPanels;
     private List<PlayerSelection> playerSelections = new List<PlayerSelection>();
-    private CharacterInfo[] charSelectOptions;
+    private CharacterSelectOption[] charSelectOptions;
     private bool canStartGame = false;
     private AudioSource audioSource;
     private MainMenuOverlord mainMenuOverlord;
+    private SceneFader fader;
+    private bool beginLoweringVolume;
+    private float beginLoweringVolumeTime;
 
     void Start()
     {
+        fader = GetComponent<SceneFader>();
+
         InitAudio();
         InitCharSelectOptions();
         InitCharSelectInfoPanels();
@@ -32,6 +37,7 @@ public class CharSelectOverlord : MonoBehaviour {
     void Update()
     {
         HandleInput();
+        HandleVolume();
     }
 
     private void InitAudio()
@@ -50,7 +56,7 @@ public class CharSelectOverlord : MonoBehaviour {
 
     void InitCharSelectOptions()
     {
-        charSelectOptions = FindObjectsOfType<CharacterInfo>().OrderByDescending(n => n.transform.position.y).ToArray();
+        charSelectOptions = FindObjectsOfType<CharacterSelectOption>().OrderByDescending(n => n.transform.position.y).ToArray();
     }
 
     void InitCharSelectInfoPanels()
@@ -72,9 +78,9 @@ public class CharSelectOverlord : MonoBehaviour {
         }
     }
 
-    public void ConfirmSelection(CharSelectCursor cursor, CharacterInfo characterIcons, GameObject characterPrefab)
+    public void ConfirmSelection(CharSelectCursor cursor, CharacterInfo characterIcons, GameObject characterPrefab, Color playerColor)
     {
-        playerSelections.Add(new PlayerSelection(cursor.playerId, characterIcons));
+        playerSelections.Add(new PlayerSelection(cursor.playerId, playerColor, characterIcons));
 
         if (playerSelections.Count >= 1)
         //if (playerSelections.Count >= 2)
@@ -93,25 +99,51 @@ public class CharSelectOverlord : MonoBehaviour {
         {
             canStartGame = false;
         }
-            
     }
 
     public List<PlayerSelection> RequestPlayerSelections()
     {
-        return playerSelections.ToList();
+        return playerSelections;
     }
 
     private void HandleInput()
     {
-        var startInputReceived = Input.GetButtonDown("Start");
         startText.gameObject.SetActive(canStartGame);
+
+        var startInputReceived = Input.GetButtonDown("Start");
+        var selectInputReceived = Input.GetButtonDown("Select");
 
         if (canStartGame && startInputReceived)
         {
             DontDestroyOnLoad(gameObject);
 
-            StartCoroutine(GameObject.FindObjectOfType<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "Game"));
+            beginLoweringVolume = true;
+            beginLoweringVolumeTime = Time.time;
+
+            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "Game", 2.0f));
         }
+
+        if (selectInputReceived)
+        {
+            if (mainMenuOverlord != null)
+                Destroy(mainMenuOverlord.gameObject);
+
+            StartCoroutine(fader.FadeAndLoadScene(SceneFader.FadeDirection.In, "MainMenu", 2.0f));
+        }
+    }
+
+    private void HandleVolume()
+    {
+        if (!beginLoweringVolume)
+            return;
+
+        var timeLeft = (beginLoweringVolumeTime + 2.0f) - Time.time;
+        if (timeLeft < 0)
+            timeLeft = 0;
+
+        var lerpFactor = timeLeft / 2.0f;
+        var volume = Mathf.Lerp(0, 1, lerpFactor);
+        audioSource.volume = volume;
     }
 
     public void PlaySelectSound()

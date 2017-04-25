@@ -38,16 +38,16 @@ X Capt. Izzy 2nd Draft (Colored)
 	- Double jump cloud poof (particle)
 - Skrush 1st Draft (Colored)
 	Includes:
-	- Portrait
-	- Profile
-	- Spritesheet
+	x Portrait
+	x Profile
+	x Spritesheet
 	- Ability Icon 1 (Mine Launcher)
 	- Ability Icon 2 (Remote Trigger)
-	- Launcher ([Over the shoulder bazooka] to be animated separately, very large, but not comically so)
-	- Rocket (FatMan-esque, not thin like an ICBM)
-	- Rocket flame (small, added to rocket when propulsed)
-	- Explosion (Smoky, red/orange fireball)
-	- Remote Mine (Halo Trip mine?, bigger than smash mine (should be visible but flat)
+	x Launcher ([Over the shoulder bazooka] to be animated separately, very large, but not comically so)
+	x Rocket (FatMan-esque, not thin like an ICBM)
+	x Rocket flame (small, added to rocket when propulsed)
+	x Explosion (Smoky, red/orange fireball)
+	x Remote Mine (Halo Trip mine?, bigger than smash mine (should be visible but flat)
 	
 Animation
 - Capt. Izzy bullet sprite toggle
