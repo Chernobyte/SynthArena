@@ -117,7 +117,7 @@ public abstract class Player : MonoBehaviour
 
     protected IEnumerator ScheduleRespawnInvincibilityRemoval()
     {
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(4.0f);
 
         invincible = false;
     }
@@ -145,7 +145,7 @@ public abstract class Player : MonoBehaviour
 
     public virtual void TakeHit(Vector2 force, int damage, float stunTime)
     {
-        if (isDead)
+        if (isDead || invincible)
             return;
 
         if (Time.time - injuredSoundCooldown > lastInjuredSoundTime)
