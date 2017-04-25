@@ -6,7 +6,7 @@ Sound (.WAV files) (! = provided, X = implemented)
 ! Char Select selection change
 ! Char Select selection confirm
 ! Char Select selection undo
-- Battle Music
+! Battle Music
 X Capt. Izzy weapon fire
 ! Capt. Izzy weapon hit wall
 ! Capt. Izzy weapon hit player
@@ -17,13 +17,13 @@ X Capt. Izzy weapon fire
 ! Capt. Izzy grenade arming (capacitor charging whine)
 ! Capt. Izzy weapon overcharge (similar to grenade arming)
 ! Capt. Izzy footsteps
-- Capt. Izzy double jump sound (more instant sound)
-- Skrush jump vocalization
-- Skrush jetpack use
+! Capt. Izzy double jump sound (more instant sound)
+! Skrush jump vocalization
+! Skrush jetpack use
 - Skrush rocket launch (same sound will be used for launching a mine)
 - Skrush rocket second stage
 - Skrush rocket explosion (deep boom)
-- Skrush footsteps (heavier than Capt. Izzy)
+! Skrush footsteps (heavier than Capt. Izzy)
 
 Art (! = provided, X = implemented)
 - Game background version 2 (larger, more dense)
