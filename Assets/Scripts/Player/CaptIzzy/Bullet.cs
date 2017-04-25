@@ -19,9 +19,6 @@ public class Bullet : MonoBehaviour {
     private Player parentPlayer;
     private Vector2 fireDirection;
 
-    public Sprite bulletImg1;
-    public Sprite bulletImg2;
-
 	private void Start()
     {
         spawnTime = Time.time;
@@ -38,10 +35,6 @@ public class Bullet : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-        if (Time.time / 1 == 0)
-            gameObject.GetComponent<SpriteRenderer>().sprite = bulletImg2;
-        if (Time.time /.5 == 0)
-            gameObject.GetComponent<SpriteRenderer>().sprite = bulletImg1;
     }
 
     private void FixedUpdate()
