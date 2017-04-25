@@ -63,6 +63,8 @@ public abstract class Player : MonoBehaviour
     protected float currentStunTime;
     protected bool acceptInput = false;
     protected bool calculateGravity = false;
+    protected float forceRespawnInputBuffer = 2.0f;
+    protected float lastRespawnInputTime;
 
     protected void Start()
     {

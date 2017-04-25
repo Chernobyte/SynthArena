@@ -234,13 +234,22 @@ public class CaptIzzy : Player
         HandleAbility2Input();
 
         float fireState;
+        ButtonState backState;
+
         if (acceptInput)
         {
             fireState = gamePadState.Triggers.Right;
+            backState = gamePadState.Buttons.Back;
         }
         else
         {
             fireState = 0;
+            backState = ButtonState.Released;
+        }
+
+        if (backState == ButtonState.Pressed && Time.time - forceRespawnInputBuffer > lastRespawnInputTime)
+        {
+            HandleDeath();
         }
 
         if (fireState > 0.2f && canFire)
