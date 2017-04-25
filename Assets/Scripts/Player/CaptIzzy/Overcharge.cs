@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Overcharge : MonoBehaviour {
 
+    public float duration = 3;
+
     private float timeTill;
     private ParticleSystem effect;
     private float initialFireRate;
@@ -17,7 +19,7 @@ public class Overcharge : MonoBehaviour {
 
 	void FixedUpdate ()
     {
-		if(Time.time - timeTill > 6)
+		if(Time.time - timeTill > duration)
         {
             gameObject.GetComponent<CaptIzzy>().bouncing = false;
             if (effect != null)

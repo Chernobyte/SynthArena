@@ -44,6 +44,7 @@ public abstract class Player : MonoBehaviour
     protected Rigidbody2D _rigidBody;
 
     public SpriteRenderer chevron;
+    public SpriteRenderer stunIcon;
 
     protected Transform spawnPoint;
     protected PlayerUI playerUI;
@@ -222,6 +223,7 @@ public abstract class Player : MonoBehaviour
         this.playerColor = playerColor;
 
         chevron.color = playerColor;
+        stunIcon.color = playerColor;
     }
 
     public void SetAcceptInput(bool value)
@@ -271,6 +273,9 @@ public abstract class Player : MonoBehaviour
         {
             isStunned = true;
         }
+
+        chevron.enabled = !isStunned;
+        stunIcon.enabled = isStunned;
     }
 
     protected void UpdatePlayerUI()
