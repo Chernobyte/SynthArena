@@ -17,8 +17,6 @@ public class CaptIzzy : Player
     public float shortWallJumpHorizontalMultiplier = 0.8f;
     public int numBouncesOnAbility;
 
-    public Animator upperBodyAnimator;
-    public Animator lowerBodyAnimator;
     public ParticleSystem ability2effect;
     public AudioClip jumpSound;
     public AudioClip doubleJumpSound;

@@ -18,6 +18,8 @@ public class Grenade : MonoBehaviour {
     private Vector2 fireDirection;
     private float startingSpeed;
     private ParticleSystem armedEffect;
+    private AudioSource audioSource;
+    private bool armSequenceComplete;
 
     void Start ()
     {
@@ -30,6 +32,8 @@ public class Grenade : MonoBehaviour {
         hurtboxTrigger.Init(OnHurtboxTriggerEnter2D, OnHurtboxTriggerExit2D, OnHurtboxTriggerStay2D);
 
         armedEffect = GetComponent<ParticleSystem>();
+
+        audioSource = GetComponent<AudioSource>();
     }
 	
 	void Update ()
@@ -39,18 +43,18 @@ public class Grenade : MonoBehaviour {
 
         if (armed)
         {
-            if (!armedEffect.isPlaying)
+            if (!armSequenceComplete)
             {
                 armedEffect.Play();
+                audioSource.PlayOneShot(armedSound);
+                armSequenceComplete = true;
             }
-            //AudioSource.PlayClipAtPoint(armedSound, transform.position);
         }
-
         if (readyToExplode)
         {
             Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
             if (explosionSound != null)
-                AudioSource.PlayClipAtPoint(explosionSound, transform.position);
+                audioSource.PlayOneShot(explosionSound);
             Destroy(gameObject);
         }
 

@@ -47,6 +47,14 @@ public abstract class Player : MonoBehaviour
     protected Overlord overlord;
     protected AudioSource audioSource;
 
+    public AudioClip injuredSound;
+    public AudioClip deathSound;
+    protected float injuredSoundCooldown = 3.0f;
+    protected float lastInjuredSoundTime;
+
+    public Animator upperBodyAnimator;
+    public Animator lowerBodyAnimator;
+
     protected GamePadState gamePadState;
     protected GamePadState previousGamePadState;
     protected Vector2 controllerState;
@@ -65,6 +73,7 @@ public abstract class Player : MonoBehaviour
     protected bool calculateGravity = false;
     protected float forceRespawnInputBuffer = 2.0f;
     protected float lastRespawnInputTime;
+    protected bool invincible;
 
     protected void Start()
     {
@@ -106,12 +115,27 @@ public abstract class Player : MonoBehaviour
         Respawn();
     }
 
+    protected IEnumerator ScheduleRespawnInvincibilityRemoval()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        invincible = false;
+    }
+
     protected virtual void Respawn()
     {
         currentHealth = maxHealth;
         transform.position = spawnPoint.position;
         acceptInput = true;
         isDead = false;
+        invincible = true;
+
+        if (lowerBodyAnimator != null)
+        {
+            lowerBodyAnimator.SetBool("isDead", false);
+        }
+
+        StartCoroutine(ScheduleRespawnInvincibilityRemoval());
     }
 
     public int PlayerId()
@@ -121,6 +145,15 @@ public abstract class Player : MonoBehaviour
 
     public virtual void TakeHit(Vector2 force, int damage, float stunTime)
     {
+        if (isDead)
+            return;
+
+        if (Time.time - injuredSoundCooldown > lastInjuredSoundTime)
+        {
+            lastInjuredSoundTime = Time.time;
+            audioSource.PlayOneShot(injuredSound);
+        }
+
         currentSpeed += force.x;
         if (currentSpeed > speedCeiling)
             currentSpeed = speedCeiling;
@@ -153,6 +186,13 @@ public abstract class Player : MonoBehaviour
         acceptInput = false;
         deathTime = Time.time;
         currentLives--;
+
+        if (lowerBodyAnimator != null)
+        {
+            lowerBodyAnimator.SetBool("isDead", true);
+        }
+
+        audioSource.PlayOneShot(deathSound);
 
         if (currentLives == 0)
         {

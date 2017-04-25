@@ -18,9 +18,6 @@ public class Skrush : Player
 
     public float fireRate = 1.0f;
 
-    public Animator upperBodyAnimator;
-    public Animator lowerBodyAnimator;
-
     public GameObject spritesContainer;
     public Transform muzzle;
     public GameObject rocket;
@@ -36,7 +33,6 @@ public class Skrush : Player
     public AudioClip jetpackRepeatSound;
     public AudioClip rocketLaunchSound;
     public AudioClip painSound;
-    public AudioClip deathSound;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
