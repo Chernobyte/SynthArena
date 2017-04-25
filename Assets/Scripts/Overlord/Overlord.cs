@@ -37,7 +37,6 @@ public class Overlord : MonoBehaviour {
     private float postGameTransitionTime = 3.0f;
     private float battleMusicInitialVolume;
 
-
     void Start ()
     {
         Init();
@@ -98,8 +97,6 @@ public class Overlord : MonoBehaviour {
             var lerpFactor = timeLeft / postGameTransitionTime;
             var volume = Mathf.Lerp(0, battleMusicInitialVolume, lerpFactor);
             battleMusicPlayer.volume = volume;
-
-            Debug.Log(volume);
         }
 	}
 
