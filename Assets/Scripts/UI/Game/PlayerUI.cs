@@ -31,6 +31,7 @@ public class PlayerUI : MonoBehaviour {
         playerIcon.sprite = selection.characterIcons.characterIcon;
         A1Icon.sprite = selection.characterIcons.ability1Icon;
         A2Icon.sprite = selection.characterIcons.ability2Icon;
+        playerFill.color = selection.playerColor;
     }
 
     public void UpdateHealthBar(int currentHealth, int maxHealth, int livesRemaining)

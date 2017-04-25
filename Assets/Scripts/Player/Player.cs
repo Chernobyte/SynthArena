@@ -11,6 +11,7 @@ public abstract class Player : MonoBehaviour
 
     protected int playerNumber;
     protected PlayerIndex playerIndex;
+    protected Color playerColor;
 
     public int maxHealth = 2000;
     protected int currentHealth;
@@ -41,6 +42,8 @@ public abstract class Player : MonoBehaviour
     public GameObject rightTriggerObject;
     protected CapsuleCollider2D _collider;
     protected Rigidbody2D _rigidBody;
+
+    public SpriteRenderer chevron;
 
     protected Transform spawnPoint;
     protected PlayerUI playerUI;
@@ -209,13 +212,16 @@ public abstract class Player : MonoBehaviour
         }
     }
 
-    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint)
+    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint, Color playerColor)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
         this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerNumber);
         this.playerUI = playerUI;
         this.spawnPoint = spawnPoint;
+        this.playerColor = playerColor;
+
+        chevron.color = playerColor;
     }
 
     public void SetAcceptInput(bool value)
@@ -247,9 +253,6 @@ public abstract class Player : MonoBehaviour
 
     protected void CalculateStun()
     {
-        Debug.Log(currentStunDuration);
-        Debug.Log(isStunned);
-
         if (currentStunDuration > 0)
         {
             currentStunDuration -= Time.deltaTime;   

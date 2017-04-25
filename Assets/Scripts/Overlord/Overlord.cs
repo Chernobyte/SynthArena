@@ -157,7 +157,7 @@ public class Overlord : MonoBehaviour {
             var player = playerGO.GetComponent<Player>();
 
             players.Add(player);
-            player.Init(selection.playerId, this, playerUI, spawnPoint.transform);
+            player.Init(selection.playerId, this, playerUI, spawnPoint.transform, selection.playerColor);
             playerUI.Init(selection);
         }
 
