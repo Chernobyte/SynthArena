@@ -28,11 +28,11 @@ public class Skrush : Player
     public ParticleSystem leftJetpackParticles;
     public ParticleSystem rightJetpackParticles;
 
+    public AudioSource jetpackAudio;
     public AudioClip jumpSound;
     public AudioClip jetpackStartSound;
     public AudioClip jetpackRepeatSound;
     public AudioClip rocketLaunchSound;
-    public AudioClip painSound;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
@@ -222,14 +222,13 @@ public class Skrush : Player
         {
             leftJetpackParticles.Play();
             rightJetpackParticles.Play();
-            audioSource.Play();
+            jetpackAudio.Play();
         }
         else
         {
-            
             leftJetpackParticles.Stop();
             rightJetpackParticles.Stop();
-            audioSource.Stop();
+            jetpackAudio.Stop();
         }
     }
 

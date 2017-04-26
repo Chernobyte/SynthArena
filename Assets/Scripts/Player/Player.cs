@@ -79,6 +79,7 @@ public abstract class Player : MonoBehaviour
     protected float forceRespawnInputBuffer = 2.0f;
     protected float lastRespawnInputTime;
     protected bool invincible;
+    protected bool hasInitialized;
 
     protected void Start()
     {
@@ -183,7 +184,7 @@ public abstract class Player : MonoBehaviour
             currentHealth = 0;
         }
 
-        if (!isDead && currentHealth == 0)
+        if (currentHealth == 0)
         {
             HandleDeath();
         }
@@ -191,6 +192,8 @@ public abstract class Player : MonoBehaviour
 
     protected virtual void HandleDeath()
     {
+        audioSource.PlayOneShot(deathSound);
+
         isDead = true;
         acceptInput = false;
         deathTime = Time.time;
@@ -200,8 +203,6 @@ public abstract class Player : MonoBehaviour
         {
             lowerBodyAnimator.SetBool("isDead", true);
         }
-
-        audioSource.PlayOneShot(deathSound);
 
         if (currentLives == 0)
         {
@@ -224,6 +225,10 @@ public abstract class Player : MonoBehaviour
 
         chevron.color = playerColor;
         stunIcon.color = playerColor;
+
+        chevron.enabled = true;
+
+        hasInitialized = true;
     }
 
     public void SetAcceptInput(bool value)
@@ -255,6 +260,9 @@ public abstract class Player : MonoBehaviour
 
     protected void CalculateStun()
     {
+        if (!hasInitialized)
+            return;
+
         if (currentStunDuration > 0)
         {
             currentStunDuration -= Time.deltaTime;   

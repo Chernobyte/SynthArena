@@ -37,11 +37,16 @@ public class PostGameOverlord : MonoBehaviour
     private bool canAdvance;
     private bool hasAdvanced;
     private AudioSource audioSource;
+    private bool beginLoweringVolume;
+    private float beginLoweringVolumeTime;
+    private float initialMusicVolume;
 
     void Start()
     {
         var previousOverlord = FindObjectOfType<Overlord>();
         audioSource = GetComponent<AudioSource>();
+
+        initialMusicVolume = audioSource.volume;
 
         if (previousOverlord == null)
             debug = true;
@@ -95,10 +100,10 @@ public class PostGameOverlord : MonoBehaviour
 
     private IEnumerator RenderPlacements()
     {
+        yield return new WaitForSeconds(1.0f);
+
         foreach (var placement in playerPlacements)
         {
-            yield return new WaitForSeconds(1.0f);
-
             var prefab = placement.playerSelection.characterIcons.characterPrefab;
             var color = placement.playerSelection.playerColor;
             AudioClip appearSound = null;
@@ -140,14 +145,18 @@ public class PostGameOverlord : MonoBehaviour
 
             appearParticles.transform.position = position;
             appearParticles.Play();
-        }
 
-        yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(1.0f);
+        }
 
         winnerText.gameObject.SetActive(true);
         winnerText.GetComponent<Animator>().SetTrigger("Appear");
 
         StartCoroutine(ScheduleStartText());
+
+        //yield return new WaitForSeconds(0.5f);
+
+        audioSource.Play();
     }
 
     private void HandleInput()
@@ -157,7 +166,23 @@ public class PostGameOverlord : MonoBehaviour
         if (canAdvance && startInputReceived)
         {
             hasAdvanced = true;
+            beginLoweringVolume = true;
+            beginLoweringVolumeTime = Time.time;
             StartCoroutine(GetComponent<SceneFader>().FadeAndLoadScene(SceneFader.FadeDirection.In, "CharSelect", 2.0f));
         }
+    }
+
+    private void HandleVolume()
+    {
+        if (!beginLoweringVolume)
+            return;
+
+        var timeLeft = (beginLoweringVolumeTime + 2.0f) - Time.time;
+        if (timeLeft < 0)
+            timeLeft = 0;
+
+        var lerpFactor = timeLeft / 2.0f;
+        var volume = Mathf.Lerp(0, initialMusicVolume, lerpFactor);
+        audioSource.volume = volume;
     }
 }
