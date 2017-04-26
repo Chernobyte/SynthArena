@@ -7,6 +7,7 @@ public class PlayerUI : MonoBehaviour {
 
     public int playerId;
     public Image playerIcon;
+    public Image healthFillBackground;
     public Image healthFillMask;
     public Image healthFillColor;
     public Image A1Icon;
@@ -27,9 +28,12 @@ public class PlayerUI : MonoBehaviour {
     private int currentHealthDisplayValue;
     private int maxHealthDisplayValue;
     private int livesRemaining;
+    private Color InactiveColor = Color.grey;
     
     void Start()
     {
+        Debug.Log(Color.grey);
+
         A1Fill.color = new Color(0, 0, 0, .5f);
         A2Fill.color = new Color(0, 0, 0, .5f);
         A1Fill.fillAmount = 0;
@@ -74,6 +78,7 @@ public class PlayerUI : MonoBehaviour {
         if (livesRemaining <= 0)
         {
             RespawnText.text = "ELIMINATED";
+            SetInactive();
         }
         else if (respawnTimer != 0.0f)
         {
@@ -98,5 +103,20 @@ public class PlayerUI : MonoBehaviour {
             A2FillAmount = 0;
         else
             A2Fill.fillAmount = A2FillAmount;
+    }
+
+    private void SetInactive()
+    {
+        playerIcon.color = InactiveColor;
+        healthFillBackground.color = InactiveColor;
+        healthFillMask.color = InactiveColor;
+        healthFillColor.color = InactiveColor;
+        A1Icon.color = InactiveColor;
+        A1Fill.color = InactiveColor;
+        A2Icon.color = InactiveColor;
+
+        LivesText.color = InactiveColor;
+        HealthText.color = InactiveColor;
+        RespawnText.color = InactiveColor;
     }
 }
