@@ -146,6 +146,13 @@ public abstract class Player : MonoBehaviour
         StartCoroutine(ScheduleRespawnInvincibilityRemoval());
     }
 
+    protected IEnumerator ScheduleRemoval()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        gameObject.SetActive(false);
+    }
+
     public int PlayerId()
     {
         return playerNumber;
@@ -213,6 +220,7 @@ public abstract class Player : MonoBehaviour
         if (currentLives == 0)
         {
             overlord.RegisterLoser(this);
+            StartCoroutine(ScheduleRemoval());
         }
         else
         {

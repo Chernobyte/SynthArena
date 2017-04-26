@@ -120,6 +120,8 @@ public class Overlord : MonoBehaviour {
             }
             if (debugDummyData != null)
             {
+                playerSelections.Add(new PlayerSelection(2, PlayerColor.Two, debugDummyData.toCharacterInfo()));
+                playerSelections.Add(new PlayerSelection(3, PlayerColor.Three, debugDummyData.toCharacterInfo()));
                 playerSelections.Add(new PlayerSelection(4, PlayerColor.Four, debugDummyData.toCharacterInfo()));
             }
         }
