@@ -32,6 +32,8 @@ public class PostGameOverlord : MonoBehaviour
 
     public ParticleSystem appearParticles;
 
+    public AudioSource gameMusicAudioSource;
+
     private bool debug;
     private List<PlayerPlacement> playerPlacements = new List<PlayerPlacement>();
     private bool canAdvance;
@@ -46,7 +48,7 @@ public class PostGameOverlord : MonoBehaviour
         var previousOverlord = FindObjectOfType<Overlord>();
         audioSource = GetComponent<AudioSource>();
 
-        initialMusicVolume = audioSource.volume;
+        initialMusicVolume = gameMusicAudioSource.volume;
 
         if (previousOverlord == null)
             debug = true;
@@ -155,7 +157,7 @@ public class PostGameOverlord : MonoBehaviour
 
         StartCoroutine(ScheduleStartText());
 
-        audioSource.Play();
+        gameMusicAudioSource.Play();
     }
 
     private void HandleInput()
@@ -182,6 +184,6 @@ public class PostGameOverlord : MonoBehaviour
 
         var lerpFactor = timeLeft / 2.0f;
         var volume = Mathf.Lerp(0, initialMusicVolume, lerpFactor);
-        audioSource.volume = volume;
+        gameMusicAudioSource.volume = volume;
     }
 }
