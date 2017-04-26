@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: a837c8e96c8d41545af6bf58a1acf227
-timeCreated: 1493167892
+timeCreated: 1493182658
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -9,6 +9,8 @@ TextureImporter:
     21300004: Skrush_RocketTrail
     21300006: Skrush_MineBase
     21300008: Skrush_Mine_Glow
+    21300010: Skrush_MineIcon
+    21300012: Skrush_DetonateIcon
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -134,6 +136,32 @@ TextureImporter:
         y: 1236
         width: 616
         height: 263
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Skrush_MineIcon
+      rect:
+        serializedVersion: 2
+        x: 1032
+        y: 1017
+        width: 700
+        height: 700
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Skrush_DetonateIcon
+      rect:
+        serializedVersion: 2
+        x: 866
+        y: 222
+        width: 400
+        height: 400
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

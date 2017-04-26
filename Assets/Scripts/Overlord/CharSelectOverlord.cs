@@ -82,8 +82,8 @@ public class CharSelectOverlord : MonoBehaviour {
     {
         playerSelections.Add(new PlayerSelection(cursor.playerId, playerColor, characterIcons));
 
-        if (playerSelections.Count >= 1)
-        //if (playerSelections.Count >= 2)
+        // if (playerSelections.Count >= 1) // for debugging
+        if (playerSelections.Count >= 2)
         {
             canStartGame = true;
         }
@@ -94,8 +94,8 @@ public class CharSelectOverlord : MonoBehaviour {
         var selectionToRemove = playerSelections.First(n => n.playerId == cursor.playerId);
         playerSelections.Remove(selectionToRemove);
 
-        if (playerSelections.Count < 1)
-        //if (playerSelections.Count < 2)
+        // if (playerSelections.Count < 1) // for debugging
+        if (playerSelections.Count < 2)
         {
             canStartGame = false;
         }
