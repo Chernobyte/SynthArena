@@ -23,6 +23,9 @@ public class CharSelectOverlord : MonoBehaviour {
     private SceneFader fader;
     private bool beginLoweringVolume;
     private float beginLoweringVolumeTime;
+    private float startButtonPressedTime;
+    private float startButtonReleasedTime;
+    private float forceSoloPlayButtonHoldDuration = 7.0f;
 
     void Start()
     {
@@ -111,7 +114,26 @@ public class CharSelectOverlord : MonoBehaviour {
         startText.gameObject.SetActive(canStartGame);
 
         var startInputReceived = Input.GetButtonDown("Start");
+        var startInputReleased = Input.GetButtonUp("Start");
+
         var selectInputReceived = Input.GetButtonDown("Select");
+
+        if (startInputReceived)
+        {
+            startButtonPressedTime = Time.time;
+        }
+        if (startInputReleased)
+        {
+            startButtonReleasedTime = Time.time;
+        }
+
+        var startButtonHeldLength = startButtonReleasedTime - startButtonPressedTime;
+
+        if (startButtonHeldLength > forceSoloPlayButtonHoldDuration)
+        {
+            canStartGame = true;
+            startInputReceived = true;
+        }
 
         if (canStartGame && startInputReceived)
         {
