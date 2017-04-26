@@ -28,6 +28,9 @@ public class Skrush : Player
     public ParticleSystem leftJetpackParticles;
     public ParticleSystem rightJetpackParticles;
 
+    public SpriteRenderer leftJetpackTrail;
+    public SpriteRenderer rightJetpackTrail;
+
     public AudioSource jetpackAudio;
     public AudioClip jumpSound;
     public AudioClip jetpackStartSound;
@@ -223,12 +226,16 @@ public class Skrush : Player
         {
             leftJetpackParticles.Play();
             rightJetpackParticles.Play();
+            leftJetpackTrail.enabled = true;
+            rightJetpackTrail.enabled = true;
             jetpackAudio.Play();
         }
         else
         {
             leftJetpackParticles.Stop();
             rightJetpackParticles.Stop();
+            leftJetpackTrail.enabled = false;
+            rightJetpackTrail.enabled = false;
             jetpackAudio.Stop();
         }
     }
@@ -580,6 +587,8 @@ public class Skrush : Player
         var mineInstance = Instantiate(mine, muzzle.position, Quaternion.identity);
         var mineComponent = mineInstance.GetComponent<Mine>();
         mineComponent.Initialize(aimDirection, mineSpeed, this);
+
+        audioSource.PlayOneShot(rocketLaunchSound);
 
         deployedMines.Add(mineComponent);
 
