@@ -84,6 +84,7 @@ public class PostGameOverlord : MonoBehaviour
     void Update()
     {
         HandleInput();
+        HandleVolume();
     }
 
     private IEnumerator ScheduleStartText()
@@ -153,8 +154,6 @@ public class PostGameOverlord : MonoBehaviour
         winnerText.GetComponent<Animator>().SetTrigger("Appear");
 
         StartCoroutine(ScheduleStartText());
-
-        //yield return new WaitForSeconds(0.5f);
 
         audioSource.Play();
     }

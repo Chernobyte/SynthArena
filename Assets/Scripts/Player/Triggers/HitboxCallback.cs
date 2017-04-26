@@ -28,11 +28,13 @@ public class HitboxCallback : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        enterFunctionToCall(collision);
+        if (enterFunctionToCall != null)
+            enterFunctionToCall(collision);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        exitFunctionToCall(collision);
+        if (exitFunctionToCall != null)
+            exitFunctionToCall(collision);
     }
 }

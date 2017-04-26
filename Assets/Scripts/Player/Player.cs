@@ -80,6 +80,8 @@ public abstract class Player : MonoBehaviour
     protected float lastRespawnInputTime;
     protected bool invincible;
     protected bool hasInitialized;
+    protected float successiveHitIgnoreDuration = 0.1f;
+    protected float lastHitTime;
 
     protected void Start()
     {
@@ -88,7 +90,7 @@ public abstract class Player : MonoBehaviour
         audioSource = gameObject.GetComponent<AudioSource>();
 
         InitializeTriggers();
-        InitializeHurtboxes();
+        InitializeHitboxes();
 
         currentHealth = maxHealth;
         currentLives = maxLives;
@@ -105,12 +107,12 @@ public abstract class Player : MonoBehaviour
         rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit, OnRightTriggerStay);
     }
 
-    protected void InitializeHurtboxes()
+    protected void InitializeHitboxes()
     {
-        var hurtboxes = GetComponentsInChildren<HitboxCallback>();
-        foreach (var hurtbox in hurtboxes)
+        var hitboxes = GetComponentsInChildren<HitboxCallback>();
+        foreach (var hitbox in hitboxes)
         {
-            hurtbox.Init(OnHitboxTriggerEnter, OnHitboxTriggerExit, this);
+            hitbox.Init(OnHitboxTriggerEnter, OnHitboxTriggerExit, this);
         }
     }
 
@@ -123,7 +125,7 @@ public abstract class Player : MonoBehaviour
 
     protected IEnumerator ScheduleRespawnInvincibilityRemoval()
     {
-        yield return new WaitForSeconds(4.0f);
+        yield return new WaitForSeconds(1.0f);
 
         invincible = false;
     }
@@ -151,8 +153,12 @@ public abstract class Player : MonoBehaviour
 
     public virtual void TakeHit(Vector2 force, int damage, float stunTime)
     {
-        if (isDead || invincible)
+        var ignoreHit = Time.time - lastHitTime < successiveHitIgnoreDuration;
+
+        if (isDead || invincible || ignoreHit)
             return;
+
+        lastHitTime = Time.time;
 
         if (Time.time - injuredSoundCooldown > lastInjuredSoundTime)
         {

@@ -1,13 +1,14 @@
 fileFormatVersion: 2
 guid: a837c8e96c8d41545af6bf58a1acf227
-timeCreated: 1493101089
+timeCreated: 1493167892
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: Skrush_Weapon
     21300002: Skrush_Rocket
     21300004: Skrush_RocketTrail
-    21300006: Skrush_Mine
+    21300006: Skrush_MineBase
+    21300008: Skrush_Mine_Glow
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -113,10 +114,23 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Skrush_Mine
+      name: Skrush_MineBase
       rect:
         serializedVersion: 2
         x: 1064
+        y: 1236
+        width: 616
+        height: 77
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Skrush_Mine_Glow
+      rect:
+        serializedVersion: 2
+        x: 1771
         y: 1236
         width: 616
         height: 263

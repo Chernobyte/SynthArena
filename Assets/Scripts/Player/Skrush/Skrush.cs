@@ -578,7 +578,7 @@ public class Skrush : Player
     {
         var mineInstance = Instantiate(mine, muzzle.position, Quaternion.identity);
         var mineComponent = mineInstance.GetComponent<Mine>();
-        mineComponent.Initialize(aimDirection, mineSpeed);
+        mineComponent.Initialize(aimDirection, mineSpeed, this);
 
         deployedMines.Add(mineComponent);
 
@@ -586,7 +586,7 @@ public class Skrush : Player
         {
             var firstMine = deployedMines.First();
             deployedMines.Remove(firstMine);
-            firstMine.Explode();
+            firstMine.ScheduleExplode();
         }
     }
 
@@ -594,11 +594,12 @@ public class Skrush : Player
     {
         foreach (var mineComponent in deployedMines)
         {
-            mineComponent.Explode();
+            mineComponent.ScheduleExplode();
         }
 
         deployedMines.Clear();
     }
+
     private void PreJump()
     {
         currentJumpCount++;
