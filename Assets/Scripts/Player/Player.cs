@@ -71,7 +71,7 @@ public abstract class Player : MonoBehaviour
 
     protected bool isDead;
     protected float deathTime;
-    protected float respawnDelay = 5;
+    protected float respawnDelay = 3;
     protected float currentStunDuration = 0;
     protected bool isStunned;
     protected bool acceptInput = false;
@@ -82,6 +82,7 @@ public abstract class Player : MonoBehaviour
     protected bool hasInitialized;
     protected float successiveHitIgnoreDuration = 0.1f;
     protected float lastHitTime;
+    protected float currentRespawnTimer;
 
     protected void Start()
     {
@@ -118,7 +119,19 @@ public abstract class Player : MonoBehaviour
 
     protected IEnumerator ScheduleRespawn()
     {
-        yield return new WaitForSeconds(respawnDelay);
+        currentRespawnTimer = respawnDelay;
+        var increment = 0.1f;
+
+        while (currentRespawnTimer > 0)
+        {
+            playerUI.UpdateRespawnTimer(currentRespawnTimer);
+            currentRespawnTimer -= increment;
+
+            yield return new WaitForSeconds(increment);
+        }
+
+        currentRespawnTimer = 0;
+        playerUI.UpdateRespawnTimer(currentRespawnTimer);
 
         Respawn();
     }
@@ -210,6 +223,7 @@ public abstract class Player : MonoBehaviour
         isDead = true;
         acceptInput = false;
         deathTime = Time.time;
+        currentHealth = 0;
         currentLives--;
 
         if (lowerBodyAnimator != null)
@@ -220,6 +234,8 @@ public abstract class Player : MonoBehaviour
         if (currentLives == 0)
         {
             overlord.RegisterLoser(this);
+            playerUI.UpdateHealthBar(0, maxHealth, 0);
+
             StartCoroutine(ScheduleRemoval());
         }
         else
@@ -253,6 +269,16 @@ public abstract class Player : MonoBehaviour
     public void SetCalculateGravity(bool value)
     {
         calculateGravity = value;
+    }
+
+    public int MaxHealth()
+    {
+        return maxHealth;
+    }
+
+    public int MaxLives()
+    {
+        return maxLives;
     }
 
     protected virtual void CalculateAbilityCooldowns()

@@ -28,11 +28,15 @@ public class Skrush : Player
     public ParticleSystem leftJetpackParticles;
     public ParticleSystem rightJetpackParticles;
 
+    public SpriteRenderer leftJetpackTrail;
+    public SpriteRenderer rightJetpackTrail;
+
     public AudioSource jetpackAudio;
     public AudioClip jumpSound;
     public AudioClip jetpackStartSound;
     public AudioClip jetpackRepeatSound;
     public AudioClip rocketLaunchSound;
+    public AudioClip detonateSound;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
@@ -222,12 +226,16 @@ public class Skrush : Player
         {
             leftJetpackParticles.Play();
             rightJetpackParticles.Play();
+            leftJetpackTrail.enabled = true;
+            rightJetpackTrail.enabled = true;
             jetpackAudio.Play();
         }
         else
         {
             leftJetpackParticles.Stop();
             rightJetpackParticles.Stop();
+            leftJetpackTrail.enabled = false;
+            rightJetpackTrail.enabled = false;
             jetpackAudio.Stop();
         }
     }
@@ -580,6 +588,8 @@ public class Skrush : Player
         var mineComponent = mineInstance.GetComponent<Mine>();
         mineComponent.Initialize(aimDirection, mineSpeed, this);
 
+        audioSource.PlayOneShot(rocketLaunchSound);
+
         deployedMines.Add(mineComponent);
 
         if (deployedMines.Count > maxMines)
@@ -592,6 +602,8 @@ public class Skrush : Player
 
     private void Ability2()
     {
+        audioSource.PlayOneShot(detonateSound);
+
         foreach (var mineComponent in deployedMines)
         {
             mineComponent.ScheduleExplode();
