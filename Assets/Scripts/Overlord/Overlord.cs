@@ -146,7 +146,6 @@ public class Overlord : MonoBehaviour {
             {
                 continue;
             }
-                
 
             var prefab = selection.characterIcons.characterPrefab;
 
