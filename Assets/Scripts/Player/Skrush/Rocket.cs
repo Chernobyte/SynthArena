@@ -11,6 +11,8 @@ public class Rocket : MonoBehaviour {
     public GameObject hurtboxTriggerObject;
     public GameObject explosion;
     public AudioClip thrustSound;
+    public SpriteRenderer flameTrail;
+    public ParticleSystem particles;
 
     private float spawnTime;
     private Player parentPlayer;
@@ -19,7 +21,6 @@ public class Rocket : MonoBehaviour {
     private bool isThrusted;
     private bool isDisabled;
     private AudioSource audioSource;
-    private ParticleSystem particles;
     private SpriteRenderer _renderer;
 
     private void Start()
@@ -31,7 +32,6 @@ public class Rocket : MonoBehaviour {
         var hurtboxTrigger = hurtboxTriggerObject.GetComponent<TriggerCallback>();
         hurtboxTrigger.Init(OnHurtboxTriggerEnter2D, null, null);
         audioSource = GetComponent<AudioSource>();
-        particles = GetComponent<ParticleSystem>();
         _renderer = GetComponent<SpriteRenderer>();
     }
 
@@ -45,6 +45,7 @@ public class Rocket : MonoBehaviour {
         {
             isThrusted = true;
             particles.Play();
+            flameTrail.enabled = true;
             audioSource.PlayOneShot(thrustSound);
         }
     }
@@ -77,6 +78,7 @@ public class Rocket : MonoBehaviour {
         isDisabled = true;
         particles.Stop();
         _renderer.enabled = false;
+        flameTrail.enabled = false;
 
         Instantiate(explosion, gameObject.transform.position, Quaternion.identity);
 

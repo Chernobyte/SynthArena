@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class Explosion : MonoBehaviour {
 
-    public float explosionForce;
+    public float explosionForce = 5.0f;
     Vector2 explosionVector;
     public int damage = 100;
+    public float stunTime = 0.1f;
 
     private ParticleSystem particle;
     private AudioSource audioSource;
@@ -28,9 +29,12 @@ public class Explosion : MonoBehaviour {
     {
         if(coll.gameObject.tag == "Player")
         {
-            explosionVector = new Vector2 (coll.gameObject.transform.position.x - gameObject.transform.position.x, coll.gameObject.transform.position.y - gameObject.transform.position.y);
+            var player = coll.GetComponent<Player>();
+
+            explosionVector = new Vector2 (coll.transform.position.x - transform.position.x, coll.transform.position.y - transform.position.y);
             explosionVector.Normalize();
-            coll.gameObject.GetComponent<Player>().TakeHit(explosionForce*explosionVector,300,.4f);
+
+            player.TakeHit(explosionForce*explosionVector, damage, stunTime);
         }
     }
 }

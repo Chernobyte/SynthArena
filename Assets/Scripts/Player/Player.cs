@@ -11,6 +11,7 @@ public abstract class Player : MonoBehaviour
 
     protected int playerNumber;
     protected PlayerIndex playerIndex;
+    protected Color playerColor;
 
     public int maxHealth = 2000;
     protected int currentHealth;
@@ -42,10 +43,21 @@ public abstract class Player : MonoBehaviour
     protected CapsuleCollider2D _collider;
     protected Rigidbody2D _rigidBody;
 
+    public SpriteRenderer chevron;
+    public SpriteRenderer stunIcon;
+
     protected Transform spawnPoint;
     protected PlayerUI playerUI;
     protected Overlord overlord;
     protected AudioSource audioSource;
+
+    public AudioClip injuredSound;
+    public AudioClip deathSound;
+    protected float injuredSoundCooldown = 3.0f;
+    protected float lastInjuredSoundTime;
+
+    public Animator upperBodyAnimator;
+    public Animator lowerBodyAnimator;
 
     protected GamePadState gamePadState;
     protected GamePadState previousGamePadState;
@@ -60,9 +72,16 @@ public abstract class Player : MonoBehaviour
     protected bool isDead;
     protected float deathTime;
     protected float respawnDelay = 5;
-    protected float currentStunTime;
+    protected float currentStunDuration = 0;
+    protected bool isStunned;
     protected bool acceptInput = false;
     protected bool calculateGravity = false;
+    protected float forceRespawnInputBuffer = 2.0f;
+    protected float lastRespawnInputTime;
+    protected bool invincible;
+    protected bool hasInitialized;
+    protected float successiveHitIgnoreDuration = 0.1f;
+    protected float lastHitTime;
 
     protected void Start()
     {
@@ -71,7 +90,7 @@ public abstract class Player : MonoBehaviour
         audioSource = gameObject.GetComponent<AudioSource>();
 
         InitializeTriggers();
-        InitializeHurtboxes();
+        InitializeHitboxes();
 
         currentHealth = maxHealth;
         currentLives = maxLives;
@@ -88,12 +107,12 @@ public abstract class Player : MonoBehaviour
         rightTriggerObject.GetComponent<TriggerCallback>().Init(OnRightTriggerEnter, OnRightTriggerExit, OnRightTriggerStay);
     }
 
-    protected void InitializeHurtboxes()
+    protected void InitializeHitboxes()
     {
-        var hurtboxes = GetComponentsInChildren<HitboxCallback>();
-        foreach (var hurtbox in hurtboxes)
+        var hitboxes = GetComponentsInChildren<HitboxCallback>();
+        foreach (var hitbox in hitboxes)
         {
-            hurtbox.Init(OnHitboxTriggerEnter, OnHitboxTriggerExit, this);
+            hitbox.Init(OnHitboxTriggerEnter, OnHitboxTriggerExit, this);
         }
     }
 
@@ -104,12 +123,34 @@ public abstract class Player : MonoBehaviour
         Respawn();
     }
 
+    protected IEnumerator ScheduleRespawnInvincibilityRemoval()
+    {
+        yield return new WaitForSeconds(1.0f);
+
+        invincible = false;
+    }
+
     protected virtual void Respawn()
     {
         currentHealth = maxHealth;
         transform.position = spawnPoint.position;
         acceptInput = true;
         isDead = false;
+        invincible = true;
+
+        if (lowerBodyAnimator != null)
+        {
+            lowerBodyAnimator.SetBool("isDead", false);
+        }
+
+        StartCoroutine(ScheduleRespawnInvincibilityRemoval());
+    }
+
+    protected IEnumerator ScheduleRemoval()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        gameObject.SetActive(false);
     }
 
     public int PlayerId()
@@ -119,6 +160,19 @@ public abstract class Player : MonoBehaviour
 
     public virtual void TakeHit(Vector2 force, int damage, float stunTime)
     {
+        var ignoreHit = Time.time - lastHitTime < successiveHitIgnoreDuration;
+
+        if (isDead || invincible || ignoreHit)
+            return;
+
+        lastHitTime = Time.time;
+
+        if (Time.time - injuredSoundCooldown > lastInjuredSoundTime)
+        {
+            lastInjuredSoundTime = Time.time;
+            audioSource.PlayOneShot(injuredSound);
+        }
+
         currentSpeed += force.x;
         if (currentSpeed > speedCeiling)
             currentSpeed = speedCeiling;
@@ -132,14 +186,18 @@ public abstract class Player : MonoBehaviour
             currentFallSpeed = -fallSpeedCeiling;
 
         currentHealth -= damage;
-        currentStunTime = Time.time + stunTime;
+
+        if (currentStunDuration < stunTime)
+        {
+            currentStunDuration = stunTime;
+        }
 
         if (currentHealth < 0)
         {
             currentHealth = 0;
         }
 
-        if (!isDead && currentHealth == 0)
+        if (currentHealth == 0)
         {
             HandleDeath();
         }
@@ -147,14 +205,22 @@ public abstract class Player : MonoBehaviour
 
     protected virtual void HandleDeath()
     {
+        audioSource.PlayOneShot(deathSound);
+
         isDead = true;
         acceptInput = false;
         deathTime = Time.time;
         currentLives--;
 
+        if (lowerBodyAnimator != null)
+        {
+            lowerBodyAnimator.SetBool("isDead", true);
+        }
+
         if (currentLives == 0)
         {
             overlord.RegisterLoser(this);
+            StartCoroutine(ScheduleRemoval());
         }
         else
         {
@@ -162,13 +228,21 @@ public abstract class Player : MonoBehaviour
         }
     }
 
-    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint)
+    public void Init(int playerNumber, Overlord overlord, PlayerUI playerUI, Transform spawnPoint, Color playerColor)
     {
         this.overlord = overlord;
         this.playerNumber = playerNumber;
         this.playerIndex = XInputDotNetHelpers.MapPlayerIdToPlayerIndex(playerNumber);
         this.playerUI = playerUI;
         this.spawnPoint = spawnPoint;
+        this.playerColor = playerColor;
+
+        chevron.color = playerColor;
+        stunIcon.color = playerColor;
+
+        chevron.enabled = true;
+
+        hasInitialized = true;
     }
 
     public void SetAcceptInput(bool value)
@@ -200,13 +274,30 @@ public abstract class Player : MonoBehaviour
 
     protected void CalculateStun()
     {
-        if (currentStunTime != 0)
+        if (!hasInitialized)
+            return;
+
+        if (currentStunDuration > 0)
         {
-            if (Time.time > currentStunTime)
-            {
-                currentStunTime = 0;
-            }
+            currentStunDuration -= Time.deltaTime;   
         }
+
+        if (currentStunDuration < 0)
+        {
+            currentStunDuration = 0;
+        }
+
+        if (currentStunDuration == 0)
+        {
+            isStunned = false;
+        }
+        else
+        {
+            isStunned = true;
+        }
+
+        chevron.enabled = !isStunned;
+        stunIcon.enabled = isStunned;
     }
 
     protected void UpdatePlayerUI()

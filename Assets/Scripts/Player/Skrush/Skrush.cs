@@ -18,9 +18,6 @@ public class Skrush : Player
 
     public float fireRate = 1.0f;
 
-    public Animator upperBodyAnimator;
-    public Animator lowerBodyAnimator;
-
     public GameObject spritesContainer;
     public Transform muzzle;
     public GameObject rocket;
@@ -31,12 +28,11 @@ public class Skrush : Player
     public ParticleSystem leftJetpackParticles;
     public ParticleSystem rightJetpackParticles;
 
+    public AudioSource jetpackAudio;
     public AudioClip jumpSound;
     public AudioClip jetpackStartSound;
     public AudioClip jetpackRepeatSound;
     public AudioClip rocketLaunchSound;
-    public AudioClip painSound;
-    public AudioClip deathSound;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
@@ -80,6 +76,7 @@ public class Skrush : Player
         HandleGravity();
         ApplySpeedToRigidBody();
         CalculateStun();
+        CheckDeath();
     }
 
     private void ApplySpeedToRigidBody()
@@ -219,18 +216,19 @@ public class Skrush : Player
     private void setJetpack(bool value)
     {
         jetpackEnabled = value;
+        lowerBodyAnimator.SetBool("isJetpacking", jetpackEnabled);
+
         if (jetpackEnabled)
         {
             leftJetpackParticles.Play();
             rightJetpackParticles.Play();
-            audioSource.Play();
+            jetpackAudio.Play();
         }
         else
         {
-            
             leftJetpackParticles.Stop();
             rightJetpackParticles.Stop();
-            audioSource.Stop();
+            jetpackAudio.Stop();
         }
     }
 
@@ -263,6 +261,14 @@ public class Skrush : Player
             }
         }
     }
+
+    private void CheckDeath()
+    {
+        if (isDead)
+        {
+            setJetpack(false);
+        }
+    }
     
     private void HandleInput()
     {
@@ -275,13 +281,22 @@ public class Skrush : Player
         HandleAbility2Input();
 
         float fireState;
-        if (acceptInput)
+        ButtonState backState;
+
+        if (acceptInput && !isStunned)
         {
             fireState = gamePadState.Triggers.Right;
+            backState = gamePadState.Buttons.Back;
         }
         else
         {
             fireState = 0;
+            backState = ButtonState.Released;
+        }
+
+        if (backState == ButtonState.Pressed && Time.time - forceRespawnInputBuffer > lastRespawnInputTime)
+        {
+            HandleDeath();
         }
 
         if (fireState > 0.2f && canFire)
@@ -296,7 +311,7 @@ public class Skrush : Player
 
     private void HandleRightStickInput()
     {
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             controllerStateR.x = gamePadState.ThumbSticks.Right.X;
             controllerStateR.y = gamePadState.ThumbSticks.Right.Y;
@@ -373,7 +388,7 @@ public class Skrush : Player
 
     private void HandleLeftStickInput()
     {
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             controllerState.x = gamePadState.ThumbSticks.Left.X;
             controllerState.y = gamePadState.ThumbSticks.Left.Y;
@@ -455,7 +470,7 @@ public class Skrush : Player
     {
         ButtonState jumpButtonState;
         ButtonState previousJumpButtonState;
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             jumpButtonState = gamePadState.Buttons.RightShoulder;
             previousJumpButtonState = previousGamePadState.Buttons.RightShoulder;
@@ -496,7 +511,7 @@ public class Skrush : Player
     {
         ButtonState ability1ButtonState;
         ButtonState previousAbility1ButtonState;
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             ability1ButtonState = gamePadState.Buttons.LeftShoulder;
             previousAbility1ButtonState = previousGamePadState.Buttons.LeftShoulder;
@@ -524,7 +539,7 @@ public class Skrush : Player
     private void HandleAbility2Input()
     {
         float ability2ButtonState;
-        if (acceptInput)
+        if (acceptInput && !isStunned)
         {
             ability2ButtonState = gamePadState.Triggers.Left;
         }
@@ -563,7 +578,7 @@ public class Skrush : Player
     {
         var mineInstance = Instantiate(mine, muzzle.position, Quaternion.identity);
         var mineComponent = mineInstance.GetComponent<Mine>();
-        mineComponent.Initialize(aimDirection, mineSpeed);
+        mineComponent.Initialize(aimDirection, mineSpeed, this);
 
         deployedMines.Add(mineComponent);
 
@@ -571,7 +586,7 @@ public class Skrush : Player
         {
             var firstMine = deployedMines.First();
             deployedMines.Remove(firstMine);
-            firstMine.Explode();
+            firstMine.ScheduleExplode();
         }
     }
 
@@ -579,11 +594,12 @@ public class Skrush : Player
     {
         foreach (var mineComponent in deployedMines)
         {
-            mineComponent.Explode();
+            mineComponent.ScheduleExplode();
         }
 
         deployedMines.Clear();
     }
+
     private void PreJump()
     {
         currentJumpCount++;

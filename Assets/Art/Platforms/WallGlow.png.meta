@@ -1,12 +1,13 @@
 fileFormatVersion: 2
 guid: c25306315a3406e40a41342a3daccf65
-timeCreated: 1493019618
+timeCreated: 1493083057
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: WallGlow_Edge
     21300002: WallGlow_Base
     21300004: WallGlow_Corner
+    21300006: WallGlow_Bottom
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -106,6 +107,19 @@ TextureImporter:
         y: 0
         width: 161
         height: 225
+      alignment: 6
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: WallGlow_Bottom
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 76
+        width: 161
+        height: 149
       alignment: 6
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

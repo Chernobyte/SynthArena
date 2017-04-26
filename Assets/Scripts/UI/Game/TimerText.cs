@@ -23,7 +23,7 @@ public class TimerText : MonoBehaviour
 
         var seconds = int.Parse(splitStr[0]);
         var minus = "";
-        if (seconds < 0)
+        if (currentTime < 0)
         {
             minus = "-";
             seconds = -seconds;
@@ -35,7 +35,7 @@ public class TimerText : MonoBehaviour
         if (minutes == 0)
             secondText.text = minus + remainder;
         else
-            secondText.text = minus + minutes + ":" + remainder;
+            secondText.text = minus + minutes + ":" + remainder.ToString("00");
 
         tenthText.text = "" + splitStr[1][0];
         hundredthText.text = "" + splitStr[1][1];

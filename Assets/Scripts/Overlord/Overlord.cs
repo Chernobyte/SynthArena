@@ -37,7 +37,6 @@ public class Overlord : MonoBehaviour {
     private float postGameTransitionTime = 3.0f;
     private float battleMusicInitialVolume;
 
-
     void Start ()
     {
         Init();
@@ -98,8 +97,6 @@ public class Overlord : MonoBehaviour {
             var lerpFactor = timeLeft / postGameTransitionTime;
             var volume = Mathf.Lerp(0, battleMusicInitialVolume, lerpFactor);
             battleMusicPlayer.volume = volume;
-
-            Debug.Log(volume);
         }
 	}
 
@@ -123,6 +120,8 @@ public class Overlord : MonoBehaviour {
             }
             if (debugDummyData != null)
             {
+                playerSelections.Add(new PlayerSelection(2, PlayerColor.Two, debugDummyData.toCharacterInfo()));
+                playerSelections.Add(new PlayerSelection(3, PlayerColor.Three, debugDummyData.toCharacterInfo()));
                 playerSelections.Add(new PlayerSelection(4, PlayerColor.Four, debugDummyData.toCharacterInfo()));
             }
         }
@@ -149,7 +148,6 @@ public class Overlord : MonoBehaviour {
             {
                 continue;
             }
-                
 
             var prefab = selection.characterIcons.characterPrefab;
 
@@ -160,7 +158,7 @@ public class Overlord : MonoBehaviour {
             var player = playerGO.GetComponent<Player>();
 
             players.Add(player);
-            player.Init(selection.playerId, this, playerUI, spawnPoint.transform);
+            player.Init(selection.playerId, this, playerUI, spawnPoint.transform, selection.playerColor);
             playerUI.Init(selection);
         }
 
