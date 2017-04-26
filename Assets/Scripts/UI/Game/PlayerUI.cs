@@ -7,16 +7,26 @@ public class PlayerUI : MonoBehaviour {
 
     public int playerId;
     public Image playerIcon;
-    public Image playerFill;
+    public Image healthFillMask;
+    public Image healthFillColor;
     public Image A1Icon;
     public Image A1Fill;
     public Image A2Icon;
     public Image A2Fill;
-    public Text LivesDisplay;
+    public Text LivesText;
+    public Text HealthText;
+    public Text RespawnText;
+    public float fillDampSpeed = 0.01f;
 
-    private float healthBarFillAmount;
+    private float targetFillAmount;
     private float A1FillAmount;
     private float A2FillAmount;
+    private float refFillSpeed;
+    private float refHealthTickSpeed;
+    private int targetHealth;
+    private int currentHealthDisplayValue;
+    private int maxHealthDisplayValue;
+    private int livesRemaining;
     
     void Start()
     {
@@ -26,21 +36,53 @@ public class PlayerUI : MonoBehaviour {
         A2Fill.fillAmount = 0;
     }
 
-    public void Init(PlayerSelection selection)
+    private void Update()
+    {
+        var fillAmount = Mathf.SmoothDamp(healthFillMask.fillAmount, targetFillAmount, ref refFillSpeed, fillDampSpeed);
+        healthFillMask.fillAmount = fillAmount;
+    }
+
+    public void Init(PlayerSelection selection, int maxHealth, int livesRemaining)
     {
         playerIcon.sprite = selection.characterIcons.characterIcon;
         A1Icon.sprite = selection.characterIcons.ability1Icon;
         A2Icon.sprite = selection.characterIcons.ability2Icon;
-        playerFill.color = selection.playerColor;
+
+        healthFillColor.color = selection.playerColor;
+        currentHealthDisplayValue = maxHealth;
+
+        this.livesRemaining = livesRemaining;
+        UpdateRespawnTimer(0);
     }
 
     public void UpdateHealthBar(int currentHealth, int maxHealth, int livesRemaining)
     {
-        healthBarFillAmount = (float)currentHealth / maxHealth;
+        targetFillAmount = (float)currentHealth / maxHealth;
 
-        playerFill.fillAmount = healthBarFillAmount;
+        LivesText.text = "x " + livesRemaining;
 
-        LivesDisplay.text = "Lives: " + livesRemaining;
+        HealthText.text = "" + currentHealth + "/" + maxHealth;
+
+        this.livesRemaining = livesRemaining;
+
+        if (livesRemaining <= 0)
+            UpdateRespawnTimer(0);
+    }
+
+    public void UpdateRespawnTimer(float respawnTimer)
+    {
+        if (livesRemaining <= 0)
+        {
+            RespawnText.text = "ELIMINATED";
+        }
+        else if (respawnTimer != 0.0f)
+        {
+            RespawnText.text = "Respawn: " + respawnTimer.ToString("0.0");
+        }
+        else
+        {
+            RespawnText.text = "";
+        }
     }
 
     public void UpdateAbilitiesCD(float currentA1CD, float maxA1CD, float currentA2CD, float maxA2CD)

@@ -159,7 +159,7 @@ public class Overlord : MonoBehaviour {
 
             players.Add(player);
             player.Init(selection.playerId, this, playerUI, spawnPoint.transform, selection.playerColor);
-            playerUI.Init(selection);
+            playerUI.Init(selection, player.MaxHealth(), player.MaxHealth());
         }
 
         var inactivePlayerUIs = playerUIs.Where(n => !playerSelections.Exists(x => x.playerId == n.playerId && x.characterIcons.characterPrefab != null));
