@@ -33,6 +33,7 @@ public class Skrush : Player
     public AudioClip jetpackStartSound;
     public AudioClip jetpackRepeatSound;
     public AudioClip rocketLaunchSound;
+    public AudioClip detonateSound;
 
     private float aimAngle = 0.0f;
     private bool canFire = true;
@@ -592,6 +593,8 @@ public class Skrush : Player
 
     private void Ability2()
     {
+        audioSource.PlayOneShot(detonateSound);
+
         foreach (var mineComponent in deployedMines)
         {
             mineComponent.ScheduleExplode();

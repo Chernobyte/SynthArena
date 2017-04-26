@@ -15,6 +15,7 @@ public class Overlord : MonoBehaviour {
     public float timerFinalScale;
     public AudioClip countdownSound1;
     public AudioClip countdownSound2;
+    public AudioClip gameOverSound;
     public AudioSource battleMusicPlayer;
     public GameObject gameOverText;
     public Image endGameFadeMask;
@@ -198,12 +199,12 @@ public class Overlord : MonoBehaviour {
 
             playerPlacements.Add(new PlayerPlacement(1, winner));
 
-            GameOver();
+            StartCoroutine(GameOver());
         }
 
         else if (playerPlacements.Count > players.Count-1) // when the only player dies
         {
-            GameOver();
+            StartCoroutine(GameOver());
         }
     }
 
@@ -212,17 +213,21 @@ public class Overlord : MonoBehaviour {
         return playerPlacements.ToList();
     }
 
-    private void GameOver()
+    private IEnumerator GameOver()
     {
         gameIsOver = true;
         gameOverTime = Time.time;
 
         players.ForEach(n => n.SetAcceptInput(false));
 
-        fader.fadeOutUIImage = endGameFadeMask;
-
         gameOverText.SetActive(true);
         gameOverText.GetComponent<Animator>().SetTrigger("Animate");
+
+        audioSource.PlayOneShot(gameOverSound);
+
+        yield return new WaitForSeconds(1.0f);
+
+        fader.fadeOutUIImage = endGameFadeMask;
 
         DontDestroyOnLoad(gameObject);
 

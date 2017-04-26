@@ -71,7 +71,7 @@ public abstract class Player : MonoBehaviour
 
     protected bool isDead;
     protected float deathTime;
-    protected float respawnDelay = 5;
+    protected float respawnDelay = 3;
     protected float currentStunDuration = 0;
     protected bool isStunned;
     protected bool acceptInput = false;
