@@ -10,8 +10,6 @@ public class MainMenuOverlord : MonoBehaviour {
     public AudioClip selectSound;
     public AudioClip confirmSound;
 
-    public Animator logoAnimator;
-
     private AudioSource audioSource;
     private Button[] buttons;
     private bool inSequence = true;
@@ -21,8 +19,6 @@ public class MainMenuOverlord : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
         buttons = FindObjectsOfType<Button>();
         StartCoroutine(OpeningSequence());
-
-        DontDestroyOnLoad(audioSource);
     }
 
     private IEnumerator OpeningSequence()
@@ -47,8 +43,18 @@ public class MainMenuOverlord : MonoBehaviour {
 
     public void LoadGame()
     {
+        DontDestroyOnLoad(gameObject);
+
         PlayConfirmSound();
         SceneManager.LoadScene("CharSelect");
+    }
+
+    public void LoadCredits()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        PlayConfirmSound();
+        SceneManager.LoadScene("Credits");
     }
 
     public void QuitGame()
@@ -98,5 +104,10 @@ public class MainMenuOverlord : MonoBehaviour {
         {
             button.enabled = false;
         }
+    }
+
+    private void Cleanup()
+    {
+
     }
 }
